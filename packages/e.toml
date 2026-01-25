@@ -73,6 +73,44 @@ build_commands = [
     "make DESTDIR=${PKG} install"
 ]
 
+[packages.expect]
+version = "5.45.4"
+version_check = "url:https://core.tcl-lang.org/expect/timeline|Expect ([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "Tool for automating interactive applications"
+url = "https://prdownloads.sourceforge.net/expect/expect${version}.tar.gz"
+git_url = "https://github.com/libtcl/expect.git"
+use_git = false
+stage = 10
+depends = ["tcl"]
+source_dir = "expect${version}"
+# Disable LTO/fast-math for compatibility; patch for Tcl 8.6 API compatibility
+build_commands = [
+    "cd ${srcdir} && ln -sf pty_termios.c pty_.c",
+    "cd ${srcdir} && sed -i 's/#define exp_deleteProc.*/#define exp_deleteProc (void (*)(void *))0/' exp_command.h",
+    "cd ${srcdir} && sed -i 's/#define exp_deleteObjProc.*/#define exp_deleteObjProc (void (*)(void *))0/' exp_command.h",
+    "cd ${srcdir} && CFLAGS='-O3 -march=znver3 -pipe' LDFLAGS='' ./configure --prefix=/usr --with-tcl=/usr/lib --enable-shared --mandir=/usr/share/man --with-tclinclude=/usr/include",
+    "cd ${srcdir} && make -j${NPROC}",
+    "cd ${srcdir} && make DESTDIR=${PKG} install",
+    "ln -sf expect${version}/libexpect${version}.so ${PKG}/usr/lib/libexpect.so"
+]
+provides = ["/usr/bin/expect"]
+
+[packages.expectrl-tcl]
+version = "0.1.0"
+version_check = "github:krystophny/expectrl-tcl"
+description = "Tcl Expect extension in Rust (using expectrl)"
+url = ""
+git_url = "https://github.com/krystophny/expectrl-tcl.git"
+use_git = true
+stage = 10
+depends = ["tcl", "rust"]
+build_commands = [
+    "cargo build --release",
+    "install -Dm755 target/release/libexpectrl_tcl.so ${PKG}/usr/lib/tcl8.6/expectrl/libexpectrl_tcl.so",
+    "echo 'package ifneeded expect 1.0 [list load [file join $$dir libexpectrl_tcl.so]]' > ${PKG}/usr/lib/tcl8.6/expectrl/pkgIndex.tcl"
+]
+provides = ["/usr/lib/tcl8.6/expectrl/libexpectrl_tcl.so"]
+
 [packages.exo]
 version = "4.20.0"
 version_check = "xfce:xfce/exo"

@@ -7,7 +7,12 @@ git_url = "https://github.com/jqlang/jq.git"
 use_git = false
 stage = 4
 build_order = 13
-configure_flags = "--disable-docs"
+# Disable LTO due to libtool compatibility issues (affects both CFLAGS and LDFLAGS)
+build_commands = [
+    "CFLAGS='-O3 -march=znver3' LDFLAGS='' ./configure --prefix=/usr --disable-docs --disable-static",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
 provides = ["/usr/bin/jq"]
 
 [packages.julia]

@@ -13,6 +13,25 @@ build_commands = [
     "make DESTDIR=${PKG} install"
 ]
 
+[packages.tcl]
+version = "8.6.16"
+version_check = "url:https://www.tcl.tk/software/tcltk/download.html|Tcl/Tk ([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "Tool Command Language"
+url = "https://prdownloads.sourceforge.net/tcl/tcl${version}-src.tar.gz"
+git_url = "https://github.com/tcltk/tcl.git"
+use_git = false
+stage = 10
+source_dir = "tcl${version}"
+# Disable fast-math/LTO due to libm linking issues
+build_commands = [
+    "cd ${srcdir}/unix && CFLAGS='-O3 -march=znver3 -pipe' LDFLAGS='' ./configure --prefix=/usr --enable-threads --enable-64bit --mandir=/usr/share/man",
+    "cd ${srcdir}/unix && make -j${NPROC}",
+    "cd ${srcdir}/unix && make DESTDIR=${PKG} install install-private-headers",
+    "ln -sf tclsh8.6 ${PKG}/usr/bin/tclsh",
+    "chmod 755 ${PKG}/usr/lib/libtcl8.6.so"
+]
+provides = ["/usr/bin/tclsh"]
+
 [packages.texinfo]
 version = "7.2"
 version_check = "gnu:texinfo"
