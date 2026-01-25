@@ -67,7 +67,7 @@ stage = 3
 build_order = 32
 depends = ["ncurses-stage3"]
 build_commands = [
-    "./configure --prefix=/usr",
+    "CFLAGS='-O2 -fno-stack-protector' ./configure --prefix=/usr",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install"
 ]
