@@ -130,7 +130,13 @@ url = "https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-con
 git_url = "https://gitlab.freedesktop.org/xkeyboard-config/xkeyboard-config.git"
 use_git = false
 stage = 8
-build_system = "meson"
+build_commands = [
+    "meson setup build-pk/meson --prefix=/usr --libdir=lib",
+    "ninja -C build-pk/meson",
+    "DESTDIR=${PKG} ninja -C build-pk/meson install",
+    "rm -rf ${PKG}/usr/share/X11/xkb",
+    "ln -sf /usr/share/xkeyboard-config-2 ${PKG}/usr/share/X11/xkb"
+]
 
 [packages.xfconf]
 version = "4.20.0"
