@@ -25,7 +25,7 @@ build_commands = [
     "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran,lto --enable-default-pie --enable-default-ssp --disable-multilib --with-system-zlib --enable-plugin --disable-werror --enable-threads=posix --enable-tls --enable-libgomp --enable-libatomic --enable-libquadmath --enable-libssp --enable-libstdcxx --enable-shared --enable-__cxa_atexit --enable-clocale=gnu --enable-lto --enable-checking=release --enable-offload-targets=nvptx-none --enable-offload-defaulted)",
     "(cd build && make -j${NPROC} BOOT_CFLAGS='-O3 -march=znver3 -mtune=znver3 -flto=auto -g' profiledbootstrap)",
     "(cd build && make DESTDIR=${PKG} install)",
-    "mkdir -p ${PKG}/usr/lib/bfd-plugins && ln -svf $(ls ${PKG}/usr/libexec/gcc/*/*/liblto_plugin.so | head -1 | sed \"s|${PKG}|..|g\") ${PKG}/usr/lib/bfd-plugins/",
+    "mkdir -p ${PKG}/usr/lib/bfd-plugins && (cd ${PKG}/usr/lib/bfd-plugins && ln -svf ../libexec/gcc/*/*/liblto_plugin.so .)",
     "ln -svf gcc ${PKG}/usr/bin/cc",
     "printf '#!/bin/sh\\nexec gcc -std=c99 \"$@\"\\n' > ${PKG}/usr/bin/c99 && chmod +x ${PKG}/usr/bin/c99",
     "ln -svf ../bin/cpp ${PKG}/usr/lib/cpp",
@@ -113,7 +113,7 @@ build_commands = [
     "sed -i -e 's/^s-selftest-c++: .*/s-selftest-c++:/' -e '/GCC_FOR_SELFTESTS.*CPP_SELFTEST_FLAGS/d' gcc/cp/Make-lang.in",
     "mkdir -p build && cd build && ../configure --build=$(../config.guess) --host=${TARGET} --target=${TARGET} LDFLAGS_FOR_TARGET=-L${PWD}/${TARGET}/libgcc --prefix=/usr --with-build-sysroot=${SYSROOT} --enable-default-pie --enable-default-ssp --disable-nls --disable-multilib --disable-libatomic --disable-libgomp --disable-libquadmath --disable-libsanitizer --disable-libssp --disable-libvtv --enable-checking=release --enable-languages=c,c++ --enable-lto --enable-plugin && make -j${NPROC} all-gcc all-target-libgcc && make DESTDIR=${PKG} install-gcc install-target-libgcc",
     "ln -sv gcc ${PKG}/usr/bin/cc",
-    "mkdir -p ${PKG}/usr/lib/bfd-plugins && ln -svf $(ls ${PKG}/usr/libexec/gcc/*/*/liblto_plugin.so | head -1 | sed \"s|${PKG}|..|g\") ${PKG}/usr/lib/bfd-plugins/"
+    "mkdir -p ${PKG}/usr/lib/bfd-plugins && (cd ${PKG}/usr/lib/bfd-plugins && ln -svf ../libexec/gcc/*/*/liblto_plugin.so .)"
 ]
 
 [packages.gawk]
