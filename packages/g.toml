@@ -279,7 +279,7 @@ stage = 9
 build_order = 6
 build_system = "meson"
 depends = ["shared-mime-info", "libjpeg-turbo", "libpng"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false"
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false --wrap-mode=nodownload"
 provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
 [packages.gtk3]
@@ -294,7 +294,7 @@ build_order = 7
 build_system = "meson"
 source_dir = "gtk+-${version}"
 depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false"
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false --wrap-mode=nodownload"
 provides = ["/usr/lib/libgtk-3.so"]
 
 [packages.garcon]

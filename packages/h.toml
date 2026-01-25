@@ -18,7 +18,7 @@ stage = 9
 build_order = 3
 build_system = "meson"
 depends = ["cairo", "freetype", "glib"]
-meson_flags = "-Ddocs=disabled -Dintrospection=disabled -Dtests=disabled -Dcairo=enabled -Dfreetype=enabled -Dglib=enabled"
+meson_flags = "-Ddocs=disabled -Dintrospection=disabled -Dtests=disabled -Dcairo=enabled -Dfreetype=enabled -Dglib=enabled --wrap-mode=nodownload"
 
 [packages.htop]
 version = "3.4.1"
