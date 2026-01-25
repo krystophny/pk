@@ -20,6 +20,16 @@ build_system = "meson"
 depends = ["cairo", "freetype", "glib"]
 meson_flags = "-Ddocs=disabled -Dintrospection=disabled -Dtests=disabled -Dcairo=enabled -Dfreetype=enabled -Dglib=enabled --wrap-mode=nodownload"
 
+[packages.hicolor-icon-theme]
+version = "0.18"
+version_check = "freedesktop:hicolor-icon-theme"
+description = "Freedesktop.org hicolor icon theme"
+url = "https://icon-theme.freedesktop.org/releases/hicolor-icon-theme-${version}.tar.xz"
+stage = 8
+build_order = 1
+build_system = "meson"
+provides = ["/usr/share/icons/hicolor/index.theme"]
+
 [packages.htop]
 version = "3.4.1"
 version_check = "github:htop-dev/htop"
