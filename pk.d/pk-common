@@ -66,3 +66,70 @@ get_tracked_files() {
         sed 's|^/bin/|/usr/bin/|; s|^/sbin/|/usr/sbin/|; s|^/lib/|/usr/lib/|' | \
         grep -v '^/$' | sort -u
 }
+
+# ============================================================================
+# Package definition parsing (for build/download commands)
+# ============================================================================
+
+# Find packages directory - sets PACKAGES_DIR global
+find_packages_dir() {
+    [ -n "${PACKAGES_DIR:-}" ] && return 0
+    PACKAGES_DIR=""
+    SCRIPT_DIR="${SCRIPT_DIR:-$(dirname "$0")}"
+    for d in "./packages" "$SCRIPT_DIR/../packages" "/etc/pk/packages" "/usr/share/pk/packages"; do
+        [ -d "$d" ] && PACKAGES_DIR="$(cd "$d" && pwd)" && return 0
+    done
+    die "packages directory not found"
+}
+
+# Cat all package definition files
+cat_packages() {
+    find_packages_dir
+    cat "$PACKAGES_DIR"/*.toml
+}
+
+# Extract a field value from package definition
+# Usage: extract_field <pkgname> <field>
+extract_field() {
+    local pkg="$1" field="$2"
+    cat_packages | awk -v pkg="$pkg" -v field="$field" '
+        /^\[packages\./ { in_pkg = ($0 ~ "\\[packages\\." pkg "\\]") }
+        in_pkg && $1 == field { gsub(/^[^=]+=[ \t]*"?|"[ \t]*$/, ""); print; exit }
+    '
+}
+
+# Extract array field from package definition
+# Usage: extract_array <pkgname> <field>
+extract_array() {
+    local pkg="$1" field="$2"
+    cat_packages | awk -v pkg="$pkg" -v field="$field" '
+        /^\[packages\./ { in_pkg = ($0 ~ "\\[packages\\." pkg "\\]") }
+        in_pkg && $1 == field {
+            in_array = 1
+            gsub(/^[^=]+=[ \t]*\[[ \t]*/, "")
+            if (/\]/) { gsub(/[ \t]*\].*/, ""); in_array = 0 }
+            gsub(/"/, ""); gsub(/,[ \t]*$/, ""); if (/./) print
+            next
+        }
+        in_array {
+            if (/\]/) { gsub(/[ \t]*\].*/, ""); in_array = 0 }
+            gsub(/^[ \t]*"/, ""); gsub(/"[ \t]*,?[ \t]*$/, ""); if (/./) print
+        }
+    '
+}
+
+# Convenience wrappers
+get_pkg_version()      { extract_field "$1" "version"; }
+get_pkg_url()          { extract_field "$1" "url"; }
+get_pkg_git_url()      { extract_field "$1" "git_url"; }
+get_pkg_stage()        { extract_field "$1" "stage"; }
+get_pkg_build_order()  { extract_field "$1" "build_order"; }
+get_pkg_build_system() { extract_field "$1" "build_system"; }
+get_pkg_source_pkg()   { extract_field "$1" "source_pkg"; }
+get_pkg_source_dir()   { extract_field "$1" "source_dir"; }
+get_pkg_configure_flags() { extract_field "$1" "configure_flags"; }
+get_pkg_meson_flags()  { extract_field "$1" "meson_flags"; }
+get_pkg_cmake_flags()  { extract_field "$1" "cmake_flags"; }
+get_pkg_depends()      { extract_array "$1" "depends"; }
+get_pkg_build_commands() { extract_array "$1" "build_commands"; }
+get_pkg_provides()     { extract_array "$1" "provides"; }

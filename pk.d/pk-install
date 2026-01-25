@@ -1,16 +1,30 @@
 #!/bin/sh
-# pk-install - install a package archive
-# Usage: pk install <pk.tar.xz>
+# pk-install - install a package archive or build from name
+# Usage: pk install <pkg.tar.xz> or pk install <pkgname>
 
 SCRIPT_DIR="$(dirname "$0")"
 . "$SCRIPT_DIR/pk-common"
 
 safety_check
 
-[ $# -ge 1 ] || die "usage: pk install <pk.tar.xz>"
+[ $# -ge 1 ] || die "usage: pk install <pkg.tar.xz|pkgname>"
 
 archive="$1"
-[ -f "$archive" ] || die "file not found: $archive"
+
+# If not a file, assume it's a package name - download, build, install
+if [ ! -f "$archive" ]; then
+    pkgname="$1"
+    info "package file not found, building $pkgname from source..."
+
+    # Download source
+    "$SCRIPT_DIR/pk-download" "$pkgname" || die "download failed"
+
+    # Build package
+    archive=$("$SCRIPT_DIR/pk-build" "$pkgname") || die "build failed"
+
+    # archive now contains the path to the built package
+    [ -f "$archive" ] || die "build did not produce package: $archive"
+fi
 
 set -- $(parse_pkgname "$archive")
 pkgname="$1"
