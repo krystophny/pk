@@ -84,12 +84,30 @@ build_system = "meson"
 [packages.firefox]
 version = "147.0.1"
 version_check = "url:https://archive.mozilla.org/pub/firefox/releases/|([0-9]+\.[0-9]+\.?[0-9]*)/linux"
-description = "Mozilla Firefox web browser"
+description = "Mozilla Firefox web browser (source)"
 url = "https://archive.mozilla.org/pub/firefox/releases/${version}/source/firefox-${version}.source.tar.xz"
 git_url = ""
 use_git = false
 stage = 11
-# Note: Firefox is complex to build, consider using prebuilt binary
+# Note: Firefox is complex to build, consider using firefox-bin instead
+
+[packages.firefox-bin]
+version = "147.0.1"
+version_check = "url:https://archive.mozilla.org/pub/firefox/releases/|([0-9]+\.[0-9]+\.?[0-9]*)/linux"
+description = "Mozilla Firefox web browser (prebuilt binary)"
+url = "https://archive.mozilla.org/pub/firefox/releases/${version}/linux-x86_64/en-US/firefox-${version}.tar.xz"
+git_url = ""
+use_git = false
+stage = 11
+source_dir = "firefox"
+build_commands = [
+    "mkdir -p ${PKG}/usr/lib/firefox ${PKG}/usr/bin ${PKG}/usr/share/applications ${PKG}/usr/share/icons/hicolor/128x128/apps",
+    "tar cf - --exclude=build-pk . | tar xf - -C ${PKG}/usr/lib/firefox/",
+    "ln -sf ../lib/firefox/firefox ${PKG}/usr/bin/firefox",
+    "cp browser/chrome/icons/default/default128.png ${PKG}/usr/share/icons/hicolor/128x128/apps/firefox.png",
+    "echo \"[Desktop Entry]\" > ${PKG}/usr/share/applications/firefox.desktop && echo Name=Firefox >> ${PKG}/usr/share/applications/firefox.desktop && echo Exec=firefox >> ${PKG}/usr/share/applications/firefox.desktop && echo Icon=firefox >> ${PKG}/usr/share/applications/firefox.desktop && echo Type=Application >> ${PKG}/usr/share/applications/firefox.desktop"
+]
+provides = ["/usr/bin/firefox"]
 
 [packages.ffmpeg]
 version = "8.0.1"
