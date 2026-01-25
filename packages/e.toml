@@ -1,0 +1,83 @@
+[packages.expat]
+version = "2.7.3"
+version_check = "github:libexpat/libexpat"
+description = "XML parser library"
+url = "https://github.com/libexpat/libexpat/releases/download/R_2_7_3/expat-${version}.tar.xz"
+git_url = "https://github.com/libexpat/libexpat.git"
+use_git = false
+stage = 4
+build_order = 7
+
+[packages.elfutils]
+version = "0.193"
+version_check = "url:https://sourceware.org/elfutils/ftp/|elfutils-([0-9.]+)\\.tar"
+description = "ELF handling libraries"
+url = "https://sourceware.org/elfutils/ftp/${version}/elfutils-${version}.tar.bz2"
+stage = 5
+build_order = 4
+build_commands = [
+    "./configure --prefix=/usr --disable-debuginfod --disable-libdebuginfod",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.efivar]
+version = "39"
+version_check = "github:rhboot/efivar"
+description = "EFI variable manipulation library"
+url = "https://github.com/rhboot/efivar/archive/refs/tags/${version}.tar.gz"
+tarball = "efivar-${version}.tar.gz"
+git_url = "https://github.com/rhboot/efivar.git"
+use_git = false
+stage = 5
+build_order = 2
+build_commands = [
+    "make -j${NPROC} CFLAGS='-O2 -flto=auto' PREFIX=/usr LIBDIR=/usr/lib ENABLE_DOCS=0",
+    "make PREFIX=/usr LIBDIR=/usr/lib DESTDIR=${PKG} ENABLE_DOCS=0 install"
+]
+
+[packages.efibootmgr]
+version = "18"
+version_check = "github:rhboot/efibootmgr"
+description = "EFI Boot Manager utility"
+url = "https://github.com/rhboot/efibootmgr/releases/download/${version}/efibootmgr-${version}.tar.bz2"
+git_url = "https://github.com/rhboot/efibootmgr.git"
+use_git = false
+stage = 5
+build_order = 3
+depends = ["efivar", "popt"]
+build_commands = [
+    "make -j${NPROC} EFIDIR=BOOT EFI_LOADER=bootx64.efi PREFIX=/usr LIBDIR=/usr/lib",
+    "make EFIDIR=BOOT PREFIX=/usr LIBDIR=/usr/lib DESTDIR=${PKG} install"
+]
+
+# GCC Support Libraries (built before GCC)
+
+# GCC support libraries - needed for final GCC build (stage 3)
+# Note: gcc-pass1/pass2 extract these from tarballs directly
+
+[packages.eudev]
+version = "3.2.14"
+version_check = "github:eudev-project/eudev"
+description = "Device manager for Linux (udev fork)"
+url = "https://github.com/eudev-project/eudev/releases/download/v${version}/eudev-${version}.tar.gz"
+git_url = "https://github.com/eudev-project/eudev.git"
+use_git = false
+stage = 3
+build_order = 90
+depends = ["gperf", "kmod"]
+# disable LTO - causes undefined references to libudev symbols
+build_commands = [
+    "CFLAGS='-O2 -pipe' LDFLAGS='' ./configure --prefix=/usr --sysconfdir=/etc --enable-manpages=no --disable-selinux",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.exo]
+version = "4.20.0"
+version_check = "xfce:xfce/exo"
+description = "Xfce extension library"
+url = "https://archive.xfce.org/src/xfce/exo/4.20/exo-${version}.tar.bz2"
+git_url = "https://gitlab.xfce.org/xfce/exo.git"
+use_git = false
+stage = 10

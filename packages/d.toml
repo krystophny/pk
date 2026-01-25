@@ -1,0 +1,74 @@
+[packages.diffutils]
+version = "3.12"
+version_check = "gnu:diffutils"
+description = "GNU diff utilities"
+url = "https://ftpmirror.gnu.org/gnu/diffutils/diffutils-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/diffutils.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/diff"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess) gl_cv_func_strcasecmp_works=yes",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.dhcpcd]
+version = "10.3.0"
+version_check = "github:NetworkConfiguration/dhcpcd"
+description = "DHCP client daemon"
+url = "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v${version}/dhcpcd-${version}.tar.xz"
+git_url = "https://github.com/NetworkConfiguration/dhcpcd.git"
+use_git = false
+stage = 7
+
+[packages.duktape]
+version = "2.7.0"
+version_check = "github:nicholasdechiara/duktape"
+description = "Embeddable JavaScript engine"
+url = "https://duktape.org/duktape-${version}.tar.xz"
+use_git = false
+stage = 8
+# Duktape refuses -ffast-math, use safe flags
+build_commands = [
+    "make -f Makefile.sharedlibrary INSTALL_PREFIX=/usr CFLAGS='-O3 -march=znver3 -mtune=znver3 -fPIC'",
+    "make -f Makefile.sharedlibrary INSTALL_PREFIX=/usr DESTDIR=${PKG} install",
+    "install -Dm644 src/duktape.h ${PKG}/usr/include/duktape.h",
+    "install -Dm644 src/duk_config.h ${PKG}/usr/include/duk_config.h"
+]
+
+# STAGE 9: GTK and Desktop Libraries
+
+[packages.dbus]
+version = "1.16.0"
+version_check = "freedesktop:dbus/dbus"
+description = "Message bus system"
+url = "https://dbus.freedesktop.org/releases/dbus/dbus-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/dbus/dbus.git"
+use_git = false
+stage = 4
+build_order = 50
+depends = ["expat", "meson", "glib"]
+build_commands = [
+    "meson setup build --prefix=/usr --sysconfdir=/etc --localstatedir=/var --buildtype=release -Druntime_dir=/run -Dsystem_socket=/run/dbus/system_bus_socket -Ddoxygen_docs=disabled -Dxml_docs=disabled -Dsystemd=disabled -Dapparmor=disabled -Dselinux=disabled",
+    "meson compile -C build",
+    "DESTDIR=${PKG} meson install -C build"
+]
+
+[packages.dejavu-fonts]
+version = "2.37"
+version_check = "github:dejavu-fonts/dejavu-fonts"
+description = "DejaVu TrueType fonts"
+url = "https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-fonts-ttf-${version}.tar.bz2"
+git_url = "https://github.com/dejavu-fonts/dejavu-fonts.git"
+use_git = false
+stage = 11
+
+[packages.dxvk]
+version = "2.7.1"
+version_check = "github:doitsujin/dxvk"
+description = "Vulkan-based D3D9/D3D10/D3D11 translation"
+url = "https://github.com/doitsujin/dxvk/releases/download/v${version}/dxvk-${version}.tar.gz"
+git_url = "https://github.com/doitsujin/dxvk.git"
+use_git = false
+stage = 13

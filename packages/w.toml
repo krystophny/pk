@@ -1,0 +1,59 @@
+[packages.wget]
+version = "1.24.5"
+version_check = "gnu:wget"
+description = "Network downloader"
+url = "https://ftpmirror.gnu.org/gnu/wget/wget-${version}.tar.gz"
+git_url = "https://git.savannah.gnu.org/git/wget.git"
+use_git = false
+stage = 4
+build_order = 10
+depends = ["openssl", "ca-certificates"]
+# disable LTO - causes undefined references to gnulib internal functions
+build_commands = [
+    "CFLAGS='-O2 -pipe' LDFLAGS='' ./configure --prefix=/usr --sysconfdir=/etc --with-ssl=openssl",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.wpa_supplicant]
+version = "2.11"
+version_check = "url:https://w1.fi/releases/|wpa_supplicant-[0-9]+\.[0-9]+(\.[0-9]+)?\.tar"
+description = "WPA/WPA2/WPA3 supplicant"
+url = "https://w1.fi/releases/wpa_supplicant-${version}.tar.gz"
+git_url = "https://w1.fi/cgit/hostap/"
+use_git = false
+stage = 7
+depends = ["openssl", "libnl"]
+# wpa_supplicant builds from wpa_supplicant/ subdir with .config file
+build_commands = [
+    "cd wpa_supplicant",
+    "cp defconfig .config",
+    "echo 'CONFIG_LIBNL32=y' >> .config",
+    "sed -i 's/CONFIG_CTRL_IFACE_DBUS/#CONFIG_CTRL_IFACE_DBUS/' .config",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} BINDIR=/usr/sbin LIBDIR=/usr/lib install"
+]
+
+[packages.wireless-tools]
+version = "29"
+version_check = "url:https://hewlettpackard.github.io/wireless-tools/|wireless_tools\.([0-9]+)\.tar"
+description = "Wireless LAN tools"
+url = "https://hewlettpackard.github.io/wireless-tools/wireless_tools.${version}.tar.gz"
+git_url = ""
+use_git = false
+stage = 7
+# No configure script - uses Makefile directly
+build_commands = [
+    "make -j${NPROC}",
+    "make PREFIX=${PKG}/usr install"
+]
+
+[packages.wine]
+version = "10.0"
+version_check = "github:wine-mirror/wine"
+description = "Windows compatibility layer"
+url = "https://dl.winehq.org/wine/source/10.0/wine-${version}.tar.xz"
+git_url = "https://gitlab.winehq.org/wine/wine.git"
+use_git = false
+stage = 13
+# Note: Build both 64-bit and 32-bit (multilib)

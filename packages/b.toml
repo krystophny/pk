@@ -1,0 +1,133 @@
+[packages.binutils-pass1]
+version = "2.45.1"
+version_check = "gnu:binutils"
+description = "GNU binary utilities (cross-toolchain)"
+source_pkg = "binutils"
+stage = 1
+build_order = 1
+build_commands = [
+    "mkdir -p build && cd build && ../configure --prefix=/var/tmp/lfs-bootstrap --with-sysroot=${SYSROOT} --target=${TARGET} --disable-nls --enable-gprofng=no --disable-werror --enable-new-dtags --enable-default-hash-style=gnu && make -j${NPROC} && make DESTDIR=${PKG} install"
+]
+
+# Final native binutils
+
+[packages.binutils]
+version = "2.45.1"
+version_check = "gnu:binutils"
+description = "GNU binary utilities"
+url = "https://ftpmirror.gnu.org/gnu/binutils/binutils-${version}.tar.xz"
+git_url = "git://sourceware.org/git/binutils-gdb.git"
+use_git = false
+checksum_url = "https://ftpmirror.gnu.org/gnu/binutils/binutils-${version}.tar.xz.sig"
+stage = 3
+build_order = 16
+build_commands = [
+    "mkdir -p build && cd build",
+    "../configure --prefix=/usr --sysconfdir=/etc --enable-gold --enable-ld=default --enable-plugins --enable-shared --disable-werror --enable-64-bit-bfd --enable-new-dtags --with-system-zlib --enable-default-hash-style=gnu --enable-gprofng=no",
+    "make -j${NPROC} tooldir=/usr",
+    "make DESTDIR=${PKG} tooldir=/usr install",
+    "rm -fv ${PKG}/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.a || true"
+]
+
+# GCC 14.2 - stable release for cross-compilation (known to work with glibc 2.40)
+
+[packages.bash]
+version = "5.3"
+version_check = "gnu:bash"
+description = "GNU Bourne-Again Shell"
+url = "https://ftpmirror.gnu.org/gnu/bash/bash-${version}.tar.gz"
+git_url = "https://git.savannah.gnu.org/git/bash.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/bash"]
+build_commands = [
+    "./configure --prefix=/usr --build=$(sh support/config.guess) --host=${TARGET} --without-bash-malloc bash_cv_strtold_broken=no",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "ln -svf bash ${PKG}/usr/bin/sh",
+    "mkdir -pv ${PKG}/bin",
+    "ln -svf /usr/bin/bash ${PKG}/bin/bash",
+    "ln -svf bash ${PKG}/bin/sh"
+]
+
+[packages.binutils-pass2]
+version = "2.45.1"
+version_check = "gnu:binutils"
+description = "GNU binary utilities pass 2"
+source_pkg = "binutils"
+stage = 2
+provides = ["${SYSROOT}/usr/bin/ld"]
+build_commands = [
+    "mkdir -p build && cd build && ../configure --prefix=/usr --build=$(../config.guess) --host=${TARGET} --disable-nls --enable-shared --enable-gprofng=no --disable-werror --enable-64-bit-bfd --enable-new-dtags --enable-default-hash-style=gnu && make -j${NPROC} && make DESTDIR=${PKG} install",
+    "rm -v ${PKG}/usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes,sframe}.{a,la}"
+]
+
+# STAGE 3: Basic System Software
+
+[packages.bzip2]
+version = "1.0.8"
+version_check = "sourceware:bzip2"
+description = "Block-sorting compression"
+url = "https://sourceware.org/pub/bzip2/bzip2-${version}.tar.gz"
+git_url = "https://gitlab.com/bzip2/bzip2.git"
+use_git = false
+stage = 3
+build_order = 12
+build_commands = [
+    "sed -i 's@\\(ln -s -f \\)\\$(PREFIX)/bin/@\\1@' Makefile",
+    "sed -i 's@(PREFIX)/man@(PREFIX)/share/man@g' Makefile",
+    "make -f Makefile-libbz2_so",
+    "make clean",
+    "make -j${NPROC}",
+    "make PREFIX=${PKG}/usr install",
+    "cp -av libbz2.so.* ${PKG}/usr/lib",
+    "ln -sv libbz2.so.1.0.8 ${PKG}/usr/lib/libbz2.so",
+    "cp -v bzip2-shared ${PKG}/usr/bin/bzip2",
+    "ln -sfv bzip2 ${PKG}/usr/bin/bzcat",
+    "ln -sfv bzip2 ${PKG}/usr/bin/bunzip2",
+    "rm -fv ${PKG}/usr/lib/libbz2.a"
+]
+
+[packages.bc]
+version = "7.0.3"
+version_check = "gnu:bc"
+description = "Arbitrary precision calculator"
+url = "https://github.com/gavinhoward/bc/releases/download/${version}/bc-${version}.tar.xz"
+git_url = "https://github.com/gavinhoward/bc.git"
+use_git = false
+stage = 3
+
+[packages.bison]
+version = "3.8.2"
+version_check = "gnu:bison"
+description = "GNU parser generator"
+url = "https://ftpmirror.gnu.org/gnu/bison/bison-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/bison.git"
+use_git = false
+stage = 3
+build_order = 2
+build_commands = [
+    "./configure --prefix=/usr --docdir=/usr/share/doc/bison-${version}",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.bluez]
+version = "5.85"
+version_check = "kernelorg:linux/bluetooth|bluez"
+description = "Bluetooth protocol stack"
+url = "https://www.kernel.org/pub/linux/bluetooth/bluez-${version}.tar.xz"
+git_url = "https://github.com/bluez/bluez.git"
+use_git = false
+stage = 19
+
+[packages.bluez-firmware]
+version = "20260110"
+version_check = "url:https://www.kernel.org/pub/linux/kernel/firmware/|linux-firmware-([0-9]+)\.tar"
+description = "Bluetooth firmware files (part of linux-firmware)"
+url = "https://www.kernel.org/pub/linux/kernel/firmware/linux-firmware-${version}.tar.xz"
+git_url = ""
+use_git = false
+stage = 19
+
+# NVMe tools

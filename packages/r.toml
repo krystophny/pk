@@ -1,0 +1,107 @@
+[packages.readline]
+version = "8.3"
+version_check = "gnu:readline"
+description = "GNU readline library"
+url = "https://ftpmirror.gnu.org/gnu/readline/readline-${version}.tar.gz"
+git_url = "https://git.savannah.gnu.org/git/readline.git"
+use_git = false
+stage = 3
+build_order = 13
+build_commands = [
+    "sed -i '/MV.*telexit.o/d' shlib/Makefile.in",
+    "./configure --prefix=/usr --disable-static --with-curses --docdir=/usr/share/doc/readline-${version}",
+    "make -j${NPROC} SHLIB_LIBS=\"-lncursesw\"",
+    "make SHLIB_LIBS=\"-lncursesw\" DESTDIR=${PKG} install",
+    "install -v -m644 doc/*.{ps,pdf,html,dvi} ${PKG}/usr/share/doc/readline-${version} || true"
+]
+
+[packages.runit]
+version = "2.3.0"
+version_check = "url:http://smarden.org/runit/|runit-([0-9]+\.[0-9]+\.[0-9]+)\.tar"
+description = "UNIX init scheme with service supervision"
+url = "http://smarden.org/runit/runit-${version}.tar.gz"
+git_url = "https://github.com/void-linux/runit.git"
+use_git = false
+stage = 6
+# runit extracts to admin/runit-X.Y.Z, but build script cd's to admin/
+build_commands = [
+    "cd runit-*/src && make",
+    "mkdir -p ${PKG}/usr/bin ${PKG}/sbin",
+    "cd runit-*/src && install -m 755 runit ${PKG}/sbin/",
+    "cd runit-*/src && install -m 755 runit-init ${PKG}/sbin/",
+    "cd runit-*/src && install -m 755 sv runsv runsvdir runsvchdir svlogd chpst ${PKG}/usr/bin/",
+    "ln -sf runit-init ${PKG}/sbin/init"
+]
+
+# STAGE 7: Networking
+
+[packages.rsync]
+version = "3.4.1"
+version_check = "url:https://rsync.samba.org/|rsync-([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "Fast incremental file transfer"
+url = "https://rsync.samba.org/ftp/rsync/src/rsync-${version}.tar.gz"
+git_url = "https://github.com/WayneD/rsync.git"
+use_git = false
+stage = 7
+build_order = 1
+build_commands = [
+    "./configure --prefix=/usr --disable-debug --with-included-zlib=no --with-included-popt=no --disable-xxhash --disable-lz4",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.rsnapshot]
+version = "1.5.1"
+version_check = "github:rsnapshot/rsnapshot"
+description = "Filesystem snapshot utility based on rsync"
+url = "https://github.com/rsnapshot/rsnapshot/releases/download/${version}/rsnapshot-${version}.tar.gz"
+git_url = "https://github.com/rsnapshot/rsnapshot.git"
+use_git = false
+stage = 7
+build_order = 10
+depends = ["rsync", "perl"]
+build_commands = [
+    "./configure --prefix=/usr --sysconfdir=/etc",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+# STAGE 8: X11/Xorg
+
+[packages.rust]
+version = "1.87.0"
+version_check = "github:rust-lang/rust"
+description = "Rust programming language"
+url = "https://static.rust-lang.org/dist/rustc-${version}-src.tar.xz"
+stage = 11
+# Install via rustup for simplicity (downloads prebuilt binaries)
+build_commands = [
+    "curl -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain ${version} --profile minimal",
+    "mkdir -p ${PKG}/usr/bin ${PKG}/usr/lib",
+    "cp -a ~/.cargo/bin/* ${PKG}/usr/bin/",
+    "cp -a ~/.rustup/toolchains/*/lib/* ${PKG}/usr/lib/ 2>/dev/null || true"
+]
+
+[packages.ripgrep]
+version = "14.1.1"
+version_check = "github:BurntSushi/ripgrep"
+description = "Fast regex-based search tool"
+url = "https://github.com/BurntSushi/ripgrep/archive/${version}/ripgrep-${version}.tar.gz"
+git_url = "https://github.com/BurntSushi/ripgrep.git"
+use_git = false
+stage = 11
+depends = ["rust"]
+build_commands = [
+    "cargo build --release",
+    "mkdir -p ${PKG}/usr/bin",
+    "cp target/release/rg ${PKG}/usr/bin/"
+]
+
+[packages.r]
+version = "4.4.2"
+version_check = "url:https://cran.r-project.org/src/base/R-4/|R-([0-9]+\.[0-9]+\.[0-9]+)\.tar"
+description = "R statistical computing language"
+url = "https://cran.r-project.org/src/base/R-4/R-${version}.tar.gz"
+git_url = "https://github.com/wch/r-source.git"
+use_git = false
+stage = 18

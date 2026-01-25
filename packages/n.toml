@@ -1,0 +1,129 @@
+[packages.ncurses]
+version = "6.6"
+version_check = "gnu:ncurses"
+description = "Terminal handling library"
+url = "https://ftpmirror.gnu.org/gnu/ncurses/ncurses-${version}.tar.gz"
+git_url = "https://github.com/mirror/ncurses.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/lib/libncursesw.so"]
+build_commands = [
+    "mkdir -p build && pushd build && ../configure AWK=gawk && make -C include && make -C progs tic && popd",
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess) --mandir=/usr/share/man --with-manpage-format=normal --with-shared --without-normal --without-cxx-binding --without-debug --without-ada --disable-stripping",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} TIC_PATH=$(pwd)/build/progs/tic install",
+    "ln -svf libncursesw.so ${PKG}/usr/lib/libncurses.so",
+    "sed -e 's/^#if.*XOPEN.*$/#if 1/' -i ${PKG}/usr/include/curses.h"
+]
+
+# Stage 3: rebuild ncurses natively with pkg-config support
+
+[packages.ncurses-stage3]
+version = "6.6"
+version_check = "gnu:ncurses"
+description = "Terminal handling library (native build)"
+url = "https://ftpmirror.gnu.org/gnu/ncurses/ncurses-${version}.tar.gz"
+tarball = "ncurses-${version}.tar.gz"
+stage = 3
+build_order = 30
+build_commands = [
+    "./configure --prefix=/usr --mandir=/usr/share/man --with-shared --without-debug --without-normal --without-cxx-binding --with-abi-version=6 --enable-widec --enable-pc-files --with-pkg-config-libdir=/usr/lib/pkgconfig",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "for lib in ncurses form panel menu; do ln -svf lib${lib}w.so ${PKG}/usr/lib/lib${lib}.so; ln -svf ${lib}w.pc ${PKG}/usr/lib/pkgconfig/${lib}.pc; done",
+    "ln -svf libncursesw.so ${PKG}/usr/lib/libcursesw.so",
+    "ln -svf libncurses.so ${PKG}/usr/lib/libcurses.so"
+]
+
+[packages.nettle]
+version = "3.10.2"
+version_check = "gnu:nettle"
+description = "Low-level cryptographic library"
+url = "https://ftpmirror.gnu.org/gnu/nettle/nettle-${version}.tar.gz"
+git_url = "https://git.lysator.liu.se/nettle/nettle.git"
+use_git = false
+stage = 4
+build_order = 4
+configure_flags = "--disable-static"
+depends = ["gmp"]
+
+[packages.ninja]
+version = "1.13.2"
+version_check = "github:ninja-build/ninja"
+description = "Small build system with focus on speed"
+url = "https://github.com/ninja-build/ninja/archive/refs/tags/v${version}.tar.gz"
+git_url = "https://github.com/ninja-build/ninja.git"
+use_git = false
+stage = 4
+build_order = 6
+build_commands = [
+    "python3 configure.py --bootstrap",
+    "install -Dm755 ninja ${PKG}/usr/bin/ninja"
+]
+
+[packages.nextcloud-client]
+version = "4.0.6"
+version_check = "github:nextcloud/desktop"
+description = "Nextcloud desktop sync client"
+url = "https://github.com/nextcloud/desktop/archive/refs/tags/v${version}.tar.gz"
+git_url = "https://github.com/nextcloud/desktop.git"
+use_git = false
+stage = 11
+repology = "nextcloud-client"
+
+# STAGE 12: GPU Drivers
+
+[packages.nvidia-driver]
+version = "580.126.09"
+version_check = "url:https://www.nvidia.com/Download/processFind.aspx?psid=101&pfid=816&osid=12&lid=1&whql=&lang=en-us&ctk=0|([0-9]+\.[0-9]+\.?[0-9]*)"
+description = "NVIDIA proprietary driver"
+url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"
+git_url = ""
+use_git = false
+stage = 12
+# Note: For real hardware only, use virtio-gpu in VM
+
+[packages.nvidia-driver-latest]
+version = "590.48.01"
+version_check = "url:https://www.nvidia.com/Download/processFind.aspx?psid=101&pfid=816&osid=12&lid=1&whql=&lang=en-us&ctk=0|([0-9]+\.[0-9]+\.?[0-9]*)"
+description = "NVIDIA proprietary driver (new feature branch)"
+url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"
+git_url = ""
+use_git = false
+stage = 12
+# Note: Newer features but may be less stable
+
+[packages.nodejs]
+version = "25.4.0"
+version_check = "github:nodejs/node"
+description = "JavaScript runtime"
+url = "https://nodejs.org/dist/v${version}/node-v${version}.tar.xz"
+git_url = "https://github.com/nodejs/node.git"
+use_git = false
+stage = 14
+
+# STAGE 15: HPC Compilers
+
+[packages.nvhpc]
+version = "100.630"
+version_check = "url:https://developer.nvidia.com/hpc-sdk-downloads|([0-9]+\.[0-9]+)"
+description = "NVIDIA HPC SDK (nvfortran, nvc, nvc++)"
+# Manual download required from NVIDIA developer site
+url = ""
+git_url = ""
+use_git = false
+stage = 15
+# Note: Binary distribution, install to /opt/nvidia/hpc_sdk
+# Includes: nvfortran, nvc, nvc++, CUDA, cuBLAS, cuFFT, nvcc
+
+[packages.nvme-cli]
+version = "2.16"
+version_check = "github:linux-nvme/nvme-cli"
+description = "NVMe management command line interface"
+url = "https://github.com/linux-nvme/nvme-cli/archive/v${version}/nvme-cli-${version}.tar.gz"
+git_url = "https://github.com/linux-nvme/nvme-cli.git"
+use_git = false
+stage = 19
+# For Samsung NVMe PM9A1/980PRO management
+
+# Software RAID

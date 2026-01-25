@@ -1,0 +1,158 @@
+[packages.m4]
+version = "1.4.20"
+version_check = "gnu:m4"
+description = "GNU macro processor"
+url = "https://ftpmirror.gnu.org/gnu/m4/m4-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/m4.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/m4"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(build-aux/config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.make]
+version = "4.4.1"
+version_check = "gnu:make"
+description = "GNU make"
+url = "https://ftpmirror.gnu.org/gnu/make/make-${version}.tar.gz"
+git_url = "https://git.savannah.gnu.org/git/make.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/make"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(build-aux/config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.mpdecimal]
+version = "4.0.0"
+description = "Library for decimal floating point arithmetic"
+url = "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-${version}.tar.gz"
+stage = 4
+build_order = 2
+
+# Rebuild Python with SSL support (stage 3 Python lacks SSL since OpenSSL wasn't available)
+# Python requires IEEE-compliant floating-point for PGO tests - use safe CFLAGS (no -ffast-math)
+
+[packages.meson]
+version = "1.10.1"
+version_check = "github:mesonbuild/meson"
+description = "Fast and user-friendly build system"
+url = "https://github.com/mesonbuild/meson/releases/download/${version}/meson-${version}.tar.gz"
+git_url = "https://github.com/mesonbuild/meson.git"
+use_git = false
+stage = 4
+build_order = 7
+depends = ["python", "ninja"]
+# Manual install - setuptools not available, meson is pure Python
+build_commands = [
+    "mkdir -p ${PKG}/usr/lib/python3.14/site-packages",
+    "cp -r mesonbuild ${PKG}/usr/lib/python3.14/site-packages/",
+    "mkdir -p ${PKG}/usr/bin",
+    "printf '%s\\n' '#!/usr/bin/env python3' 'import sys' 'from mesonbuild import mesonmain' 'sys.exit(mesonmain.main())' > ${PKG}/usr/bin/meson",
+    "chmod 755 ${PKG}/usr/bin/meson"
+]
+
+[packages.mpfr]
+version = "4.2.2"
+version_check = "gnu:mpfr"
+description = "GNU Multiple Precision Floating-Point Reliable Library"
+url = "https://ftpmirror.gnu.org/gnu/mpfr/mpfr-${version}.tar.xz"
+git_url = "https://gitlab.inria.fr/mpfr/mpfr.git"
+use_git = false
+stage = 3
+build_order = 18
+depends = ["gmp"]
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr --enable-thread-safe --docdir=/usr/share/doc/mpfr-${version}",
+    "make -j${NPROC}",
+    "make html || true",
+    "make DESTDIR=${PKG} install install-html || make DESTDIR=${PKG} install"
+]
+
+[packages.mpc]
+version = "1.3.1"
+version_check = "gnu:mpc"
+description = "GNU Multiple Precision Complex Library"
+url = "https://ftpmirror.gnu.org/gnu/mpc/mpc-${version}.tar.gz"
+git_url = "https://gitlab.inria.fr/mpc/mpc.git"
+use_git = false
+stage = 3
+build_order = 19
+depends = ["gmp", "mpfr"]
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr --docdir=/usr/share/doc/mpc-${version}",
+    "make -j${NPROC}",
+    "make html || true",
+    "make DESTDIR=${PKG} install install-html || make DESTDIR=${PKG} install"
+]
+
+[packages.mesa]
+version = "24.3.4"
+version_check = "freedesktop:mesa/mesa"
+description = "OpenGL implementation"
+url = "https://mesa.freedesktop.org/archive/mesa-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/mesa/mesa.git"
+use_git = false
+stage = 8
+build_system = "meson"
+
+[packages.mtdev]
+version = "1.1.7"
+version_check = "github:nicwn/mtdev"
+description = "Multitouch protocol translation library"
+url = "https://bitmath.org/code/mtdev/mtdev-${version}.tar.bz2"
+git_url = "https://bitmath.org/git/mtdev.git"
+use_git = false
+stage = 8
+
+[packages.mangohud]
+version = "0.8.1"
+version_check = "github:flightlessmango/MangoHud"
+description = "Vulkan/OpenGL overlay for monitoring"
+url = "https://github.com/flightlessmango/MangoHud/archive/refs/tags/v${version}.tar.gz"
+git_url = "https://github.com/flightlessmango/MangoHud.git"
+use_git = false
+stage = 13
+
+[packages.moonlight]
+version = "6.1.0"
+version_check = "github:moonlight-stream/moonlight-qt"
+description = "Open source game streaming client"
+url = "https://github.com/moonlight-stream/moonlight-qt/releases/download/v${version}/MoonlightSrc-${version}.tar.gz"
+git_url = "https://github.com/moonlight-stream/moonlight-qt.git"
+use_git = false
+stage = 16
+# Client: Run on TV/another device to receive stream
+
+[packages.moonlight-embedded]
+version = "2.7.1"
+version_check = "github:moonlight-stream/moonlight-embedded"
+description = "Moonlight for embedded/ARM devices"
+url = "https://github.com/moonlight-stream/moonlight-embedded/releases/download/v${version}/moonlight-embedded-${version}.tar.xz"
+git_url = "https://github.com/moonlight-stream/moonlight-embedded.git"
+use_git = false
+stage = 16
+# For Raspberry Pi, etc.
+
+# Dependencies for Sunshine
+
+[packages.mdadm]
+version = "4.4"
+version_check = "kernelorg:linux/utils/raid/mdadm|mdadm"
+description = "Linux Software RAID management"
+url = "https://www.kernel.org/pub/linux/utils/raid/mdadm/mdadm-${version}.tar.xz"
+git_url = "https://git.kernel.org/pub/scm/utils/mdadm/mdadm.git"
+use_git = false
+stage = 19
+build_commands = [
+    "make -j${NPROC} CXFLAGS=\"${CFLAGS}\"",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/sbin/mdadm", "/usr/sbin/mdmon"]
+
+# Sensors and monitoring

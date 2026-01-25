@@ -1,0 +1,55 @@
+[packages.openssl]
+version = "3.6.0-beta1"
+version_check = "github:openssl/openssl"
+description = "TLS/SSL and crypto library"
+url = "https://github.com/openssl/openssl/releases/download/openssl-${version}/openssl-${version}.tar.gz"
+git_url = "https://github.com/openssl/openssl.git"
+use_git = false
+stage = 4
+build_order = 1
+# TODO: PGO can provide ~5% gains but needs build script changes for proper variable handling
+build_commands = [
+    "./Configure --prefix=/usr --openssldir=/etc/ssl --libdir=lib shared zlib-dynamic enable-ktls linux-x86_64",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.openssh]
+version = "9.9p2"
+version_check = "url:https://www.openssh.com/releasenotes.html|OpenSSH ([0-9]+\\.[0-9]+p[0-9]+)"
+description = "OpenSSH client and server"
+url = "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${version}.tar.gz"
+git_url = "https://github.com/openssh/openssh-portable.git"
+use_git = false
+stage = 4
+build_order = 11
+depends = ["openssl", "zlib"]
+build_commands = [
+    "./configure --prefix=/usr --sysconfdir=/etc/ssh --with-privsep-path=/var/lib/sshd --with-default-path=/usr/bin:/usr/sbin --with-superuser-path=/usr/bin:/usr/sbin --with-pid-dir=/run",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "mkdir -p ${PKG}/var/lib/sshd",
+    "chmod 755 ${PKG}/var/lib/sshd"
+]
+provides = ["/usr/bin/ssh", "/usr/sbin/sshd"]
+
+[packages.opus]
+version = "1.6.1"
+version_check = "github:xiph/opus"
+description = "Audio codec for streaming"
+url = "https://downloads.xiph.org/releases/opus/opus-${version}.tar.gz"
+git_url = "https://gitlab.xiph.org/xiph/opus.git"
+use_git = false
+stage = 16
+
+[packages.octave]
+version = "10.3.0"
+version_check = "gnu:octave"
+description = "GNU Octave numerical computing"
+url = "https://ftpmirror.gnu.org/gnu/octave/octave-${version}.tar.xz"
+git_url = "https://hg.savannah.gnu.org/hgweb/octave"
+use_git = false
+stage = 18
+
+# STAGE 19: Firmware and Hardware Support (microcode and specialized firmware)
+# Note: Main linux-firmware is in Stage 5 (early for WiFi/hardware at boot)

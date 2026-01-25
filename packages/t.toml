@@ -1,0 +1,60 @@
+[packages.tar]
+version = "1.35"
+version_check = "gnu:tar"
+description = "GNU tar"
+url = "https://ftpmirror.gnu.org/gnu/tar/tar-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/tar.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/tar"]
+build_commands = [
+    "FORCE_UNSAFE_CONFIGURE=1 ./configure --prefix=/usr --host=${TARGET} --build=$(build-aux/config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.texinfo]
+version = "7.2"
+version_check = "gnu:texinfo"
+description = "GNU documentation system"
+url = "https://ftpmirror.gnu.org/gnu/texinfo/texinfo-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/texinfo.git"
+use_git = false
+stage = 3
+build_order = 5
+build_commands = [
+    "./configure --prefix=/usr",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.thunar]
+version = "4.20.2"
+version_check = "xfce:xfce/thunar"
+description = "Xfce file manager"
+url = "https://archive.xfce.org/src/xfce/thunar/4.20/thunar-${version}.tar.bz2"
+git_url = "https://gitlab.xfce.org/xfce/thunar.git"
+use_git = false
+stage = 10
+
+[packages.texlive]
+version = "2025"
+version_check = "url:https://tug.org/texlive/|TeX Live ([0-9]{4})"
+description = "TeX Live LaTeX distribution"
+url = "https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz"
+git_url = ""
+use_git = false
+stage = 17
+# Note: Run install-tl script, or use texlive ISO for offline install
+# Full install is ~7GB, use schemes for smaller installs
+
+[packages.texlive-iso]
+version = "2025"
+version_check = "url:https://tug.org/texlive/|TeX Live ([0-9]{4})"
+description = "TeX Live ISO image (full offline)"
+url = "https://mirror.ctan.org/systems/texlive/Images/texlive${version}.iso"
+git_url = ""
+use_git = false
+manual_download = true
+stage = 17
+# Alternative: Full ISO for offline installation

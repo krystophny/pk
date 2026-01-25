@@ -1,0 +1,13 @@
+[packages.kmod]
+version = "34"
+version_check = "github:kmod-project/kmod"
+description = "Linux kernel module tools (modprobe, insmod, lsmod, etc.)"
+url = "https://github.com/kmod-project/kmod/archive/refs/tags/v${version}.tar.gz"
+git_url = "https://github.com/kmod-project/kmod.git"
+use_git = false
+stage = 3
+build_order = 89
+depends = ["zlib", "xz", "zstd", "openssl"]
+build_system = "meson"
+meson_flags = "-Dmanpages=false"
+provides = ["/usr/bin/kmod", "/usr/sbin/modprobe"]

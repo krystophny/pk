@@ -1,0 +1,78 @@
+[packages.vim]
+version = "9.1.2103"
+version_check = "url:https://github.com/vim/vim/tags|v([0-9]+\.[0-9]+\.[0-9]+)"
+description = "Vi IMproved text editor"
+url = "https://github.com/vim/vim/archive/v${version}/vim-${version}.tar.gz"
+git_url = "https://github.com/vim/vim.git"
+use_git = false
+stage = 11
+
+[packages.vte]
+version = "0.78.3"
+version_check = "gnome:vte"
+description = "Virtual Terminal Emulator widget library"
+url = "https://download.gnome.org/sources/vte/0.78/vte-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/vte.git"
+use_git = false
+stage = 10
+build_system = "meson"
+meson_flags = "-Dvapi=false -Dgtk4=false -Dicu=false -D_systemd=false -Ddocs=false -Dgir=false -Dglade=false"
+provides = ["/usr/lib/libvte-2.91.so"]
+depends = ["gnutls", "gtk3", "pcre2"]
+
+[packages.virtio-gpu]
+version = "0.1"
+version_check = "url:https://github.com/nicwn/mtdev/releases|skip"
+description = "VirtIO GPU driver (built into kernel)"
+url = ""
+git_url = ""
+use_git = false
+stage = 12
+# Note: Enable CONFIG_DRM_VIRTIO_GPU in kernel config
+
+[packages.vkd3d-proton]
+version = "3.0b"
+version_check = "github:HansKristian-Work/vkd3d-proton"
+description = "Vulkan-based D3D12 translation"
+url = "https://github.com/HansKristian-Work/vkd3d-proton/releases/download/v${version}/vkd3d-proton-${version}.tar.zst"
+git_url = "https://github.com/HansKristian-Work/vkd3d-proton.git"
+use_git = false
+stage = 13
+
+[packages.vulkan-loader]
+version = "1.4.339"
+version_check = "github:KhronosGroup/Vulkan-Loader"
+description = "Vulkan ICD loader"
+url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/v${version}/Vulkan-Loader-${version}.tar.gz"
+git_url = "https://github.com/KhronosGroup/Vulkan-Loader.git"
+use_git = false
+stage = 13
+
+[packages.vulkan-headers]
+version = "1.4.339"
+version_check = "url:https://github.com/KhronosGroup/Vulkan-Headers/tags|v([0-9]+\.[0-9]+\.[0-9]+)"
+description = "Vulkan header files"
+url = "https://github.com/KhronosGroup/Vulkan-Headers/archive/v${version}/Vulkan-Headers-${version}.tar.gz"
+git_url = "https://github.com/KhronosGroup/Vulkan-Headers.git"
+use_git = false
+stage = 13
+
+[packages.vscode]
+version = "1.108.1"
+version_check = "github:microsoft/vscode"
+description = "Visual Studio Code editor"
+url = "https://update.code.visualstudio.com/${version}/linux-x64/stable"
+git_url = ""
+use_git = false
+stage = 14
+# Note: Binary distribution, extract to /opt/vscode
+
+[packages.vscode-source]
+version = "1.108.1"
+version_check = "github:microsoft/vscode"
+description = "Visual Studio Code (source build)"
+url = "https://github.com/microsoft/vscode/archive/refs/tags/${version}.tar.gz"
+git_url = "https://github.com/microsoft/vscode.git"
+use_git = false
+stage = 14
+# Note: Requires Node.js, Yarn, Electron

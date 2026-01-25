@@ -1,0 +1,231 @@
+[packages.patch]
+version = "2.8"
+version_check = "gnu:patch"
+description = "GNU patch"
+url = "https://ftpmirror.gnu.org/gnu/patch/patch-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/patch.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/patch"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.perl]
+version = "5.42.0"
+version_check = "cpan:perl"
+description = "Practical Extraction and Report Language"
+url = "https://www.cpan.org/src/5.0/perl-${version}.tar.xz"
+git_url = "https://github.com/Perl/perl5.git"
+use_git = false
+stage = 3
+build_order = 3
+build_commands = [
+    "sh Configure -des -Dprefix=/usr -Dvendorprefix=/usr -Duseshrplib -Dprivlib=/usr/lib/perl5/5.42/core_perl -Darchlib=/usr/lib/perl5/5.42/core_perl -Dsitelib=/usr/lib/perl5/5.42/site_perl -Dsitearch=/usr/lib/perl5/5.42/site_perl -Dvendorlib=/usr/lib/perl5/5.42/vendor_perl -Dvendorarch=/usr/lib/perl5/5.42/vendor_perl",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.python]
+version = "3.14.2"
+version_check = "python:"
+description = "Python programming language"
+url = "https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz"
+git_url = "https://github.com/python/cpython.git"
+use_git = false
+stage = 3
+build_order = 4
+# Basic build for Stage 3, will rebuild with optimizations later
+build_commands = [
+    "./configure --prefix=/usr --enable-shared --without-ensurepip",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "ln -sf python3 ${PKG}/usr/bin/python"
+]
+
+[packages.procps-ng]
+version = "4.0.4"
+version_check = "github:procps-ng/procps"
+description = "Process monitoring utilities (ps, top, pgrep)"
+url = "https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-${version}.tar.xz"
+git_url = "https://gitlab.com/procps-ng/procps.git"
+use_git = false
+stage = 3
+build_order = 31
+depends = ["pkgconf", "ncurses-stage3"]
+
+[packages.python-ssl]
+version = "3.14.2"
+description = "Python with SSL support, PGO, pip and venv"
+source_pkg = "python"
+source_dir = "Python-${version}"
+stage = 4
+build_order = 3
+depends = ["openssl", "mpdecimal"]
+build_commands = [
+    "export CFLAGS='-O3 -march=znver3 -mtune=znver3 -fno-semantic-interposition' && export CXXFLAGS=\"$CFLAGS\" && export LDFLAGS='-Wl,-O2 -Wl,--as-needed -fno-semantic-interposition' && ./configure --prefix=/usr --enable-shared --enable-optimizations --with-lto --with-openssl=/usr --with-openssl-rpath=auto --with-ensurepip=install",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "ln -sf python3 ${PKG}/usr/bin/python",
+    "ln -sf pip3 ${PKG}/usr/bin/pip"
+]
+
+[packages.pcre2]
+version = "10.45"
+version_check = "github:PCRE2Project/pcre2"
+description = "Perl Compatible Regular Expressions"
+url = "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${version}/pcre2-${version}.tar.bz2"
+git_url = "https://github.com/PCRE2Project/pcre2.git"
+use_git = false
+stage = 4
+build_order = 6
+build_commands = [
+    "./configure --prefix=/usr --enable-unicode --enable-jit --enable-pcre2-16 --enable-pcre2-32 --disable-static",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.pkgconf]
+version = "2.5.1"
+version_check = "github:pkgconf/pkgconf"
+description = "Package compiler and linker metadata toolkit"
+url = "https://distfiles.ariadne.space/pkgconf/pkgconf-${version}.tar.xz"
+git_url = "https://github.com/pkgconf/pkgconf.git"
+use_git = false
+stage = 3
+build_order = 28
+build_commands = [
+    "./configure --prefix=/usr --disable-static",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "ln -svf pkgconf ${PKG}/usr/bin/pkg-config"
+]
+
+[packages.pciutils]
+version = "3.13.0"
+version_check = "url:https://mj.ucw.cz/download/linux/pci/|pciutils-([0-9.]+)\\.tar"
+description = "PCI utilities (lspci, setpci)"
+url = "https://mj.ucw.cz/download/linux/pci/pciutils-${version}.tar.gz"
+git_url = "https://github.com/pciutils/pciutils.git"
+use_git = false
+stage = 4
+build_order = 13
+depends = ["kmod"]
+build_commands = [
+    "make PREFIX=/usr SHAREDIR=/usr/share/hwdata SHARED=yes -j${NPROC}",
+    "make PREFIX=/usr SHAREDIR=/usr/share/hwdata SHARED=yes DESTDIR=${PKG} install install-lib",
+    "chmod 755 ${PKG}/usr/lib/libpci.so.*"
+]
+provides = ["/usr/bin/lspci"]
+
+# STAGE 5: Kernel and Bootloader
+
+[packages.popt]
+version = "1.19"
+version_check = "github:rpm-software-management/popt"
+description = "Command-line option parsing library"
+url = "https://ftp.osuosl.org/pub/rpm/popt/releases/popt-1.x/popt-${version}.tar.gz"
+stage = 5
+build_order = 1
+build_commands = [
+    "./configure --prefix=/usr --disable-static",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.pixman]
+version = "0.46.4"
+version_check = "freedesktop:pixman/pixman"
+description = "Pixel manipulation library"
+url = "https://www.cairographics.org/releases/pixman-${version}.tar.gz"
+git_url = "https://gitlab.freedesktop.org/pixman/pixman.git"
+use_git = false
+stage = 8
+build_system = "meson"
+
+[packages.pango]
+version = "1.56.0"
+version_check = "gnome:pango"
+description = "Text layout and rendering library"
+url = "https://download.gnome.org/sources/pango/1.56/pango-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/pango.git"
+use_git = false
+stage = 9
+build_order = 4
+build_system = "meson"
+depends = ["harfbuzz", "cairo", "fribidi", "fontconfig"]
+meson_flags = "-Dintrospection=disabled -Ddocumentation=false --wrap-mode=nodownload"
+provides = ["/usr/lib/libpango-1.0.so"]
+
+[packages.polkit]
+version = "127"
+version_check = "url:https://github.com/polkit-org/polkit/tags|/releases/tag/([0-9]+)"
+description = "Authorization framework"
+url = "https://github.com/polkit-org/polkit/archive/${version}/polkit-${version}.tar.gz"
+git_url = "https://github.com/polkit-org/polkit.git"
+use_git = false
+stage = 9
+build_order = 8
+build_system = "meson"
+depends = ["duktape", "glib"]
+meson_flags = "-Dintrospection=false -Dman=false -Dgtk_doc=false -Dtests=false -Dsession_tracking=ConsoleKit -Dlibs-only=true"
+
+[packages.pulseaudio]
+version = "17.0"
+version_check = "freedesktop:pulseaudio/pulseaudio"
+description = "Sound server"
+url = "https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/pulseaudio/pulseaudio.git"
+use_git = false
+stage = 11
+
+[packages.pavucontrol]
+version = "6.0"
+version_check = "freedesktop:pulseaudio/pavucontrol"
+description = "PulseAudio Volume Control"
+url = "https://www.freedesktop.org/software/pulseaudio/pavucontrol/pavucontrol-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/pulseaudio/pavucontrol.git"
+use_git = false
+stage = 11
+repology = "pavucontrol"
+
+[packages.proton-ge]
+version = "GE-Proton10-2"
+version_check = "github:GloriousEggroll/proton-ge-custom"
+description = "Proton-GE custom Proton build"
+url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${version}/${version}.tar.gz"
+git_url = "https://github.com/GloriousEggroll/proton-ge-custom.git"
+use_git = false
+stage = 13
+# Install to: ~/.steam/root/compatibilitytools.d/
+
+[packages.pandoc]
+version = "3.8.3"
+version_check = "github:jgm/pandoc"
+description = "Universal document converter"
+url = "https://github.com/jgm/pandoc/releases/download/${version}/pandoc-${version}-linux-amd64.tar.gz"
+git_url = "https://github.com/jgm/pandoc.git"
+use_git = false
+stage = 17
+# Note: Binary distribution; source requires Haskell toolchain
+
+[packages.pandoc-source]
+version = "3.8.3"
+version_check = "github:jgm/pandoc"
+description = "Pandoc (source build)"
+url = "https://github.com/jgm/pandoc/archive/refs/tags/${version}.tar.gz"
+git_url = "https://github.com/jgm/pandoc.git"
+use_git = false
+stage = 17
+# Requires: ghc, cabal-install
+
+[packages.poppler]
+version = "26.01.0"
+version_check = "freedesktop:poppler/poppler"
+description = "PDF rendering library"
+url = "https://poppler.freedesktop.org/poppler-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/poppler/poppler.git"
+use_git = false
+stage = 17

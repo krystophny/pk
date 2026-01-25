@@ -1,0 +1,132 @@
+[packages.coreutils]
+version = "9.9"
+version_check = "gnu:coreutils"
+description = "GNU core utilities"
+url = "https://ftpmirror.gnu.org/gnu/coreutils/coreutils-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/coreutils.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/ls"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(build-aux/config.guess) --enable-install-program=hostname",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "mkdir -p ${PKG}/usr/sbin && mv -v ${PKG}/usr/bin/chroot ${PKG}/usr/sbin/"
+]
+
+[packages.ca-certificates]
+version = "2025-01-19"
+version_check = "url:https://curl.se/docs/caextract.html|CA-bundle \\(([0-9-]+)\\)"
+description = "Mozilla CA certificate bundle"
+url = "https://curl.se/ca/cacert.pem"
+stage = 4
+build_order = 8
+depends = ["openssl"]
+build_commands = [
+    "mkdir -p ${PKG}/etc/ssl/certs",
+    "cp cacert.pem ${PKG}/etc/ssl/certs/ca-certificates.crt",
+    "ln -sfv certs/ca-certificates.crt ${PKG}/etc/ssl/cert.pem",
+    "mkdir -p ${PKG}/usr/share/ca-certificates",
+    "cp cacert.pem ${PKG}/usr/share/ca-certificates/ca-bundle.crt",
+    "mkdir -p ${PKG}/etc/profile.d",
+    "echo 'export CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt' > ${PKG}/etc/profile.d/curl-ca.sh",
+    "echo 'export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt' >> ${PKG}/etc/profile.d/curl-ca.sh"
+]
+provides = ["/etc/ssl/certs/ca-certificates.crt"]
+
+[packages.curl]
+version = "8.18.0"
+version_check = "github:curl/curl"
+description = "URL transfer library and tool"
+url = "https://curl.se/download/curl-${version}.tar.xz"
+git_url = "https://github.com/curl/curl.git"
+use_git = false
+stage = 4
+build_order = 9
+depends = ["openssl", "ca-certificates"]
+# disable LTO - libtool has issues with nm output parsing
+build_commands = [
+    "CFLAGS='-O2 -pipe' LDFLAGS='' ./configure --prefix=/usr --with-openssl --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt --enable-threaded-resolver --without-libpsl",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.cmake]
+version = "3.28.6"
+version_check = "github:Kitware/CMake"
+description = "Cross-platform build system generator"
+url = "https://github.com/Kitware/CMake/releases/download/v${version}/cmake-${version}.tar.gz"
+git_url = "https://github.com/Kitware/CMake.git"
+use_git = false
+# TODO: cmake has bootstrap issues with GCC 16, defer to later stage
+stage = 99
+depends = ["openssl"]
+build_commands = [
+    "./bootstrap --prefix=/usr --parallel=${NPROC} --system-zstd --system-zlib --system-bzip2",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.cronie]
+version = "1.7.2"
+version_check = "github:cronie-crond/cronie"
+description = "Cron daemon"
+url = "https://github.com/cronie-crond/cronie/releases/download/cronie-${version}/cronie-${version}.tar.gz"
+git_url = "https://github.com/cronie-crond/cronie.git"
+use_git = false
+stage = 7
+# -std=gnu11 required for GCC 16 C23 function pointer compatibility
+build_commands = [
+    "CFLAGS='-std=gnu11' ./configure --prefix=/usr --sysconfdir=/etc",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.cairo]
+version = "1.18.4"
+version_check = "freedesktop:cairo/cairo"
+description = "2D graphics library"
+url = "https://cairographics.org/releases/cairo-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/cairo/cairo.git"
+use_git = false
+stage = 9
+build_order = 2
+build_system = "meson"
+depends = ["pixman", "fontconfig", "freetype"]
+meson_flags = "-Dgtk_doc=false -Dtests=disabled -Dspectre=disabled -Dsymbol-lookup=disabled --wrap-mode=nodownload"
+provides = ["/usr/lib/libcairo.so"]
+
+[packages.claws-mail]
+version = "4.3.1"
+version_check = "url:https://www.claws-mail.org/releases.php|([0-9]+\.[0-9]+\.[0-9]+)"
+description = "Lightweight email client"
+url = "https://www.claws-mail.org/releases/claws-mail-${version}.tar.xz"
+git_url = "https://git.claws-mail.org/readonly/claws.git"
+use_git = false
+stage = 11
+repology = "claws-mail"
+
+[packages.chicago95]
+version = "3.0.1"
+version_check = "github:grassmunk/Chicago95"
+description = "Chicago95 XFCE theme (Windows 95 style)"
+url = "https://github.com/grassmunk/Chicago95/archive/refs/tags/v${version}.tar.gz"
+git_url = "https://github.com/grassmunk/Chicago95.git"
+use_git = false
+stage = 11
+# Includes GTK theme, icons, cursors, sounds, fonts, Plymouth theme
+
+[packages.cuda-toolkit]
+version = "12.8.1"
+version_check = "url:https://developer.nvidia.com/cuda-downloads|CUDA Toolkit ([0-9]+\\.[0-9]+)"
+description = "NVIDIA CUDA Toolkit (nvcc, cuBLAS, cuDNN, etc.)"
+url = "https://developer.download.nvidia.com/compute/cuda/${version}/local_installers/cuda_${version}_570.124.06_linux.run"
+git_url = ""
+use_git = false
+manual_download = true
+stage = 12
+depends = ["nvidia-driver"]
+# Note: Run with: sh cuda_*.run --silent --toolkit --no-opengl-libs
+# Installs to /usr/local/cuda-12.8
+
+# VM Support (QEMU/KVM)

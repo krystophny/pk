@@ -1,0 +1,391 @@
+[packages.gcc-stable]
+version = "14.2.0"
+description = "GNU Compiler Collection (stable release for cross-compilation)"
+url = "https://ftpmirror.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz"
+stage = 0
+
+[packages.gcc]
+version = "16-20260118"
+version_check = "gcc-snapshot:"
+description = "GNU Compiler Collection (development snapshot)"
+url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-16/gcc-${version}.tar.xz"
+git_url = "git://gcc.gnu.org/git/gcc.git"
+use_git = false
+checksum_url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-16/sha512.sum"
+stage = 3
+build_order = 25
+depends = ["gmp", "mpfr", "mpc", "flex"]
+languages = "c,c++,fortran"
+# PGO: profiledbootstrap compiles GCC 4 times with profile-guided optimization
+# This takes longer but results in ~10% faster GCC
+build_commands = [
+    "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
+    "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran --enable-default-pie --enable-default-ssp --disable-multilib --with-system-zlib --enable-plugin --disable-werror)",
+    "(cd build && make -j${NPROC} profiledbootstrap)",
+    "(cd build && make DESTDIR=${PKG} install)",
+    "ln -svf gcc ${PKG}/usr/bin/cc",
+    "printf '#!/bin/sh\\nexec gcc -std=c99 \"$@\"\\n' > ${PKG}/usr/bin/c99 && chmod +x ${PKG}/usr/bin/c99",
+    "ln -svf ../bin/cpp ${PKG}/usr/lib/cpp",
+    "ln -svf gcc.1 ${PKG}/usr/share/man/man1/cc.1"
+]
+
+# GCC Pass 1 - Cross compiler (limited, for building glibc)
+# Uses stable GCC 14.2 for reliable cross-compilation with glibc 2.40
+# Build order: 2 (requires binutils-pass1)
+
+[packages.gcc-pass1]
+version = "16-20260118"
+description = "GCC cross-compiler pass 1"
+source_pkg = "gcc"
+stage = 1
+build_order = 2
+depends = ["binutils-pass1"]
+build_commands = [
+    "tar -xf ${SOURCES}/mpfr-*.tar.xz && mv mpfr-* mpfr && tar -xf ${SOURCES}/gmp-*.tar.xz && mv gmp-* gmp && tar -xf ${SOURCES}/mpc-*.tar.* && mv mpc-* mpc",
+    "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
+    "mkdir -p build && cd build && ../configure --target=${TARGET} --prefix=/var/tmp/lfs-bootstrap --with-glibc-version=2.40 --with-sysroot=${SYSROOT} --with-newlib --without-headers --enable-default-pie --enable-default-ssp --disable-nls --disable-shared --disable-multilib --disable-threads --disable-libatomic --disable-libgomp --disable-libquadmath --disable-libssp --disable-libvtv --disable-libstdcxx --enable-languages=c,c++ && make -j${NPROC} && make DESTDIR=${PKG} install && cat ../gcc/limitx.h ../gcc/glimits.h ../gcc/limity.h > $(dirname $(${PKG}/var/tmp/lfs-bootstrap/bin/${TARGET}-gcc -print-libgcc-file-name))/include/limits.h"
+]
+
+# Linux headers - can build in parallel with gcc-pass1
+# Build order: 3 (no gcc dependency, but conventionally after)
+
+[packages.glibc-pass1]
+version = "2.40"
+version_check = "gnu:glibc"
+description = "GNU C Library (cross-built)"
+source_pkg = "glibc"
+stage = 1
+build_order = 4
+depends = ["gcc-pass1", "linux-headers"]
+build_commands = [
+    "mkdir -p build && cd build && echo 'rootsbindir=/usr/sbin' > configparms && ../configure --prefix=/usr --host=${TARGET} --build=$(../scripts/config.guess) --enable-kernel=5.4 --with-headers=${SYSROOT}/usr/include --disable-nscd --disable-werror libc_cv_slibdir=/usr/lib && make -j${NPROC} && make DESTDIR=${PKG} install",
+    "case $(uname -m) in x86_64) mkdir -pv ${PKG}/lib64 && ln -sfv ../usr/lib/ld-linux-x86-64.so.2 ${PKG}/lib64/ld-linux-x86-64.so.2 && ln -sfv ../usr/lib/ld-linux-x86-64.so.2 ${PKG}/lib64/ld-lsb-x86-64.so.3 ;; esac",
+    "sed '/RTLDLIST=/s@/usr@@g' -i ${PKG}/usr/bin/ldd"
+]
+
+# Final native glibc
+
+[packages.glibc]
+version = "2.40"
+version_check = "gnu:glibc"
+description = "GNU C Library"
+url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz"
+git_url = "git://sourceware.org/git/glibc.git"
+use_git = false
+checksum_url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz.sig"
+stage = 3
+build_order = 7
+# Note: glibc needs gettext, bison, perl, python to build
+# LTO causes POINTER_GUARD undefined errors, so build_order < 10 disables it
+build_commands = [
+    "mkdir -p build && cd build",
+    "echo 'rootsbindir=/usr/sbin' > configparms",
+    "../configure --prefix=/usr --disable-werror --enable-kernel=5.4 --enable-stack-protector=strong --disable-nscd libc_cv_slibdir=/usr/lib",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "case $(uname -m) in x86_64) mkdir -pv ${PKG}/lib64 && ln -sfv ../usr/lib/ld-linux-x86-64.so.2 ${PKG}/lib64/ld-linux-x86-64.so.2 && ln -sfv ../usr/lib/ld-linux-x86-64.so.2 ${PKG}/lib64/ld-lsb-x86-64.so.3 ;; esac",
+    "sed '/RTLDLIST=/s@/usr@@g' -i ${PKG}/usr/bin/ldd",
+    "mkdir -pv ${PKG}/etc && cp -v ../nscd/nscd.conf ${PKG}/etc/nscd.conf"
+]
+
+# libstdc++ pass 1 - built with cross-compiler (temporary)
+# Build order: 5 (requires glibc-pass1)
+
+[packages.gcc-pass2]
+version = "16-20260118"
+version_check = "gcc-snapshot:"
+description = "GCC cross-compiler pass 2"
+source_pkg = "gcc"
+stage = 2
+provides = ["${SYSROOT}/usr/bin/cc"]
+build_commands = [
+    "tar -xf ${SOURCES}/mpfr-*.tar.xz && mv mpfr-* mpfr",
+    "tar -xf ${SOURCES}/gmp-*.tar.xz && mv gmp-* gmp",
+    "tar -xf ${SOURCES}/mpc-*.tar.* && mv mpc-* mpc",
+    "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
+    "sed -i -e 's/^s-selftest-c++: .*/s-selftest-c++:/' -e '/GCC_FOR_SELFTESTS.*CPP_SELFTEST_FLAGS/d' gcc/cp/Make-lang.in",
+    "mkdir -p build && cd build && ../configure --build=$(../config.guess) --host=${TARGET} --target=${TARGET} LDFLAGS_FOR_TARGET=-L${PWD}/${TARGET}/libgcc --prefix=/usr --with-build-sysroot=${SYSROOT} --enable-default-pie --enable-default-ssp --disable-nls --disable-multilib --disable-libatomic --disable-libgomp --disable-libquadmath --disable-libsanitizer --disable-libssp --disable-libvtv --enable-checking=release --enable-languages=c,c++ && make -j${NPROC} all-gcc all-target-libgcc && make DESTDIR=${PKG} install-gcc install-target-libgcc",
+    "ln -sv gcc ${PKG}/usr/bin/cc"
+]
+
+[packages.gawk]
+version = "5.3.2"
+version_check = "gnu:gawk"
+description = "GNU AWK"
+url = "https://ftpmirror.gnu.org/gnu/gawk/gawk-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/gawk.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/gawk"]
+build_commands = [
+    "sed -i 's/extras//' Makefile.in",
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.grep]
+version = "3.12"
+version_check = "gnu:grep"
+description = "GNU grep"
+url = "https://ftpmirror.gnu.org/gnu/grep/grep-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/grep.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/grep"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.gzip]
+version = "1.14"
+version_check = "gnu:gzip"
+description = "GNU compression utility"
+url = "https://ftpmirror.gnu.org/gnu/gzip/gzip-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/gzip.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/gzip"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.gperf]
+version = "3.1"
+description = "Perfect hash function generator"
+url = "https://ftpmirror.gnu.org/gnu/gperf/gperf-${version}.tar.gz"
+stage = 3
+build_order = 1
+
+[packages.gettext]
+version = "0.26"
+version_check = "gnu:gettext"
+description = "GNU internationalization"
+url = "https://ftpmirror.gnu.org/gnu/gettext/gettext-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/gettext.git"
+use_git = false
+stage = 3
+build_order = 1
+build_commands = [
+    "./configure --prefix=/usr --disable-shared",
+    "make -j${NPROC}",
+    "mkdir -p ${PKG}/usr/bin",
+    "cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} ${PKG}/usr/bin/"
+]
+
+[packages.gnutls]
+version = "3.8.11"
+version_check = "github:gnutls/gnutls"
+description = "TLS library"
+url = "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-${version}.tar.xz"
+git_url = "https://gitlab.com/gnutls/gnutls.git"
+use_git = false
+stage = 4
+build_order = 5
+depends = ["nettle", "libtasn1", "libunistring", "gmp"]
+build_commands = [
+    "./configure --prefix=/usr --disable-static --without-p11-kit --with-default-trust-store-file=/etc/ssl/certs/ca-certificates.crt --disable-doc --disable-tests --disable-libdane",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.git]
+version = "2.48.1"
+version_check = "github:git/git"
+description = "Distributed version control system"
+url = "https://www.kernel.org/pub/software/scm/git/git-${version}.tar.xz"
+git_url = "https://github.com/git/git.git"
+use_git = false
+stage = 4
+build_order = 12
+depends = ["curl", "openssl", "zlib", "expat"]
+build_commands = [
+    "make -j${NPROC} prefix=/usr gitexecdir=/usr/lib/git-core all",
+    "make prefix=/usr gitexecdir=/usr/lib/git-core DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/git"]
+
+[packages.grub]
+version = "2.14"
+version_check = "gnu:grub"
+description = "GRand Unified Bootloader"
+url = "https://ftpmirror.gnu.org/gnu/grub/grub-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/grub.git"
+use_git = false
+stage = 5
+build_order = 5
+# disable LTO - causes linker issues
+build_commands = [
+    "CFLAGS='-O2 -pipe' LDFLAGS='' ./configure --prefix=/usr --sysconfdir=/etc --disable-werror --disable-efiemu --disable-grub-mkfont --with-platform=efi --target=x86_64 --disable-grub-mount",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.gmp]
+version = "6.3.0"
+version_check = "gnu:gmp"
+description = "GNU Multiple Precision Arithmetic Library"
+url = "https://ftpmirror.gnu.org/gnu/gmp/gmp-${version}.tar.xz"
+git_url = "https://gmplib.org/repo/gmp/"
+use_git = false
+stage = 3
+build_order = 17
+build_commands = [
+    "unset CFLAGS CXXFLAGS && CC='gcc -std=gnu17' ./configure --prefix=/usr --disable-cxx --docdir=/usr/share/doc/gmp-${version}",
+    "make -j${NPROC}",
+    "make html || true",
+    "make DESTDIR=${PKG} install install-html || make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libgmp.so"]
+
+[packages.glib]
+version = "2.84.0"
+version_check = "gnome:glib"
+description = "GLib core library"
+url = "https://download.gnome.org/sources/glib/2.84/glib-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/glib.git"
+use_git = false
+stage = 4
+build_order = 40
+depends = ["meson", "pcre2", "libffi", "zlib"]
+build_commands = [
+    "meson setup build --prefix=/usr --buildtype=release -Dman-pages=disabled -Ddtrace=disabled -Dsystemtap=disabled -Dgtk_doc=false -Dintrospection=disabled -Dtests=false",
+    "meson compile -C build",
+    "DESTDIR=${PKG} meson install -C build"
+]
+provides = ["/usr/lib/libglib-2.0.so"]
+
+[packages.gdk-pixbuf]
+version = "2.42.12"
+version_check = "gnome:gdk-pixbuf"
+description = "Image loading library"
+url = "https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/gdk-pixbuf.git"
+use_git = false
+stage = 9
+build_order = 6
+build_system = "meson"
+depends = ["shared-mime-info", "libjpeg-turbo", "libpng"]
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false --wrap-mode=nodownload"
+provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
+
+[packages.gtk3]
+version = "3.24.43"
+version_check = "gnome:gtk"
+description = "GTK+ 3 toolkit"
+url = "https://download.gnome.org/sources/gtk+/3.24/gtk+-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/gtk.git"
+use_git = false
+stage = 9
+build_order = 7
+build_system = "meson"
+source_dir = "gtk+-${version}"
+depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon"]
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false --wrap-mode=nodownload"
+provides = ["/usr/lib/libgtk-3.so"]
+
+[packages.garcon]
+version = "4.20.0"
+version_check = "xfce:xfce/garcon"
+description = "Xfce menu library"
+url = "https://archive.xfce.org/src/xfce/garcon/4.20/garcon-${version}.tar.bz2"
+git_url = "https://gitlab.xfce.org/xfce/garcon.git"
+use_git = false
+stage = 10
+
+[packages.go]
+version = "1.25.6"
+version_check = "url:https://go.dev/dl/|go([0-9]+\\.[0-9]+\\.[0-9]+)\\.linux"
+description = "Go programming language"
+url = "https://go.dev/dl/go${version}.linux-amd64.tar.gz"
+stage = 4
+build_order = 50
+source_dir = "go"
+# Go is distributed as precompiled binaries - copy contents to /usr/local/go
+build_commands = [
+    "mkdir -p ${PKG}/usr/local/go",
+    "cp -a bin pkg src lib misc api doc ${PKG}/usr/local/go/",
+    "mkdir -p ${PKG}/usr/bin",
+    "ln -sf ../local/go/bin/go ${PKG}/usr/bin/go",
+    "ln -sf ../local/go/bin/gofmt ${PKG}/usr/bin/gofmt"
+]
+
+[packages.gh]
+version = "2.86.0"
+version_check = "github:cli/cli"
+description = "GitHub CLI"
+url = "https://github.com/cli/cli/archive/v${version}/cli-${version}.tar.gz"
+source_dir = "cli-${version}"
+stage = 4
+build_order = 51
+depends = ["go"]
+build_commands = [
+    "export PATH=/usr/local/go/bin:$PATH",
+    "make",
+    "mkdir -p ${PKG}/usr/bin",
+    "cp bin/gh ${PKG}/usr/bin/"
+]
+
+[packages.gedit]
+version = "47.0"
+version_check = "github:GNOME/gedit"
+description = "GNOME text editor"
+url = "https://download.gnome.org/sources/gedit/47/gedit-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/gedit.git"
+use_git = false
+stage = 11
+repology = "gedit"
+
+[packages.gamemode]
+version = "1.8.2"
+version_check = "github:FeralInteractive/gamemode"
+description = "Optimize Linux performance for gaming"
+url = "https://github.com/FeralInteractive/gamemode/releases/download/${version}/gamemode-${version}.tar.xz"
+git_url = "https://github.com/FeralInteractive/gamemode.git"
+use_git = false
+stage = 13
+
+[packages.gamescope]
+version = "3.16.19"
+version_check = "github:ValveSoftware/gamescope"
+description = "SteamOS session compositing window manager"
+url = "https://github.com/ValveSoftware/gamescope/archive/refs/tags/${version}.tar.gz"
+git_url = "https://github.com/ValveSoftware/gamescope.git"
+use_git = false
+stage = 13
+
+[packages.glslang]
+version = "16.1.0"
+version_check = "github:KhronosGroup/glslang"
+description = "Khronos GLSL/HLSL to SPIR-V compiler"
+url = "https://github.com/KhronosGroup/glslang/archive/${version}/glslang-${version}.tar.gz"
+git_url = "https://github.com/KhronosGroup/glslang.git"
+use_git = false
+stage = 13
+
+# 32-bit Libraries (required for Steam/Wine)
+
+[packages.ghc]
+version = "9.10.1"
+version_check = "github:ghc/ghc"
+description = "Glasgow Haskell Compiler"
+url = "https://downloads.haskell.org/~ghc/${version}/ghc-${version}-x86_64-deb11-linux.tar.xz"
+git_url = ""
+use_git = false
+stage = 17
+# Required for building Pandoc from source
+
+[packages.ghostscript]
+version = "10.04.0"
+version_check = "url:https://github.com/ArtifexSoftware/ghostpdl-downloads/releases|ghostscript-([0-9]+\.[0-9]+\.[0-9]+)"
+description = "PostScript/PDF interpreter"
+url = "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/ghostscript-${version}.tar.xz"
+git_url = ""
+use_git = false
+stage = 17
+
+# STAGE 18: Scientific Computing Languages

@@ -1,0 +1,102 @@
+[packages.file]
+version = "5.46"
+version_check = "url:https://github.com/file/file/tags|FILE([0-9]+)_([0-9]+)"
+description = "File type identification"
+url = "https://astron.com/pub/file/file-${version}.tar.gz"
+git_url = "https://github.com/file/file.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/file"]
+build_commands = [
+    "mkdir -p build && pushd build && ../configure --disable-bzlib --disable-libseccomp --disable-xzlib --disable-zlib && make && popd",
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess)",
+    "make FILE_COMPILE=$(pwd)/build/src/file -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "rm -v ${PKG}/usr/lib/libmagic.la"
+]
+
+[packages.findutils]
+version = "4.10.0"
+version_check = "gnu:findutils"
+description = "GNU find utilities"
+url = "https://ftpmirror.gnu.org/gnu/findutils/findutils-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/findutils.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/find"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess) --localstatedir=/var/lib/locate gl_cv_func_wcwidth_works=yes",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.flex]
+version = "2.6.4"
+version_check = "github:westes/flex"
+description = "Fast lexical analyzer generator"
+url = "https://github.com/westes/flex/releases/download/v${version}/flex-${version}.tar.gz"
+git_url = "https://github.com/westes/flex.git"
+use_git = false
+stage = 3
+build_order = 24
+
+# Stage 3 temporary tools (needed before glibc rebuild)
+# These come from LFS Chapter 7
+
+[packages.freetype]
+version = "2.14.1"
+version_check = "savannah:freetype"
+description = "Font rendering library"
+url = "https://downloads.sourceforge.net/freetype/freetype-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/freetype/freetype.git"
+use_git = false
+stage = 8
+
+[packages.fontconfig]
+version = "2.16.0"
+version_check = "freedesktop:fontconfig/fontconfig"
+description = "Font configuration library"
+url = "https://www.freedesktop.org/software/fontconfig/release/fontconfig-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/fontconfig/fontconfig.git"
+use_git = false
+stage = 8
+
+[packages.font-util]
+version = "1.4.1"
+version_check = "xorg:font/font-util"
+description = "X font utilities"
+url = "https://www.x.org/releases/individual/font/font-util-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/xorg/font/util.git"
+use_git = false
+stage = 8
+
+[packages.fribidi]
+version = "1.0.16"
+version_check = "github:fribidi/fribidi"
+description = "Unicode bidirectional algorithm library"
+url = "https://github.com/fribidi/fribidi/releases/download/v${version}/fribidi-${version}.tar.xz"
+git_url = "https://github.com/fribidi/fribidi.git"
+use_git = false
+stage = 9
+build_order = 1
+build_system = "meson"
+
+[packages.firefox]
+version = "147.0.1"
+version_check = "url:https://archive.mozilla.org/pub/firefox/releases/|([0-9]+\.[0-9]+\.?[0-9]*)/linux"
+description = "Mozilla Firefox web browser"
+url = "https://archive.mozilla.org/pub/firefox/releases/${version}/source/firefox-${version}.source.tar.xz"
+git_url = ""
+use_git = false
+stage = 11
+# Note: Firefox is complex to build, consider using prebuilt binary
+
+[packages.ffmpeg]
+version = "8.0.1"
+version_check = "url:https://github.com/FFmpeg/FFmpeg/tags|n([0-9]+\.[0-9]+\.?[0-9]*)"
+description = "Complete multimedia framework"
+url = "https://ffmpeg.org/releases/ffmpeg-${version}.tar.xz"
+git_url = "https://git.ffmpeg.org/ffmpeg.git"
+use_git = false
+stage = 16
+# Build with: --enable-nvenc --enable-cuda --enable-vaapi

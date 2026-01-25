@@ -1,0 +1,98 @@
+[packages.attr]
+version = "2.5.2"
+version_check = "savannah:attr"
+description = "Extended filesystem attributes"
+url = "https://download.savannah.nongnu.org/releases/attr/attr-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/attr.git"
+use_git = false
+stage = 3
+build_order = 20
+build_commands = [
+    "./configure --prefix=/usr --disable-static --sysconfdir=/etc --docdir=/usr/share/doc/attr-${version}",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.acl]
+version = "2.3.2"
+version_check = "savannah:acl"
+description = "Access Control Lists"
+url = "https://download.savannah.nongnu.org/releases/acl/acl-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/acl.git"
+use_git = false
+stage = 3
+build_order = 21
+depends = ["attr"]
+build_commands = [
+    "./configure --prefix=/usr --disable-static --docdir=/usr/share/doc/acl-${version}",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.autoconf]
+version = "2.72"
+version_check = "gnu:autoconf"
+description = "GNU autoconf"
+url = "https://ftpmirror.gnu.org/gnu/autoconf/autoconf-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/autoconf.git"
+use_git = false
+stage = 4
+
+[packages.automake]
+version = "1.18.1"
+version_check = "gnu:automake"
+description = "GNU automake"
+url = "https://ftpmirror.gnu.org/gnu/automake/automake-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/automake.git"
+use_git = false
+stage = 4
+
+[packages.atk]
+version = "2.38.0"
+version_check = "gnome:atk"
+description = "Accessibility toolkit"
+url = "https://download.gnome.org/sources/atk/2.38/atk-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/atk.git"
+use_git = false
+stage = 9
+build_order = 5
+build_system = "meson"
+meson_flags = "-Dintrospection=false"
+
+[packages.alsa-lib]
+version = "1.2.15"
+version_check = "alsa:lib"
+description = "ALSA sound library"
+url = "https://www.alsa-project.org/files/pub/lib/alsa-lib-${version}.tar.bz2"
+git_url = "https://github.com/alsa-project/alsa-lib.git"
+use_git = false
+stage = 11
+
+[packages.alsa-utils]
+version = "1.2.15"
+version_check = "alsa:utils"
+description = "ALSA sound utilities"
+url = "https://www.alsa-project.org/files/pub/utils/alsa-utils-${version}.tar.bz2"
+git_url = "https://github.com/alsa-project/alsa-utils.git"
+use_git = false
+stage = 11
+
+[packages.amd-ucode]
+version = "20260110"
+version_check = "url:https://www.kernel.org/pub/linux/kernel/firmware/|linux-firmware-([0-9]+)\.tar"
+description = "AMD CPU microcode (extracted from linux-firmware)"
+url = "https://www.kernel.org/pub/linux/kernel/firmware/linux-firmware-${version}.tar.xz"
+git_url = ""
+use_git = false
+stage = 19
+# Extract amd-ucode/ directory and create initrd for early loading
+
+[packages.amdgpu-firmware]
+version = "20260110"
+version_check = "url:https://www.kernel.org/pub/linux/kernel/firmware/|linux-firmware-([0-9]+)\.tar"
+description = "AMD GPU firmware (part of linux-firmware)"
+url = "https://www.kernel.org/pub/linux/kernel/firmware/linux-firmware-${version}.tar.xz"
+git_url = ""
+use_git = false
+stage = 19
+# For AMD integrated graphics if present

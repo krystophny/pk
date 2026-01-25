@@ -1,0 +1,137 @@
+[packages.sed]
+version = "4.9"
+version_check = "gnu:sed"
+description = "GNU stream editor"
+url = "https://ftpmirror.gnu.org/gnu/sed/sed-${version}.tar.xz"
+git_url = "https://git.savannah.gnu.org/git/sed.git"
+use_git = false
+stage = 2
+provides = ["${SYSROOT}/usr/bin/sed"]
+build_commands = [
+    "./configure --prefix=/usr --host=${TARGET} --build=$(./config.guess)",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+[packages.sqlite]
+version = "3.48.0"
+version_check = "url:https://www.sqlite.org/download.html|sqlite-autoconf-([0-9]+)"
+description = "Self-contained SQL database engine"
+url = "https://www.sqlite.org/2025/sqlite-autoconf-3480000.tar.gz"
+git_url = "https://github.com/sqlite/sqlite.git"
+use_git = false
+stage = 3
+# TODO: PGO can provide ~10-30% gains but needs build script changes for proper variable handling
+build_commands = [
+    "./configure --prefix=/usr --enable-fts5",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libsqlite3.so", "/usr/bin/sqlite3"]
+
+[packages.shadow]
+version = "4.19.2"
+version_check = "github:shadow-maint/shadow"
+description = "Password and shadow file utilities"
+url = "https://github.com/shadow-maint/shadow/releases/download/${version}/shadow-${version}.tar.xz"
+git_url = "https://github.com/shadow-maint/shadow.git"
+use_git = false
+stage = 3
+build_order = 33
+depends = ["libxcrypt"]
+build_commands = [
+    "./configure --prefix=/usr --disable-static --disable-logind --without-libbsd --with-bcrypt --with-yescrypt --with-group-name-max-length=32",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "mkdir -pv ${PKG}/etc/default",
+    "touch ${PKG}/etc/default/useradd"
+]
+
+[packages.sudo]
+version = "1.9.17p2"
+version_check = "url:https://www.sudo.ws/releases/stable/|sudo-([0-9]+\.[0-9]+[p0-9]*)\.tar"
+description = "Execute commands as another user"
+url = "https://www.sudo.ws/dist/sudo-${version}.tar.gz"
+git_url = "https://github.com/sudo-project/sudo.git"
+use_git = false
+stage = 4
+provides = ["/usr/bin/sudo"]
+# disable LTO - causes linker issues with internal libraries
+build_commands = [
+    "CFLAGS='-O2 -pipe' LDFLAGS='' ./configure --prefix=/usr --with-all-insults --with-env-editor --disable-log-server --disable-log-client",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+
+# STAGE 6: Init System (runit for fast boot)
+
+[packages.shared-mime-info]
+version = "2.4"
+version_check = "freedesktop:xdg/shared-mime-info"
+description = "Shared MIME database"
+url = "https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/${version}/shared-mime-info-${version}.tar.gz"
+git_url = "https://gitlab.freedesktop.org/xdg/shared-mime-info.git"
+use_git = false
+stage = 8
+build_system = "meson"
+depends = ["libxml2"]
+meson_flags = "-Dupdate-mimedb=false"
+
+[packages.spice-vdagent]
+version = "0.23.0"
+version_check = "url:https://www.spice-space.org/download/releases/|spice-vdagent-([0-9]+\.[0-9]+\.[0-9]+)\.tar"
+description = "Spice agent for VM integration"
+url = "https://www.spice-space.org/download/releases/spice-vdagent-${version}.tar.bz2"
+git_url = "https://gitlab.freedesktop.org/spice/linux/vd_agent.git"
+use_git = false
+stage = 12
+
+[packages.steam]
+version = "1.0.0.81"
+version_check = "url:https://repo.steampowered.com/steam/archive/stable/|steam_([0-9]+\.[0-9]+\.[0-9]+)"
+description = "Steam gaming platform"
+url = "https://repo.steampowered.com/steam/archive/precise/steam_${version}.tar.gz"
+git_url = ""
+use_git = false
+stage = 13
+# Note: Steam is distributed as a binary, requires 32-bit libs
+
+[packages.spirv-headers]
+version = "1.4.335"
+version_check = "url:https://github.com/KhronosGroup/SPIRV-Headers/tags|vulkan-sdk-([0-9]+\.[0-9]+\.[0-9]+)"
+description = "SPIR-V headers"
+url = "https://github.com/KhronosGroup/SPIRV-Headers/archive/vulkan-sdk-${version}/SPIRV-Headers-${version}.tar.gz"
+git_url = "https://github.com/KhronosGroup/SPIRV-Headers.git"
+use_git = false
+stage = 13
+
+[packages.spirv-tools]
+version = "vulkan-sdk-1.4.335.0"
+version_check = "github:KhronosGroup/SPIRV-Tools"
+description = "SPIR-V tools"
+url = "https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/${version}.tar.gz"
+git_url = "https://github.com/KhronosGroup/SPIRV-Tools.git"
+use_git = false
+stage = 13
+
+[packages.sunshine]
+version = "2026.122.133140"
+version_check = "github:LizardByte/Sunshine"
+description = "Self-hosted game streaming host"
+url = "https://github.com/LizardByte/Sunshine/archive/refs/tags/v${version}.tar.gz"
+git_url = "https://github.com/LizardByte/Sunshine.git"
+use_git = false
+stage = 16
+# Host: Run on your PC to stream games
+
+[packages.sof-firmware]
+version = "2025.12.1"
+version_check = "github:thesofproject/sof-bin"
+description = "Sound Open Firmware"
+url = "https://github.com/thesofproject/sof-bin/releases/download/v${version}/sof-bin-${version}.tar.gz"
+git_url = "https://github.com/thesofproject/sof-bin.git"
+use_git = false
+stage = 19
+# Required for some Intel audio devices
+
+# Hardware-specific drivers for this system (AMD Ryzen 5950X + RTX 5060 Ti)
