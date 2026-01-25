@@ -110,13 +110,13 @@ if [ -n "$build_commands" ]; then
         eval "$cmd" || die "build command failed: $cmd"
     done
 elif [ "$build_system" = "meson" ]; then
-    meson setup "$builddir/meson" --prefix=/usr $meson_flags
+    meson setup "$builddir/meson" --prefix=/usr --libdir=lib $meson_flags
     ninja -C "$builddir/meson"
     DESTDIR="$pkgdir" ninja -C "$builddir/meson" install
 elif [ "$build_system" = "cmake" ]; then
     mkdir -p "$builddir/cmake"
     cd "$builddir/cmake"
-    cmake "$srcdir" -DCMAKE_INSTALL_PREFIX=/usr $cmake_flags
+    cmake "$srcdir" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib $cmake_flags
     make -j$NPROC
     make DESTDIR="$pkgdir" install
 elif [ "$build_system" = "autotools" ] || [ -x "$srcdir/configure" ]; then

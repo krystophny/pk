@@ -355,6 +355,7 @@ git_url = "https://github.com/libjpeg-turbo/libjpeg-turbo.git"
 use_git = false
 stage = 8
 build_system = "cmake"
+cmake_flags = "-DCMAKE_INSTALL_LIBDIR=lib -DENABLE_STATIC=OFF -DWITH_JAVA=OFF"
 
 [packages.libdrm]
 version = "2.4.131"
