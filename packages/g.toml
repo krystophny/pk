@@ -312,7 +312,8 @@ build_commands = [
     "rmdir ${PKG}/opt/google ${PKG}/opt",
     # Create wrapper script
     "mkdir -p ${PKG}/usr/bin",
-    "printf '#!/bin/sh\\nexec /usr/lib/google-chrome/google-chrome \"$@\"\\n' > ${PKG}/usr/bin/google-chrome",
+    "echo '#!/bin/sh' > ${PKG}/usr/bin/google-chrome",
+    "echo 'exec /usr/lib/google-chrome/google-chrome \"$@\"' >> ${PKG}/usr/bin/google-chrome",
     "chmod +x ${PKG}/usr/bin/google-chrome",
     # Fix desktop file paths
     "sed -i 's|/opt/google/chrome|/usr/lib/google-chrome|g' ${PKG}/usr/share/applications/google-chrome.desktop"
