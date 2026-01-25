@@ -1,0 +1,2 @@
+# Preserve PK_ROOT for pk package manager
+Defaults env_keep += "PK_ROOT"

@@ -19,3 +19,16 @@ build_order = 3
 build_system = "meson"
 depends = ["cairo", "freetype", "glib"]
 meson_flags = "-Ddocs=disabled -Dintrospection=disabled -Dtests=disabled -Dcairo=enabled -Dfreetype=enabled -Dglib=enabled --wrap-mode=nodownload"
+
+[packages.htop]
+version = "3.4.1"
+version_check = "github:htop-dev/htop"
+description = "Interactive process viewer"
+url = "https://github.com/htop-dev/htop/releases/download/${version}/htop-${version}.tar.xz"
+git_url = "https://github.com/htop-dev/htop.git"
+use_git = false
+stage = 4
+build_order = 12
+depends = ["ncurses"]
+configure_flags = "--enable-unicode"
+provides = ["/usr/bin/htop"]

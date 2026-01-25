@@ -229,3 +229,20 @@ url = "https://poppler.freedesktop.org/poppler-${version}.tar.xz"
 git_url = "https://gitlab.freedesktop.org/poppler/poppler.git"
 use_git = false
 stage = 17
+
+[packages.pk]
+version = "0.0.2"
+description = "Minimal POSIX shell package manager"
+stage = 3
+build_order = 1
+build_commands = [
+    "mkdir -p ${PKG}/usr/bin ${PKG}/usr/lib/pk ${PKG}/etc/profile.d ${PKG}/etc/sudoers.d",
+    "cp pk ${PKG}/usr/bin/",
+    "cp -r pk.d/* ${PKG}/usr/lib/pk/",
+    "cp etc/profile.d/pk.sh ${PKG}/etc/profile.d/",
+    "cp etc/sudoers.d/pk ${PKG}/etc/sudoers.d/",
+    "chmod 755 ${PKG}/usr/bin/pk ${PKG}/usr/lib/pk/*",
+    "chmod 644 ${PKG}/etc/profile.d/pk.sh",
+    "chmod 440 ${PKG}/etc/sudoers.d/pk"
+]
+provides = ["/usr/bin/pk"]
