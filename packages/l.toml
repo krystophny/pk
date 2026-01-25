@@ -528,6 +528,12 @@ use_git = false
 stage = 9
 build_order = 10
 depends = ["glib"]
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.libxfce4ui]
 version = "4.20.1"
@@ -539,6 +545,12 @@ use_git = false
 stage = 9
 build_order = 12
 depends = ["libxfce4util", "xfconf", "gtk3"]
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.libxfce4windowing]
 version = "4.20.4"
@@ -550,6 +562,12 @@ use_git = false
 stage = 9
 build_order = 14
 depends = ["libxfce4util", "gtk3"]
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 # STAGE 10: XFCE Desktop
 
@@ -668,7 +686,12 @@ git_url = "https://gitlab.com/libpipeline/libpipeline.git"
 use_git = false
 stage = 4
 build_order = 11
-configure_flags = "--disable-static"
+# Disable LTO - libtool issues with nm on LTO objects
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr --disable-static CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 provides = ["/usr/lib/libpipeline.so"]
 
 [packages.libevent]

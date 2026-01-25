@@ -55,6 +55,12 @@ url = "https://archive.xfce.org/src/xfce/thunar/4.20/thunar-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/xfce/thunar.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.texlive]
 version = "2025"

@@ -52,27 +52,38 @@ export NPROC=$(nproc)
 export PKG="$pkgdir"
 export version version_mm srcdir pkgdir
 
-# Load optimization flags
-BUILD_CONF=""
-for f in "./config/build.conf" "$SCRIPT_DIR/../config/build.conf" "/etc/pk/build.conf"; do
-    [ -f "$f" ] && BUILD_CONF="$f" && break
-done
-if [ -n "$BUILD_CONF" ]; then
-    . "$BUILD_CONF"
-    # Use LTO flags for native builds
-    export CFLAGS="${CFLAGS_LTO:-$CFLAGS_PERF}"
-    export CXXFLAGS="${CXXFLAGS_LTO:-$CFLAGS_PERF}"
-    export LDFLAGS="${LDFLAGS_LTO:-$LDFLAGS}"
-    export FFLAGS="$CFLAGS"
-    export FCFLAGS="$CFLAGS"
-    info "using optimization flags from $BUILD_CONF"
-else
-    # Fallback Zen 3 flags
-    export CFLAGS="-O3 -march=znver3 -mtune=znver3 -pipe -flto=$NPROC"
+# Load optimization flags (unless skip_optimization is set)
+skip_opt=$(extract_field "$pkgname" "skip_optimization")
+if [ "$skip_opt" = "true" ]; then
+    # Package manages its own optimization (e.g. GCC bootstrap)
+    export CFLAGS="-O2 -march=znver3"
     export CXXFLAGS="$CFLAGS"
-    export LDFLAGS="-Wl,-O2 -Wl,--as-needed -flto=$NPROC"
+    export LDFLAGS=""
     export FFLAGS="$CFLAGS"
     export FCFLAGS="$CFLAGS"
+    info "skip_optimization: using minimal flags"
+else
+    BUILD_CONF=""
+    for f in "./config/build.conf" "$SCRIPT_DIR/../config/build.conf" "/etc/pk/build.conf"; do
+        [ -f "$f" ] && BUILD_CONF="$f" && break
+    done
+    if [ -n "$BUILD_CONF" ]; then
+        . "$BUILD_CONF"
+        # Use LTO flags for native builds
+        export CFLAGS="${CFLAGS_LTO:-$CFLAGS_PERF}"
+        export CXXFLAGS="${CXXFLAGS_LTO:-$CFLAGS_PERF}"
+        export LDFLAGS="${LDFLAGS_LTO:-$LDFLAGS}"
+        export FFLAGS="$CFLAGS"
+        export FCFLAGS="$CFLAGS"
+        info "using optimization flags from $BUILD_CONF"
+    else
+        # Fallback Zen 3 flags
+        export CFLAGS="-O3 -march=znver3 -mtune=znver3 -pipe -flto=$NPROC"
+        export CXXFLAGS="$CFLAGS"
+        export LDFLAGS="-Wl,-O2 -Wl,--as-needed -flto=$NPROC"
+        export FFLAGS="$CFLAGS"
+        export FCFLAGS="$CFLAGS"
+    fi
 fi
 export MAKEFLAGS="-j$NPROC"
 

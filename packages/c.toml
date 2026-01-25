@@ -52,7 +52,7 @@ build_commands = [
 ]
 
 [packages.cmake]
-version = "4.2.2"
+version = "4.0.2"
 version_check = "github:Kitware/CMake"
 description = "Cross-platform build system generator"
 url = "https://github.com/Kitware/CMake/releases/download/v${version}/cmake-${version}.tar.gz"
@@ -61,8 +61,10 @@ use_git = false
 stage = 4
 build_order = 6
 depends = ["openssl"]
+# CMake bootstrap doesn't work well with aggressive LTO flags
+skip_optimization = true
 build_commands = [
-    "./bootstrap --prefix=/usr --parallel=${NPROC} --system-zstd --system-zlib --system-bzip2",
+    "./bootstrap --prefix=/usr --parallel=${NPROC} --system-zstd --system-zlib --system-bzip2 -- -DCMAKE_BUILD_TYPE=Release",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install"
 ]

@@ -13,6 +13,35 @@ pkgname="$1"
 version=$(get_pkg_version "$pkgname")
 [ -n "$version" ] || die "package '$pkgname' not found"
 
+mkdir -p "$SOURCES_DIR"
+
+# Check if using git
+use_git=$(extract_field "$pkgname" "use_git")
+if [ "$use_git" = "true" ]; then
+    git_url=$(extract_field "$pkgname" "git_url")
+    [ -n "$git_url" ] || die "no git_url for $pkgname"
+
+    srcdir="$SOURCES_DIR/${pkgname}-${version}"
+
+    # Configure git SSL cert path
+    export GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt
+
+    if [ -d "$srcdir" ]; then
+        info "git repo already exists: $srcdir"
+        # Update existing repo
+        cd "$srcdir"
+        git fetch origin 2>/dev/null || true
+        git reset --hard origin/HEAD 2>/dev/null || git reset --hard HEAD
+    else
+        info "cloning $git_url"
+        git clone --depth 1 "$git_url" "$srcdir" || die "git clone failed"
+    fi
+
+    info "source ready: $srcdir"
+    exit 0
+fi
+
+# Standard URL download
 url=$(extract_field "$pkgname" "url")
 [ -n "$url" ] || die "no url for $pkgname"
 
@@ -20,11 +49,15 @@ url=$(extract_field "$pkgname" "url")
 version_mm=$(echo "$version" | sed 's/\.[^.]*$//')
 url=$(echo "$url" | sed "s|\${version}|$version|g; s|\${version_mm}|$version_mm|g")
 
-# Determine filename
-filename="${url##*/}"
+# Check for custom tarball name
+tarball=$(extract_field "$pkgname" "tarball")
+if [ -n "$tarball" ]; then
+    tarball=$(echo "$tarball" | sed "s|\${version}|$version|g")
+    filename="$tarball"
+else
+    filename="${url##*/}"
+fi
 destfile="$SOURCES_DIR/$filename"
-
-mkdir -p "$SOURCES_DIR"
 
 if [ -f "$destfile" ]; then
     info "$filename already exists"
@@ -33,10 +66,18 @@ else
     curl -L -o "$destfile" "$url" || die "download failed"
 fi
 
+# Get custom source_dir if specified
+source_dir=$(extract_field "$pkgname" "source_dir")
+if [ -n "$source_dir" ]; then
+    source_dir=$(echo "$source_dir" | sed "s|\${version}|$version|g")
+    srcdir="$SOURCES_DIR/$source_dir"
+else
+    srcdir="$SOURCES_DIR/${pkgname}-${version}"
+fi
+
 # Extract if archive
 case "$filename" in
     *.tar.gz|*.tgz|*.tar.xz|*.tar.bz2)
-        srcdir="$SOURCES_DIR/${pkgname}-${version}"
         if [ ! -d "$srcdir" ]; then
             info "extracting to $srcdir"
             cd "$SOURCES_DIR"

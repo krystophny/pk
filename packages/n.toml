@@ -47,6 +47,33 @@ build_order = 4
 configure_flags = "--disable-static"
 depends = ["gmp"]
 
+[packages.newlib]
+version = "4.6.0.20260123"
+version_check = "url:ftp://sourceware.org/pub/newlib/|newlib-([0-9.]+)\\.tar\\.gz"
+description = "C library for embedded systems (used for nvptx offloading)"
+url = "ftp://sourceware.org/pub/newlib/newlib-${version}.tar.gz"
+stage = 3
+build_order = 24
+# Built as part of GCC nvptx offload, not standalone
+
+[packages.nvptx-tools]
+version = "0.1"
+version_check = "github:SourceryTools/nvptx-tools"
+description = "Assembler and linker for NVIDIA PTX (GCC offloading)"
+url = "https://github.com/SourceryTools/nvptx-tools/archive/refs/heads/master.tar.gz"
+git_url = "https://github.com/SourceryTools/nvptx-tools.git"
+use_git = true
+stage = 3
+build_order = 24
+# Disable LTO - libiberty doesn't link properly with it
+skip_optimization = true
+build_commands = [
+    "./configure --prefix=/usr CFLAGS='-O2 -march=znver3' CXXFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/nvptx-as"]
+
 [packages.ninja]
 version = "1.13.2"
 version_check = "github:ninja-build/ninja"

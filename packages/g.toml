@@ -14,15 +14,18 @@ use_git = false
 checksum_url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-16/sha512.sum"
 stage = 3
 build_order = 25
-depends = ["gmp", "mpfr", "mpc", "flex"]
+depends = ["gmp", "mpfr", "mpc", "flex", "nvptx-tools", "newlib"]
 languages = "c,c++,fortran"
-# PGO: profiledbootstrap compiles GCC 4 times with profile-guided optimization
-# This takes longer but results in ~10% faster GCC
+# PGO+LTO: profiledbootstrap with BOOT_CFLAGS for LTO
+# External LTO breaks symbol versioning - use GCC's BOOT_CFLAGS mechanism instead
+skip_optimization = true
 build_commands = [
     "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
-    "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran --enable-default-pie --enable-default-ssp --disable-multilib --with-system-zlib --enable-plugin --disable-werror)",
-    "(cd build && make -j${NPROC} profiledbootstrap)",
+    "ln -sf /usr/src/newlib-*/newlib newlib",
+    "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran,lto --enable-default-pie --enable-default-ssp --disable-multilib --with-system-zlib --enable-plugin --disable-werror --enable-threads=posix --enable-tls --enable-libgomp --enable-libatomic --enable-libquadmath --enable-libssp --enable-libstdcxx --enable-shared --enable-__cxa_atexit --enable-clocale=gnu --enable-lto --enable-checking=release --enable-offload-targets=nvptx-none --enable-offload-defaulted)",
+    "(cd build && make -j${NPROC} BOOT_CFLAGS='-O3 -march=znver3 -mtune=znver3 -flto=auto -g' profiledbootstrap)",
     "(cd build && make DESTDIR=${PKG} install)",
+    "mkdir -p ${PKG}/usr/lib/bfd-plugins && ln -svf $(ls ${PKG}/usr/libexec/gcc/*/*/liblto_plugin.so | head -1 | sed \"s|${PKG}|..|g\") ${PKG}/usr/lib/bfd-plugins/",
     "ln -svf gcc ${PKG}/usr/bin/cc",
     "printf '#!/bin/sh\\nexec gcc -std=c99 \"$@\"\\n' > ${PKG}/usr/bin/c99 && chmod +x ${PKG}/usr/bin/c99",
     "ln -svf ../bin/cpp ${PKG}/usr/lib/cpp",
@@ -40,6 +43,8 @@ source_pkg = "gcc"
 stage = 1
 build_order = 2
 depends = ["binutils-pass1"]
+# Bootstrap phase - skip external optimization flags
+skip_optimization = true
 build_commands = [
     "tar -xf ${SOURCES}/mpfr-*.tar.xz && mv mpfr-* mpfr && tar -xf ${SOURCES}/gmp-*.tar.xz && mv gmp-* gmp && tar -xf ${SOURCES}/mpc-*.tar.* && mv mpc-* mpc",
     "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
@@ -98,14 +103,17 @@ description = "GCC cross-compiler pass 2"
 source_pkg = "gcc"
 stage = 2
 provides = ["${SYSROOT}/usr/bin/cc"]
+# Bootstrap phase - skip external optimization flags, but install LTO plugin for stage 3
+skip_optimization = true
 build_commands = [
     "tar -xf ${SOURCES}/mpfr-*.tar.xz && mv mpfr-* mpfr",
     "tar -xf ${SOURCES}/gmp-*.tar.xz && mv gmp-* gmp",
     "tar -xf ${SOURCES}/mpc-*.tar.* && mv mpc-* mpc",
     "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
     "sed -i -e 's/^s-selftest-c++: .*/s-selftest-c++:/' -e '/GCC_FOR_SELFTESTS.*CPP_SELFTEST_FLAGS/d' gcc/cp/Make-lang.in",
-    "mkdir -p build && cd build && ../configure --build=$(../config.guess) --host=${TARGET} --target=${TARGET} LDFLAGS_FOR_TARGET=-L${PWD}/${TARGET}/libgcc --prefix=/usr --with-build-sysroot=${SYSROOT} --enable-default-pie --enable-default-ssp --disable-nls --disable-multilib --disable-libatomic --disable-libgomp --disable-libquadmath --disable-libsanitizer --disable-libssp --disable-libvtv --enable-checking=release --enable-languages=c,c++ && make -j${NPROC} all-gcc all-target-libgcc && make DESTDIR=${PKG} install-gcc install-target-libgcc",
-    "ln -sv gcc ${PKG}/usr/bin/cc"
+    "mkdir -p build && cd build && ../configure --build=$(../config.guess) --host=${TARGET} --target=${TARGET} LDFLAGS_FOR_TARGET=-L${PWD}/${TARGET}/libgcc --prefix=/usr --with-build-sysroot=${SYSROOT} --enable-default-pie --enable-default-ssp --disable-nls --disable-multilib --disable-libatomic --disable-libgomp --disable-libquadmath --disable-libsanitizer --disable-libssp --disable-libvtv --enable-checking=release --enable-languages=c,c++ --enable-lto --enable-plugin && make -j${NPROC} all-gcc all-target-libgcc && make DESTDIR=${PKG} install-gcc install-target-libgcc",
+    "ln -sv gcc ${PKG}/usr/bin/cc",
+    "mkdir -p ${PKG}/usr/lib/bfd-plugins && ln -svf $(ls ${PKG}/usr/libexec/gcc/*/*/liblto_plugin.so | head -1 | sed \"s|${PKG}|..|g\") ${PKG}/usr/lib/bfd-plugins/"
 ]
 
 [packages.gawk]
@@ -296,6 +304,12 @@ url = "https://archive.xfce.org/src/xfce/garcon/4.20/garcon-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/xfce/garcon.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.go]
 version = "1.25.6"
@@ -397,7 +411,12 @@ git_url = "https://git.savannah.gnu.org/git/groff.git"
 use_git = false
 stage = 4
 build_order = 9
-configure_flags = "--with-doc=no"
+# Disable LTO - C++ linking issues
+build_commands = [
+    "CFLAGS='-O2 -march=znver3' CXXFLAGS='-O2 -march=znver3' LDFLAGS='' ./configure --prefix=/usr --with-doc=no",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
 provides = ["/usr/bin/groff", "/usr/bin/troff"]
 
 [packages.gdbm]
@@ -409,7 +428,13 @@ git_url = "https://git.savannah.gnu.org/git/gdbm.git"
 use_git = false
 stage = 4
 build_order = 10
-configure_flags = "--disable-static --enable-libgdbm-compat"
+# Disable LTO - causes undefined reference errors during linking (wordwrap symbols)
+# Must pass flags to make as well since system env leaks LTO
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr --disable-static --enable-libgdbm-compat CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 provides = ["/usr/lib/libgdbm.so"]
 
 # STAGE 18: Scientific Computing Languages

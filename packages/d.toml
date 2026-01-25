@@ -64,15 +64,20 @@ git_url = "https://github.com/dejavu-fonts/dejavu-fonts.git"
 use_git = false
 stage = 11
 
-# TODO: DejaGnu requires Expect which has Tcl 8.6 compatibility issues
-# Re-enable when expect is fixed or use fossil version from core.tcl-lang.org
-#[packages.dejagnu]
-#version = "1.6.3"
-#version_check = "gnu:dejagnu"
-#description = "GNU testing framework"
-#url = "https://ftpmirror.gnu.org/gnu/dejagnu/dejagnu-${version}.tar.gz"
-#stage = 10
-#depends = ["tcl", "expect"]
+# DejaGnu now works with expectrl-tcl
+[packages.dejagnu]
+version = "1.6.3"
+version_check = "gnu:dejagnu"
+description = "GNU testing framework"
+url = "https://ftpmirror.gnu.org/gnu/dejagnu/dejagnu-${version}.tar.gz"
+stage = 10
+depends = ["tcl", "expectrl-tcl"]
+build_commands = [
+    "./configure --prefix=/usr",
+    "make",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/runtest"]
 
 [packages.dxvk]
 version = "2.7.1"

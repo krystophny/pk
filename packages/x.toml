@@ -126,6 +126,12 @@ use_git = false
 stage = 9
 build_order = 11
 depends = ["libxfce4util", "dbus"]
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xfce4-dev-tools]
 version = "4.20.0"
@@ -146,6 +152,12 @@ url = "https://archive.xfce.org/src/xfce/xfce4-panel/4.20/xfce4-panel-${version}
 git_url = "https://gitlab.xfce.org/xfce/xfce4-panel.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xfce4-settings]
 version = "4.20.3"
@@ -155,6 +167,12 @@ url = "https://archive.xfce.org/src/xfce/xfce4-settings/4.20/xfce4-settings-${ve
 git_url = "https://gitlab.xfce.org/xfce/xfce4-settings.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xfce4-session]
 version = "4.20.2"
@@ -164,6 +182,12 @@ url = "https://archive.xfce.org/src/xfce/xfce4-session/4.20/xfce4-session-${vers
 git_url = "https://gitlab.xfce.org/xfce/xfce4-session.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xfwm4]
 version = "4.20.0"
@@ -173,6 +197,12 @@ url = "https://archive.xfce.org/src/xfce/xfwm4/4.20/xfwm4-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/xfce/xfwm4.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xfdesktop]
 version = "4.20.1"
@@ -182,6 +212,12 @@ url = "https://archive.xfce.org/src/xfce/xfdesktop/4.20/xfdesktop-${version}.tar
 git_url = "https://gitlab.xfce.org/xfce/xfdesktop.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xfce4-appfinder]
 version = "4.20.0"
@@ -200,6 +236,12 @@ url = "https://archive.xfce.org/src/apps/xfce4-terminal/1.1/xfce4-terminal-${ver
 git_url = "https://gitlab.xfce.org/apps/xfce4-terminal.git"
 use_git = false
 stage = 10
+# Disable LTO - libtool nm issues
+build_commands = [
+    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "make DESTDIR=${PKG} install"
+]
 
 # STAGE 11: Applications
 
