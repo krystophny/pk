@@ -200,10 +200,10 @@ depends = ["nspr", "sqlite"]
 build_commands = [
     "(cd nss && make -j${NPROC} BUILD_OPT=1 NSPR_INCLUDE_DIR=/usr/include/nspr NSPR_LIB_DIR=/usr/lib USE_SYSTEM_ZLIB=1 ZLIB_LIBS=-lz NSS_USE_SYSTEM_SQLITE=1 NSS_ENABLE_WERROR=0 NSS_DISABLE_GTESTS=1 USE_64=1)",
     "mkdir -p ${PKG}/usr/lib/pkgconfig ${PKG}/usr/include/nss ${PKG}/usr/bin",
-    "install -m755 dist/Release/lib/*.so ${PKG}/usr/lib/",
-    "install -m644 dist/Release/lib/*.chk ${PKG}/usr/lib/ || true",
+    "NSS_DIST=$(ls -d dist/*_OPT.OBJ); install -m755 $NSS_DIST/lib/*.so ${PKG}/usr/lib/",
+    "NSS_DIST=$(ls -d dist/*_OPT.OBJ); install -m644 $NSS_DIST/lib/*.chk ${PKG}/usr/lib/ || true",
     "install -m644 dist/public/nss/*.h ${PKG}/usr/include/nss/",
-    "install -m755 dist/Release/bin/certutil dist/Release/bin/pk12util ${PKG}/usr/bin/"
+    "NSS_DIST=$(ls -d dist/*_OPT.OBJ); install -m755 $NSS_DIST/bin/certutil $NSS_DIST/bin/pk12util ${PKG}/usr/bin/"
 ]
 provides = ["/usr/lib/libnss3.so"]
 
