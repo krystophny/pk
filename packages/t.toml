@@ -55,9 +55,12 @@ url = "https://archive.xfce.org/src/xfce/thunar/4.20/thunar-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/xfce/thunar.git"
 use_git = false
 stage = 10
+depends = ["exo", "libxfce4ui", "libxfce4util"]
 # Disable LTO - libtool nm issues
+# Create .xml/.policy files before make to bypass ITS rules requirement
 build_commands = [
     "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
+    "cp org.xfce.thunar.appdata.xml.in org.xfce.thunar.appdata.xml",
     "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
     "make DESTDIR=${PKG} install"
 ]

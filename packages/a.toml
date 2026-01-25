@@ -98,6 +98,19 @@ use_git = false
 stage = 19
 # Extract amd-ucode/ directory and create initrd for early loading
 
+[packages.appstream-glib]
+version = "0.8.3"
+version_check = "github:hughsie/appstream-glib"
+description = "AppStream helper library"
+url = "https://github.com/hughsie/appstream-glib/archive/refs/tags/appstream_glib_0_8_3.tar.gz"
+source_dir = "appstream-glib-appstream_glib_0_8_3"
+stage = 8
+build_order = 50
+build_system = "meson"
+depends = ["glib", "gdk-pixbuf", "libarchive", "curl"]
+meson_flags = "-Dgtk-doc=false -Dintrospection=false -Dman=false -Drpm=false -Dstemmer=false"
+provides = ["/usr/share/gettext/its/metainfo.its"]
+
 [packages.amdgpu-firmware]
 version = "20260110"
 version_check = "url:https://www.kernel.org/pub/linux/kernel/firmware/|linux-firmware-([0-9]+)\.tar"

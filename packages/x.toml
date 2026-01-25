@@ -232,15 +232,16 @@ stage = 10
 version = "1.1.5"
 version_check = "xfce:apps/xfce4-terminal"
 description = "Xfce terminal emulator"
-url = "https://archive.xfce.org/src/apps/xfce4-terminal/1.1/xfce4-terminal-${version}.tar.bz2"
+url = "https://archive.xfce.org/src/apps/xfce4-terminal/1.1/xfce4-terminal-${version}.tar.xz"
 git_url = "https://gitlab.xfce.org/apps/xfce4-terminal.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
+depends = ["vte"]
 build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
+    "sed -i '/subdir..doc../d' meson.build",
+    "meson setup build-pk/meson --prefix=/usr --buildtype=plain",
+    "ninja -C build-pk/meson",
+    "DESTDIR=${PKG} ninja -C build-pk/meson install"
 ]
 
 # STAGE 11: Applications
@@ -254,15 +255,6 @@ git_url = "https://gitlab.xfce.org/panel-plugins/xfce4-pulseaudio-plugin.git"
 use_git = false
 stage = 11
 repology = "xfce4-pulseaudio-plugin"
-
-[packages.xfce4-terminal]
-version = "1.1.3"
-description = "XFCE terminal emulator"
-url = "https://archive.xfce.org/src/apps/xfce4-terminal/1.1/xfce4-terminal-${version}.tar.bz2"
-git_url = "https://gitlab.xfce.org/apps/xfce4-terminal.git"
-use_git = false
-stage = 10
-depends = ["vte"]
 
 [packages.x264]
 version = "stable"
