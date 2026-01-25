@@ -56,6 +56,23 @@ stage = 3
 build_order = 31
 depends = ["pkgconf", "ncurses-stage3"]
 
+[packages.psmisc]
+version = "23.7"
+version_check = "url:https://gitlab.com/psmisc/psmisc/-/tags|v([0-9]+\\.[0-9]+)"
+description = "Process management utilities (killall, fuser, pstree)"
+url = "https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-${version}.tar.xz"
+git_url = "https://gitlab.com/psmisc/psmisc.git"
+use_git = false
+stage = 3
+build_order = 32
+depends = ["ncurses-stage3"]
+build_commands = [
+    "./configure --prefix=/usr",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/killall", "/usr/bin/fuser", "/usr/bin/pstree"]
+
 [packages.python-ssl]
 version = "3.14.2"
 description = "Python with SSL support, PGO, pip and venv"
