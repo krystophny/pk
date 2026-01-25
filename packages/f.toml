@@ -74,6 +74,8 @@ url = "https://www.freedesktop.org/software/fontconfig/release/fontconfig-${vers
 git_url = "https://gitlab.freedesktop.org/fontconfig/fontconfig.git"
 use_git = false
 stage = 8
+configure_flags = "--sysconfdir=/etc --localstatedir=/var --disable-docs"
+depends = ["freetype", "expat"]
 
 [packages.font-util]
 version = "1.4.1"
