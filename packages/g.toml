@@ -25,6 +25,7 @@ build_commands = [
     "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran,lto --enable-default-pie --enable-default-ssp --disable-multilib --with-system-zlib --enable-plugin --disable-werror --enable-threads=posix --enable-tls --enable-libgomp --enable-libatomic --enable-libquadmath --enable-libssp --enable-libstdcxx --enable-shared --enable-__cxa_atexit --enable-clocale=gnu --enable-lto --enable-checking=release --enable-offload-targets=nvptx-none --enable-offload-defaulted)",
     "(cd build && make -j${NPROC} BOOT_CFLAGS='-O3 -march=znver3 -mtune=znver3 -flto=auto -g' profiledbootstrap)",
     "(cd build && make DESTDIR=${PKG} install)",
+    "cp -v ${PKG}/usr/include/c++/*/x86_64-pc-linux-gnu/bits/c++config.h ${PKG}/usr/include/c++/*/bits/c++config.h",
     "mkdir -p ${PKG}/usr/lib/bfd-plugins && (cd ${PKG}/usr/lib/bfd-plugins && ln -svf ../libexec/gcc/*/*/liblto_plugin.so .)",
     "ln -svf gcc ${PKG}/usr/bin/cc",
     "printf '#!/bin/sh\\nexec gcc -std=c99 \"$@\"\\n' > ${PKG}/usr/bin/c99 && chmod +x ${PKG}/usr/bin/c99",
