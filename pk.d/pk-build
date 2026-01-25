@@ -1,5 +1,5 @@
 #!/bin/sh
-# pk-build - build a package from packages.toml
+# pk-build - build a package from package definitions
 # Usage: pk build <pkgname>
 
 SCRIPT_DIR="$(dirname "$0")"
@@ -9,25 +9,30 @@ SCRIPT_DIR="$(dirname "$0")"
 
 pkgname="$1"
 
-# Find packages.toml
-TOML_FILE=""
-for f in "./packages.toml" "$SCRIPT_DIR/../packages.toml" "/etc/pk/packages.toml"; do
-    [ -f "$f" ] && TOML_FILE="$(cd "$(dirname "$f")" && pwd)/$(basename "$f")" && break
+# Find packages directory
+PACKAGES_DIR=""
+for d in "./packages" "$SCRIPT_DIR/../packages" "/etc/pk/packages"; do
+    [ -d "$d" ] && PACKAGES_DIR="$(cd "$d" && pwd)" && break
 done
-[ -n "$TOML_FILE" ] || die "packages.toml not found"
+[ -n "$PACKAGES_DIR" ] || die "packages directory not found"
+
+# Cat all package files
+cat_packages() {
+    cat "$PACKAGES_DIR"/*.toml
+}
 
 # Extract package info from TOML using awk
 extract_field() {
     local pkg="$1" field="$2"
-    awk -v pkg="$pkg" -v field="$field" '
+    cat_packages | awk -v pkg="$pkg" -v field="$field" '
         /^\[packages\./ { in_pkg = ($0 ~ "\\[packages\\." pkg "\\]") }
         in_pkg && $1 == field { gsub(/^[^=]+=[ \t]*"?|"[ \t]*$/, ""); print; exit }
-    ' "$TOML_FILE"
+    '
 }
 
 extract_array() {
     local pkg="$1" field="$2"
-    awk -v pkg="$pkg" -v field="$field" '
+    cat_packages | awk -v pkg="$pkg" -v field="$field" '
         /^\[packages\./ { in_pkg = ($0 ~ "\\[packages\\." pkg "\\]") }
         in_pkg && $1 == field {
             in_array = 1
@@ -40,12 +45,12 @@ extract_array() {
             if (/\]/) { gsub(/[ \t]*\].*/, ""); in_array = 0 }
             gsub(/^[ \t]*"/, ""); gsub(/"[ \t]*,?[ \t]*$/, ""); if (/./) print
         }
-    ' "$TOML_FILE"
+    '
 }
 
 # Get package metadata
 version=$(extract_field "$pkgname" "version")
-[ -n "$version" ] || die "package '$pkgname' not found in $TOML_FILE"
+[ -n "$version" ] || die "package '$pkgname' not found"
 
 url=$(extract_field "$pkgname" "url")
 build_system=$(extract_field "$pkgname" "build_system")
