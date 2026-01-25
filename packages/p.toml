@@ -170,7 +170,7 @@ stage = 9
 build_order = 8
 build_system = "meson"
 depends = ["duktape", "glib"]
-meson_flags = "-Dintrospection=false -Dman=false -Dgtk_doc=false -Dtests=false -Dsession_tracking=ConsoleKit -Dlibs-only=true"
+meson_flags = "-Dauthfw=shadow -Dintrospection=false -Dman=false -Dgtk_doc=false -Dtests=false -Dsession_tracking=ConsoleKit -Dlibs-only=true"
 
 [packages.pulseaudio]
 version = "17.0"
