@@ -50,6 +50,14 @@ use_git = false
 stage = 8
 provides = ["/usr/bin/xauth"]
 
+[packages.xrdb]
+version = "1.2.2"
+version_check = "xorg:app/xrdb"
+description = "X server resource database utility"
+url = "https://www.x.org/releases/individual/app/xrdb-${version}.tar.xz"
+stage = 8
+provides = ["/usr/bin/xrdb"]
+
 [packages.xcb-proto]
 version = "1.17.0"
 version_check = "freedesktop:xorg/proto/xcbproto"
