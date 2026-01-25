@@ -85,6 +85,17 @@ else
         export FCFLAGS="$CFLAGS"
     fi
 fi
+
+# If using LTO, use gcc-ar/gcc-ranlib/gcc-nm for proper LTO object handling
+# This ensures ar/ranlib/nm can process LTO bytecode even if build systems
+# don't respect the bfd-plugins symlink
+if echo "$CFLAGS" | grep -q '\-flto'; then
+    export AR=gcc-ar
+    export RANLIB=gcc-ranlib
+    export NM=gcc-nm
+    info "LTO enabled: using gcc-ar/gcc-ranlib/gcc-nm"
+fi
+
 export MAKEFLAGS="-j$NPROC"
 
 # Get build commands
