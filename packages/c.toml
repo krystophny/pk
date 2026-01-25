@@ -121,10 +121,16 @@ version = "3.0.1"
 version_check = "github:grassmunk/Chicago95"
 description = "Chicago95 XFCE theme (Windows 95 style)"
 url = "https://github.com/grassmunk/Chicago95/archive/refs/tags/v${version}.tar.gz"
-git_url = "https://github.com/grassmunk/Chicago95.git"
-use_git = false
-stage = 11
-# Includes GTK theme, icons, cursors, sounds, fonts, Plymouth theme
+source_dir = "Chicago95-${version}"
+stage = 9
+build_commands = [
+    "mkdir -p ${PKG}/usr/share/themes ${PKG}/usr/share/icons ${PKG}/usr/share/fonts/truetype",
+    "cp -r Theme/Chicago95 ${PKG}/usr/share/themes/",
+    "cp -r Icons/Chicago95 ${PKG}/usr/share/icons/",
+    "cp -r Cursors/Chicago95* ${PKG}/usr/share/icons/",
+    "cp -r Fonts/*.ttf ${PKG}/usr/share/fonts/truetype/ || true"
+]
+provides = ["/usr/share/themes/Chicago95/index.theme"]
 
 [packages.cuda-toolkit]
 version = "12.8.1"
