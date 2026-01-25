@@ -58,3 +58,16 @@ use_git = false
 manual_download = true
 stage = 17
 # Alternative: Full ISO for offline installation
+
+[packages.tmux]
+version = "3.6a"
+version_check = "github:tmux/tmux"
+description = "Terminal multiplexer"
+url = "https://github.com/tmux/tmux/releases/download/${version}/tmux-${version}.tar.gz"
+git_url = "https://github.com/tmux/tmux.git"
+use_git = false
+stage = 4
+build_order = 11
+depends = ["libevent", "ncurses"]
+configure_flags = ""
+provides = ["/usr/bin/tmux"]
