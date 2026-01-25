@@ -28,6 +28,19 @@ build_commands = [
     "make DESTDIR=${PKG} install"
 ]
 
+[packages.man-db]
+version = "2.13.1"
+version_check = "url:https://download-mirror.savannah.gnu.org/releases/man-db/|man-db-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "On-line manual database with man command"
+url = "https://download-mirror.savannah.gnu.org/releases/man-db/man-db-${version}.tar.xz"
+git_url = "https://gitlab.com/man-db/man-db.git"
+use_git = false
+stage = 4
+build_order = 12
+depends = ["libpipeline", "gdbm", "groff"]
+configure_flags = "--disable-setuid --enable-cache-owner=bin --with-browser=/usr/bin/lynx --with-vgrind=/usr/bin/vgrind --with-grap=/usr/bin/grap"
+provides = ["/usr/bin/man", "/usr/bin/mandb"]
+
 [packages.mpdecimal]
 version = "4.0.0"
 description = "Library for decimal floating point arithmetic"
@@ -140,6 +153,21 @@ stage = 16
 # For Raspberry Pi, etc.
 
 # Dependencies for Sunshine
+
+[packages.micromamba]
+version = "2.5.0"
+version_check = "github:mamba-org/micromamba-releases"
+description = "Fast conda package manager (single binary)"
+url = "https://github.com/mamba-org/micromamba-releases/releases/download/${version}/micromamba-linux-64"
+git_url = ""
+use_git = false
+stage = 10
+build_commands = [
+    "mkdir -p ${PKG}/usr/bin",
+    "cp ${srcdir}/micromamba-linux-64 ${PKG}/usr/bin/micromamba",
+    "chmod +x ${PKG}/usr/bin/micromamba"
+]
+provides = ["/usr/bin/micromamba"]
 
 [packages.mdadm]
 version = "4.4"

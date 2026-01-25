@@ -388,4 +388,28 @@ git_url = ""
 use_git = false
 stage = 17
 
+[packages.groff]
+version = "1.23.0"
+version_check = "gnu:groff"
+description = "GNU troff text formatting system"
+url = "https://ftpmirror.gnu.org/gnu/groff/groff-${version}.tar.gz"
+git_url = "https://git.savannah.gnu.org/git/groff.git"
+use_git = false
+stage = 4
+build_order = 9
+configure_flags = "--with-doc=no"
+provides = ["/usr/bin/groff", "/usr/bin/troff"]
+
+[packages.gdbm]
+version = "1.26"
+version_check = "gnu:gdbm"
+description = "GNU database manager"
+url = "https://ftpmirror.gnu.org/gnu/gdbm/gdbm-${version}.tar.gz"
+git_url = "https://git.savannah.gnu.org/git/gdbm.git"
+use_git = false
+stage = 4
+build_order = 10
+configure_flags = "--disable-static --enable-libgdbm-compat"
+provides = ["/usr/lib/libgdbm.so"]
+
 # STAGE 18: Scientific Computing Languages

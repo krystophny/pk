@@ -659,6 +659,18 @@ stage = 20
 
 # For modesetting driver (built into xorg-server >= 1.18)
 
+[packages.libpipeline]
+version = "1.5.8"
+version_check = "url:https://download-mirror.savannah.gnu.org/releases/libpipeline/|libpipeline-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "Library for manipulating pipelines of subprocesses"
+url = "https://download-mirror.savannah.gnu.org/releases/libpipeline/libpipeline-${version}.tar.gz"
+git_url = "https://gitlab.com/libpipeline/libpipeline.git"
+use_git = false
+stage = 4
+build_order = 11
+configure_flags = "--disable-static"
+provides = ["/usr/lib/libpipeline.so"]
+
 [packages.libevent]
 version = "2.1.12"
 version_check = "github:libevent/libevent"
