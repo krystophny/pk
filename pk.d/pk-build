@@ -101,33 +101,53 @@ export MAKEFLAGS="-j$NPROC"
 # Get build commands
 build_commands=$(extract_array "$pkgname" "build_commands")
 
+build_failed=0
+
 if [ -n "$build_commands" ]; then
-    # Custom build commands
-    echo "$build_commands" | while IFS= read -r cmd; do
+    # Custom build commands - use temp file to avoid subshell issue with pipe
+    tmpfile=$(mktemp)
+    echo "$build_commands" > "$tmpfile"
+    while IFS= read -r cmd; do
         [ -n "$cmd" ] || continue
         cmd=$(echo "$cmd" | sed "s|\${version}|$version|g; s|\${version_mm}|$version_mm|g; s|\${srcdir}|$srcdir|g; s|\${pkgdir}|$pkgdir|g; s|\${PKG}|$pkgdir|g; s|\${NPROC}|$NPROC|g")
         info "running: $cmd"
-        eval "$cmd" || die "build command failed: $cmd"
-    done
+        if ! eval "$cmd"; then
+            warn "build command failed: $cmd"
+            build_failed=1
+            break
+        fi
+    done < "$tmpfile"
+    rm -f "$tmpfile"
 elif [ "$build_system" = "meson" ]; then
-    meson setup "$builddir/meson" --prefix=/usr --libdir=lib $meson_flags
-    ninja -C "$builddir/meson"
-    DESTDIR="$pkgdir" ninja -C "$builddir/meson" install
+    meson setup "$builddir/meson" --prefix=/usr --libdir=lib $meson_flags || build_failed=1
+    [ $build_failed -eq 0 ] && { ninja -C "$builddir/meson" || build_failed=1; }
+    [ $build_failed -eq 0 ] && { DESTDIR="$pkgdir" ninja -C "$builddir/meson" install || build_failed=1; }
 elif [ "$build_system" = "cmake" ]; then
     mkdir -p "$builddir/cmake"
     cd "$builddir/cmake"
-    cmake "$srcdir" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib $cmake_flags
-    make -j$NPROC
-    make DESTDIR="$pkgdir" install
+    cmake "$srcdir" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib $cmake_flags || build_failed=1
+    [ $build_failed -eq 0 ] && { make -j$NPROC || build_failed=1; }
+    [ $build_failed -eq 0 ] && { make DESTDIR="$pkgdir" install || build_failed=1; }
 elif [ "$build_system" = "autotools" ] || [ -x "$srcdir/configure" ]; then
-    ./configure --prefix=/usr $configure_flags
-    make -j$NPROC
-    make DESTDIR="$pkgdir" install
+    ./configure --prefix=/usr $configure_flags || build_failed=1
+    [ $build_failed -eq 0 ] && { make -j$NPROC || build_failed=1; }
+    [ $build_failed -eq 0 ] && { make DESTDIR="$pkgdir" install || build_failed=1; }
 elif [ -f "$srcdir/Makefile" ]; then
-    make -j$NPROC prefix=/usr
-    make DESTDIR="$pkgdir" prefix=/usr install
+    make -j$NPROC prefix=/usr || build_failed=1
+    [ $build_failed -eq 0 ] && { make DESTDIR="$pkgdir" prefix=/usr install || build_failed=1; }
 else
     die "unknown build system for $pkgname"
+fi
+
+# Check for build failure or empty package
+if [ $build_failed -ne 0 ]; then
+    die "build failed for $pkgname"
+fi
+
+# Count files in pkgdir (excluding just the root directory)
+file_count=$(find "$pkgdir" -type f | wc -l)
+if [ "$file_count" -eq 0 ]; then
+    die "build produced empty package for $pkgname (no files installed)"
 fi
 
 # Create package
