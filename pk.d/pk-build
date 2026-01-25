@@ -164,6 +164,8 @@ fi
 mkdir -p "$CACHE_DIR"
 pkg_archive="$CACHE_DIR/${pkgname}-${version}.pk.tar.xz"
 cd "$pkgdir"
+# Ensure pkgdir root has sane permissions (prevents installing bad perms to /)
+chmod 755 "$pkgdir"
 tar cJf "$pkg_archive" .
 
 info "created $pkg_archive"

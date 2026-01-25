@@ -40,8 +40,8 @@ root="${PK_ROOT:-/}"
 # List files in archive
 tar -tf "$archive" > "$dbdir/files"
 
-# Extract archive
-tar -xf "$archive" -C "$root"
+# Extract archive (--no-overwrite-dir prevents changing permissions on existing dirs like /)
+tar -xf "$archive" -C "$root" --no-overwrite-dir
 
 # Record package info
 printf '%s\n%s\n' "$pkgname" "$version" > "$dbdir/info"

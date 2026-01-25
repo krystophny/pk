@@ -294,6 +294,31 @@ depends = ["shared-mime-info", "libjpeg-turbo", "libpng"]
 meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false -Dtests=false --wrap-mode=nodownload"
 provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
+[packages.google-chrome]
+version = "stable"
+description = "Google Chrome browser (binary from Google)"
+url = "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+tarball = "google-chrome-stable_current_amd64.deb"
+source_dir = "."
+stage = 14
+skip_optimization = true
+build_commands = [
+    # Extract .deb (ar archive containing data.tar.xz)
+    "ar x /usr/src/google-chrome-stable_current_amd64.deb",
+    "tar xf data.tar.xz -C ${PKG}",
+    # Move files from /opt to /usr
+    "mkdir -p ${PKG}/usr/lib",
+    "mv ${PKG}/opt/google/chrome ${PKG}/usr/lib/google-chrome",
+    "rmdir ${PKG}/opt/google ${PKG}/opt",
+    # Create wrapper script
+    "mkdir -p ${PKG}/usr/bin",
+    "printf '#!/bin/sh\\nexec /usr/lib/google-chrome/google-chrome \"$@\"\\n' > ${PKG}/usr/bin/google-chrome",
+    "chmod +x ${PKG}/usr/bin/google-chrome",
+    # Fix desktop file paths
+    "sed -i 's|/opt/google/chrome|/usr/lib/google-chrome|g' ${PKG}/usr/share/applications/google-chrome.desktop"
+]
+provides = ["/usr/lib/google-chrome/google-chrome"]
+
 [packages.gtk3]
 version = "3.24.43"
 version_check = "gnome:gtk"
