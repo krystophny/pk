@@ -1,0 +1,38 @@
+#!/bin/sh
+# pk-search - search available packages
+# Usage: pk search <pattern>
+
+SCRIPT_DIR="$(dirname "$0")"
+. "$SCRIPT_DIR/pk-common"
+
+pattern="${1:-}"
+
+# Initialize packages directory
+find_packages_dir
+
+if [ -z "$pattern" ]; then
+    # List all packages
+    grep '^\[packages\.' "$PACKAGES_DIR"/*.toml | \
+        sed 's/.*\[packages\.//' | sed 's/\]//' | sort -u | \
+    while read pkg; do
+        if [ -d "$DB_DIR/$pkg" ]; then
+            printf "[installed] %s\n" "$pkg"
+        else
+            printf "            %s\n" "$pkg"
+        fi
+    done
+else
+    # Search packages matching pattern
+    grep '^\[packages\.' "$PACKAGES_DIR"/*.toml | \
+        sed 's/.*\[packages\.//' | sed 's/\]//' | sort -u | \
+        grep -i "$pattern" | \
+    while read pkg; do
+        version=$(get_pkg_version "$pkg")
+        desc=$(extract_field "$pkg" "description")
+        if [ -d "$DB_DIR/$pkg" ]; then
+            printf "[installed] %-25s %s - %s\n" "$pkg" "$version" "$desc"
+        else
+            printf "            %-25s %s - %s\n" "$pkg" "$version" "$desc"
+        fi
+    done
+fi

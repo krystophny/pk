@@ -81,7 +81,25 @@ url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-
 git_url = ""
 use_git = false
 stage = 12
-# Note: For real hardware only, use virtio-gpu in VM
+depends = ["linux"]
+source_dir = "NVIDIA-Linux-x86_64-${version}"
+build_commands = [
+    "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
+    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target ${srcdir}",
+    "cd kernel && make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build module",
+    "mkdir -p ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video",
+    "install -m644 kernel/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
+    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors ${PKG}/usr/share/vulkan/icd.d",
+    "install -m755 libGL*.so.${version} libEGL*.so.${version} libGLESv*.so.${version} libcuda*.so.${version} libnvcuvid.so.${version} libnvidia*.so.${version} ${PKG}/usr/lib/",
+    "install -m755 nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
+    "install -m755 libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
+    "install -m755 nvidia-smi nvidia-settings nvidia-xconfig ${PKG}/usr/bin/",
+    "install -m644 10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
+    "install -m644 nvidia.icd ${PKG}/etc/OpenCL/vendors/",
+    "install -m644 nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
+    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do ln -sf $lib ${lib%.${version}}; ln -sf $lib ${lib%.so.${version}}.so.1; done"
+]
+provides = ["/usr/lib/libnvidia-glcore.so", "/usr/bin/nvidia-smi"]
 
 [packages.nvidia-driver-latest]
 version = "590.48.01"
@@ -91,7 +109,25 @@ url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-
 git_url = ""
 use_git = false
 stage = 12
-# Note: Newer features but may be less stable
+depends = ["linux"]
+source_dir = "NVIDIA-Linux-x86_64-${version}"
+build_commands = [
+    "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
+    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target ${srcdir}",
+    "cd kernel && make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build module",
+    "mkdir -p ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video",
+    "install -m644 kernel/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
+    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors ${PKG}/usr/share/vulkan/icd.d",
+    "install -m755 libGL*.so.${version} libEGL*.so.${version} libGLESv*.so.${version} libcuda*.so.${version} libnvcuvid.so.${version} libnvidia*.so.${version} ${PKG}/usr/lib/",
+    "install -m755 nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
+    "install -m755 libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
+    "install -m755 nvidia-smi nvidia-settings nvidia-xconfig ${PKG}/usr/bin/",
+    "install -m644 10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
+    "install -m644 nvidia.icd ${PKG}/etc/OpenCL/vendors/",
+    "install -m644 nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
+    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do ln -sf $lib ${lib%.${version}}; ln -sf $lib ${lib%.so.${version}}.so.1; done"
+]
+provides = ["/usr/lib/libnvidia-glcore.so", "/usr/bin/nvidia-smi"]
 
 [packages.nodejs]
 version = "25.4.0"

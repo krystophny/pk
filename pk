@@ -24,6 +24,7 @@ Package commands:
   l, list                  List installed packages
   q, query <pkgname>       Query package info
   f, files <pkgname>       List package files
+  s, search [pattern]      Search available packages
 
 Build commands:
   b, build <pkgname>       Build package from package definitions
@@ -52,6 +53,7 @@ case "$cmd" in
     l) cmd="list" ;;
     q) cmd="query" ;;
     f) cmd="files" ;;
+    s) cmd="search" ;;
     b) cmd="build" ;;
     d) cmd="download" ;;
     bs) cmd="build-stage" ;;
