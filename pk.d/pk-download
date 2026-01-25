@@ -86,4 +86,21 @@ case "$filename" in
         ;;
 esac
 
+# Download extra sources if specified
+extra_sources=$(extract_array "$pkgname" "extra_sources")
+if [ -n "$extra_sources" ]; then
+    echo "$extra_sources" | while IFS= read -r extra_url; do
+        [ -n "$extra_url" ] || continue
+        extra_url=$(echo "$extra_url" | sed "s|\${version}|$version|g; s|\${version_mm}|$version_mm|g")
+        extra_filename="${extra_url##*/}"
+        extra_destfile="$SOURCES_DIR/$extra_filename"
+        if [ -f "$extra_destfile" ]; then
+            info "extra source $extra_filename already exists"
+        else
+            info "downloading extra source: $extra_url"
+            curl -L -o "$extra_destfile" "$extra_url" || die "download failed: $extra_url"
+        fi
+    done
+fi
+
 info "source ready: $destfile"

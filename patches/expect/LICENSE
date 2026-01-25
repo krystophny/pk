@@ -1,0 +1,20 @@
+Expect Patches License
+======================
+
+These patches are collected from:
+- Arch Linux packaging repository (BSD Zero Clause License)
+- Fedora/Red Hat distribution (Public Domain)
+
+The expect package itself is in the Public Domain (originally from NIST/Don Libes).
+
+All patches in this directory are freely usable under Public Domain / BSD-0 terms.
+
+Sources:
+- https://gitlab.archlinux.org/archlinux/packaging/packages/expect
+- https://src.fedoraproject.org/rpms/expect
+
+Patch descriptions:
+- expect-c99.patch: C99 compatibility for Tcl channel API
+- expect-configure-c99.patch: C99 configure script fixes
+- expect-5.45.4-covscan-fixes.patch: Static analysis fixes (Coverity)
+- expect-5.45-format-security.patch: Fix -Werror=format-security

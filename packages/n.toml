@@ -99,62 +99,92 @@ stage = 11
 repology = "nextcloud-client"
 
 # STAGE 12: GPU Drivers
+# NVIDIA open-source kernel modules (recommended by upstream)
+# Use nvidia-open for production, nvidia-open-latest for bleeding edge
 
-[packages.nvidia-driver]
+[packages.nvidia-open]
 version = "580.126.09"
-version_check = "url:https://www.nvidia.com/Download/processFind.aspx?psid=101&pfid=816&osid=12&lid=1&whql=&lang=en-us&ctk=0|([0-9]+\.[0-9]+\.?[0-9]*)"
-description = "NVIDIA proprietary driver"
-url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"
-git_url = ""
-use_git = false
+version_check = "github:NVIDIA/open-gpu-kernel-modules"
+description = "NVIDIA open kernel modules + userspace (production branch)"
+url = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/${version}.tar.gz"
+source_dir = "open-gpu-kernel-modules-${version}"
 stage = 12
 depends = ["linux"]
-source_dir = "NVIDIA-Linux-x86_64-${version}"
+extra_sources = ["https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"]
+skip_optimization = true
 build_commands = [
+    # Build open kernel modules from source (unset LDFLAGS to avoid kernel LTO flags)
+    "unset LDFLAGS; make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build NV_VERBOSE=1 modules",
+    # Extract userspace from .run file
     "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
-    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target ${srcdir}",
-    "cd kernel && make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build module",
+    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target userspace",
+    # Install kernel modules
     "mkdir -p ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video",
-    "install -m644 kernel/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
-    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors ${PKG}/usr/share/vulkan/icd.d",
-    "install -m755 libGL*.so.${version} libEGL*.so.${version} libGLESv*.so.${version} libcuda*.so.${version} libnvcuvid.so.${version} libnvidia*.so.${version} ${PKG}/usr/lib/",
-    "install -m755 nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
-    "install -m755 libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
-    "install -m755 nvidia-smi nvidia-settings nvidia-xconfig ${PKG}/usr/bin/",
-    "install -m644 10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
-    "install -m644 nvidia.icd ${PKG}/etc/OpenCL/vendors/",
-    "install -m644 nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
-    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do ln -sf $lib ${lib%.${version}}; ln -sf $lib ${lib%.so.${version}}.so.1; done"
+    "install -m644 kernel-open/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
+    # Install userspace libraries
+    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions",
+    "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors",
+    "mkdir -p ${PKG}/usr/share/vulkan/icd.d ${PKG}/etc/X11/xorg.conf.d ${PKG}/usr/share/nvidia",
+    "mkdir -p ${PKG}/lib/firmware/nvidia/${version}",
+    "install -m755 userspace/libGL*.so.${version} userspace/libEGL*.so.${version} userspace/libGLESv*.so.${version} ${PKG}/usr/lib/ || true",
+    "install -m755 userspace/libcuda*.so.${version} userspace/libnvcuvid.so.${version} ${PKG}/usr/lib/ || true",
+    "install -m755 userspace/libnvidia*.so.${version} ${PKG}/usr/lib/",
+    "install -m755 userspace/nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
+    "install -m755 userspace/libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
+    "install -m755 userspace/nvidia-smi userspace/nvidia-xconfig ${PKG}/usr/bin/",
+    "install -m755 userspace/nvidia-settings ${PKG}/usr/bin/ || true",
+    "install -m644 userspace/10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
+    "install -m644 userspace/nvidia.icd ${PKG}/etc/OpenCL/vendors/",
+    "install -m644 userspace/nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
+    "install -m644 userspace/firmware/*.bin ${PKG}/lib/firmware/nvidia/${version}/ || true",
+    # Create library symlinks
+    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do [ -f \"$lib\" ] && ln -sf $lib ${lib%.${version}} && ln -sf $lib ${lib%.so.${version}}.so.1; done || true",
+    # X11 config for nvidia driver
+    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf"
 ]
-provides = ["/usr/lib/libnvidia-glcore.so", "/usr/bin/nvidia-smi"]
+provides = ["/usr/lib/libnvidia-glcore.so.${version}", "/usr/bin/nvidia-smi"]
 
-[packages.nvidia-driver-latest]
+[packages.nvidia-open-latest]
 version = "590.48.01"
-version_check = "url:https://www.nvidia.com/Download/processFind.aspx?psid=101&pfid=816&osid=12&lid=1&whql=&lang=en-us&ctk=0|([0-9]+\.[0-9]+\.?[0-9]*)"
-description = "NVIDIA proprietary driver (new feature branch)"
-url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"
-git_url = ""
-use_git = false
+version_check = "url:https://www.nvidia.com/en-us/drivers/unix/|New Feature Branch Version: ([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "NVIDIA open kernel modules + userspace (new feature branch)"
+url = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/${version}.tar.gz"
+source_dir = "open-gpu-kernel-modules-${version}"
 stage = 12
 depends = ["linux"]
-source_dir = "NVIDIA-Linux-x86_64-${version}"
+extra_sources = ["https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"]
+skip_optimization = true
 build_commands = [
+    # Build open kernel modules from source (unset LDFLAGS to avoid kernel LTO flags)
+    "unset LDFLAGS; make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build NV_VERBOSE=1 modules",
+    # Extract userspace from .run file
     "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
-    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target ${srcdir}",
-    "cd kernel && make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build module",
+    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target userspace",
+    # Install kernel modules
     "mkdir -p ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video",
-    "install -m644 kernel/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
-    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors ${PKG}/usr/share/vulkan/icd.d",
-    "install -m755 libGL*.so.${version} libEGL*.so.${version} libGLESv*.so.${version} libcuda*.so.${version} libnvcuvid.so.${version} libnvidia*.so.${version} ${PKG}/usr/lib/",
-    "install -m755 nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
-    "install -m755 libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
-    "install -m755 nvidia-smi nvidia-settings nvidia-xconfig ${PKG}/usr/bin/",
-    "install -m644 10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
-    "install -m644 nvidia.icd ${PKG}/etc/OpenCL/vendors/",
-    "install -m644 nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
-    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do ln -sf $lib ${lib%.${version}}; ln -sf $lib ${lib%.so.${version}}.so.1; done"
+    "install -m644 kernel-open/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
+    # Install userspace libraries
+    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions",
+    "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors",
+    "mkdir -p ${PKG}/usr/share/vulkan/icd.d ${PKG}/etc/X11/xorg.conf.d ${PKG}/usr/share/nvidia",
+    "mkdir -p ${PKG}/lib/firmware/nvidia/${version}",
+    "install -m755 userspace/libGL*.so.${version} userspace/libEGL*.so.${version} userspace/libGLESv*.so.${version} ${PKG}/usr/lib/ || true",
+    "install -m755 userspace/libcuda*.so.${version} userspace/libnvcuvid.so.${version} ${PKG}/usr/lib/ || true",
+    "install -m755 userspace/libnvidia*.so.${version} ${PKG}/usr/lib/",
+    "install -m755 userspace/nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
+    "install -m755 userspace/libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
+    "install -m755 userspace/nvidia-smi userspace/nvidia-xconfig ${PKG}/usr/bin/",
+    "install -m755 userspace/nvidia-settings ${PKG}/usr/bin/ || true",
+    "install -m644 userspace/10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
+    "install -m644 userspace/nvidia.icd ${PKG}/etc/OpenCL/vendors/",
+    "install -m644 userspace/nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
+    "install -m644 userspace/firmware/*.bin ${PKG}/lib/firmware/nvidia/${version}/ || true",
+    # Create library symlinks
+    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do [ -f \"$lib\" ] && ln -sf $lib ${lib%.${version}} && ln -sf $lib ${lib%.so.${version}}.so.1; done || true",
+    # X11 config for nvidia driver
+    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf"
 ]
-provides = ["/usr/lib/libnvidia-glcore.so", "/usr/bin/nvidia-smi"]
+provides = ["/usr/lib/libnvidia-glcore.so.${version}", "/usr/bin/nvidia-smi"]
 
 [packages.nodejs]
 version = "25.4.0"

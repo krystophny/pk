@@ -30,9 +30,10 @@ safety_check() {
 }
 
 # Parse package name and version from filename
-# foo-1.2.3.pkg.tar.xz -> name=foo version=1.2.3
+# foo-1.2.3.pk.tar.xz -> name=foo version=1.2.3
 parse_pkgname() {
     local basename="${1##*/}"
+    basename="${basename%.pk.tar*}"
     basename="${basename%.pkg.tar*}"
     basename="${basename%.tar*}"
 

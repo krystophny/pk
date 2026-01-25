@@ -64,14 +64,13 @@ git_url = "https://github.com/dejavu-fonts/dejavu-fonts.git"
 use_git = false
 stage = 11
 
-# DejaGnu now works with expectrl-tcl
 [packages.dejagnu]
 version = "1.6.3"
 version_check = "gnu:dejagnu"
 description = "GNU testing framework"
 url = "https://ftpmirror.gnu.org/gnu/dejagnu/dejagnu-${version}.tar.gz"
 stage = 10
-depends = ["tcl", "expectrl-tcl"]
+depends = ["tcl", "expect"]
 build_commands = [
     "./configure --prefix=/usr",
     "make",

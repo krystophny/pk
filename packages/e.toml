@@ -83,14 +83,20 @@ use_git = false
 stage = 10
 depends = ["tcl"]
 source_dir = "expect${version}"
-# Disable LTO/fast-math for compatibility; patch for Tcl 8.6 API compatibility
+skip_optimization = true
+# Patches from Arch Linux (Public Domain / BSD-0) + GCC 14+ fix from OpenEmbedded
 build_commands = [
-    "cd ${srcdir} && ln -sf pty_termios.c pty_.c",
-    "cd ${srcdir} && sed -i 's/#define exp_deleteProc.*/#define exp_deleteProc (void (*)(void *))0/' exp_command.h",
-    "cd ${srcdir} && sed -i 's/#define exp_deleteObjProc.*/#define exp_deleteObjProc (void (*)(void *))0/' exp_command.h",
-    "cd ${srcdir} && CFLAGS='-O3 -march=znver3 -pipe' LDFLAGS='' ./configure --prefix=/usr --with-tcl=/usr/lib --enable-shared --mandir=/usr/share/man --with-tclinclude=/usr/include",
-    "cd ${srcdir} && make -j${NPROC}",
-    "cd ${srcdir} && make DESTDIR=${PKG} install",
+    # Apply Arch Linux patches
+    "patch -Np0 -i /home/ert/code/pk/patches/expect/expect-5.45-format-security.patch",
+    "patch -Np1 -i /home/ert/code/pk/patches/expect/expect-c99.patch",
+    "patch -Np1 -i /home/ert/code/pk/patches/expect/expect-5.45.4-covscan-fixes.patch",
+    "patch -Np1 -i /home/ert/code/pk/patches/expect/expect-configure-c99.patch",
+    # Regenerate configure after patching
+    "autoreconf -fiv",
+    # Configure and build (use gnu89 for old K&R C code compatibility with GCC 14+)
+    "CFLAGS='-O3 -march=znver3 -pipe -std=gnu89' LDFLAGS='' ./configure --prefix=/usr --with-tcl=/usr/lib --enable-shared --mandir=/usr/share/man --with-tclinclude=/usr/include",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
     "ln -sf expect${version}/libexpect${version}.so ${PKG}/usr/lib/libexpect.so"
 ]
 provides = ["/usr/bin/expect"]

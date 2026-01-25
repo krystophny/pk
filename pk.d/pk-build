@@ -26,6 +26,7 @@ info "building $pkgname $version"
 version_mm=$(echo "$version" | sed 's/\.[^.]*$//')
 
 # Find source directory
+skip_extract=$(extract_field "$pkgname" "skip_extract")
 source_dir=$(extract_field "$pkgname" "source_dir")
 if [ -n "$source_dir" ]; then
     # Expand ${version} in source_dir
@@ -38,18 +39,27 @@ else
     srcdir="$SOURCES_DIR/${pkgname}-${version}"
 fi
 
-[ -d "$srcdir" ] || die "source directory not found: $srcdir"
-
-# Build directory
-builddir="$srcdir/build-pk"
-pkgdir="$builddir/pkg"
-
-rm -rf "$builddir"
-mkdir -p "$pkgdir"
-cd "$srcdir"
+# For packages with skip_extract (like .run installers), don't require srcdir to exist
+if [ "$skip_extract" = "true" ]; then
+    # Clean any previous extraction
+    rm -rf "$srcdir"
+    builddir="$SOURCES_DIR/build-${pkgname}"
+    pkgdir="$builddir/pkg"
+    rm -rf "$builddir"
+    mkdir -p "$pkgdir"
+    cd "$SOURCES_DIR"
+else
+    [ -d "$srcdir" ] || die "source directory not found: $srcdir"
+    builddir="$srcdir/build-pk"
+    pkgdir="$builddir/pkg"
+    rm -rf "$builddir"
+    mkdir -p "$pkgdir"
+    cd "$srcdir"
+fi
 
 export NPROC=$(nproc)
 export PKG="$pkgdir"
+export SOURCES_DIR
 export version version_mm srcdir pkgdir
 
 # Load optimization flags (unless skip_optimization is set)
