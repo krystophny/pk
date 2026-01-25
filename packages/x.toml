@@ -40,6 +40,16 @@ git_url = "https://gitlab.freedesktop.org/xorg/proto/xorgproto.git"
 use_git = false
 stage = 8
 
+[packages.xauth]
+version = "1.1.4"
+version_check = "xorg:app/xauth"
+description = "X authority file utility"
+url = "https://www.x.org/releases/individual/app/xauth-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/xorg/app/xauth.git"
+use_git = false
+stage = 8
+provides = ["/usr/bin/xauth"]
+
 [packages.xcb-proto]
 version = "1.17.0"
 version_check = "freedesktop:xorg/proto/xcbproto"
