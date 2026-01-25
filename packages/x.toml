@@ -24,6 +24,12 @@ url = "https://www.x.org/releases/individual/xserver/xorg-server-${version}.tar.
 git_url = "https://gitlab.freedesktop.org/xorg/xserver.git"
 use_git = false
 stage = 8
+skip_optimization = true
+build_commands = [
+    "./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --enable-glamor --enable-suid-wrapper --enable-xorg --disable-docs --disable-devel-docs CFLAGS='-O2 -march=znver3 -Wno-error'",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
 
 [packages.xorgproto]
 version = "2025.1"
