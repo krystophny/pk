@@ -103,9 +103,9 @@ repology = "nextcloud-client"
 # Use nvidia-open for production, nvidia-open-latest for bleeding edge
 
 [packages.nvidia-open]
-version = "580.126.09"
+version = "570.211.01"
 version_check = "github:NVIDIA/open-gpu-kernel-modules"
-description = "NVIDIA open kernel modules + userspace (production branch)"
+description = "NVIDIA open kernel modules + userspace (570 branch for Blackwell)"
 url = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/${version}.tar.gz"
 source_dir = "open-gpu-kernel-modules-${version}"
 stage = 12
@@ -113,6 +113,8 @@ depends = ["linux"]
 extra_sources = ["https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"]
 skip_optimization = true
 build_commands = [
+    # Clean any previous userspace extraction
+    "rm -rf userspace",
     # Build open kernel modules from source (unset LDFLAGS to avoid kernel LTO flags)
     "unset LDFLAGS; make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build NV_VERBOSE=1 modules",
     # Extract userspace from .run file
@@ -140,49 +142,13 @@ build_commands = [
     # Create library symlinks (use find to avoid TOML escaping issues)
     "find ${PKG}/usr/lib -maxdepth 1 -name 'lib*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
     # X11 config for nvidia driver
-    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf"
-]
-provides = ["/usr/lib/libnvidia-glcore.so.${version}", "/usr/bin/nvidia-smi"]
-
-[packages.nvidia-open-latest]
-version = "590.48.01"
-version_check = "url:https://www.nvidia.com/en-us/drivers/unix/|New Feature Branch Version: ([0-9]+\\.[0-9]+\\.[0-9]+)"
-description = "NVIDIA open kernel modules + userspace (new feature branch)"
-url = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/${version}.tar.gz"
-source_dir = "open-gpu-kernel-modules-${version}"
-stage = 12
-depends = ["linux"]
-extra_sources = ["https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}.run"]
-skip_optimization = true
-build_commands = [
-    # Build open kernel modules from source (unset LDFLAGS to avoid kernel LTO flags)
-    "unset LDFLAGS; make -j${NPROC} SYSSRC=/lib/modules/$(uname -r)/build NV_VERBOSE=1 modules",
-    # Extract userspace from .run file
-    "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
-    "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target userspace",
-    # Install kernel modules (use /lib/modules, not /usr/lib/modules)
-    "mkdir -p ${PKG}/lib/modules/$(uname -r)/kernel/drivers/video",
-    "install -m644 kernel-open/*.ko ${PKG}/lib/modules/$(uname -r)/kernel/drivers/video/",
-    # Install userspace libraries
-    "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions",
-    "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors",
-    "mkdir -p ${PKG}/usr/share/vulkan/icd.d ${PKG}/etc/X11/xorg.conf.d ${PKG}/usr/share/nvidia",
-    "mkdir -p ${PKG}/lib/firmware/nvidia/${version}",
-    "install -m755 userspace/libGL*.so.${version} userspace/libEGL*.so.${version} userspace/libGLESv*.so.${version} ${PKG}/usr/lib/ || true",
-    "install -m755 userspace/libcuda*.so.${version} userspace/libnvcuvid.so.${version} ${PKG}/usr/lib/ || true",
-    "install -m755 userspace/libnvidia*.so.${version} ${PKG}/usr/lib/",
-    "install -m755 userspace/nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
-    "install -m755 userspace/libglxserver_nvidia.so.${version} ${PKG}/usr/lib/xorg/modules/extensions/",
-    "install -m755 userspace/nvidia-smi userspace/nvidia-xconfig ${PKG}/usr/bin/",
-    "install -m755 userspace/nvidia-settings ${PKG}/usr/bin/ || true",
-    "install -m644 userspace/10_nvidia.json ${PKG}/usr/share/glvnd/egl_vendor.d/",
-    "install -m644 userspace/nvidia.icd ${PKG}/etc/OpenCL/vendors/",
-    "install -m644 userspace/nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
-    "install -m644 userspace/firmware/*.bin ${PKG}/lib/firmware/nvidia/${version}/ || true",
-    # Create library symlinks (use find to avoid TOML escaping issues)
-    "find ${PKG}/usr/lib -maxdepth 1 -name 'lib*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
-    # X11 config for nvidia driver
-    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf"
+    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    # udev rules for nvidia device nodes
+    "mkdir -p ${PKG}/usr/lib/udev/rules.d",
+    "echo 'KERNEL==\"nvidia\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' > ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
+    "echo 'KERNEL==\"nvidia_uvm\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' >> ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
+    # Install nvidia-modprobe for device node creation
+    "install -m4755 userspace/nvidia-modprobe ${PKG}/usr/bin/ || true"
 ]
 provides = ["/usr/lib/libnvidia-glcore.so.${version}", "/usr/bin/nvidia-smi"]
 
