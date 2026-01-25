@@ -118,9 +118,9 @@ build_commands = [
     # Extract userspace from .run file
     "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
     "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target userspace",
-    # Install kernel modules
-    "mkdir -p ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video",
-    "install -m644 kernel-open/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
+    # Install kernel modules (use /lib/modules, not /usr/lib/modules)
+    "mkdir -p ${PKG}/lib/modules/$(uname -r)/kernel/drivers/video",
+    "install -m644 kernel-open/*.ko ${PKG}/lib/modules/$(uname -r)/kernel/drivers/video/",
     # Install userspace libraries
     "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions",
     "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors",
@@ -137,8 +137,8 @@ build_commands = [
     "install -m644 userspace/nvidia.icd ${PKG}/etc/OpenCL/vendors/",
     "install -m644 userspace/nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
     "install -m644 userspace/firmware/*.bin ${PKG}/lib/firmware/nvidia/${version}/ || true",
-    # Create library symlinks
-    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do [ -f \"$lib\" ] && ln -sf $lib ${lib%.${version}} && ln -sf $lib ${lib%.so.${version}}.so.1; done || true",
+    # Create library symlinks (use find to avoid TOML escaping issues)
+    "find ${PKG}/usr/lib -maxdepth 1 -name 'lib*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
     # X11 config for nvidia driver
     "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf"
 ]
@@ -160,9 +160,9 @@ build_commands = [
     # Extract userspace from .run file
     "chmod +x ${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run",
     "${SOURCES_DIR}/NVIDIA-Linux-x86_64-${version}.run --extract-only --target userspace",
-    # Install kernel modules
-    "mkdir -p ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video",
-    "install -m644 kernel-open/*.ko ${PKG}/usr/lib/modules/$(uname -r)/kernel/drivers/video/",
+    # Install kernel modules (use /lib/modules, not /usr/lib/modules)
+    "mkdir -p ${PKG}/lib/modules/$(uname -r)/kernel/drivers/video",
+    "install -m644 kernel-open/*.ko ${PKG}/lib/modules/$(uname -r)/kernel/drivers/video/",
     # Install userspace libraries
     "mkdir -p ${PKG}/usr/lib ${PKG}/usr/lib/xorg/modules/drivers ${PKG}/usr/lib/xorg/modules/extensions",
     "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors",
@@ -179,8 +179,8 @@ build_commands = [
     "install -m644 userspace/nvidia.icd ${PKG}/etc/OpenCL/vendors/",
     "install -m644 userspace/nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
     "install -m644 userspace/firmware/*.bin ${PKG}/lib/firmware/nvidia/${version}/ || true",
-    # Create library symlinks
-    "cd ${PKG}/usr/lib && for lib in lib*.so.${version}; do [ -f \"$lib\" ] && ln -sf $lib ${lib%.${version}} && ln -sf $lib ${lib%.so.${version}}.so.1; done || true",
+    # Create library symlinks (use find to avoid TOML escaping issues)
+    "find ${PKG}/usr/lib -maxdepth 1 -name 'lib*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
     # X11 config for nvidia driver
     "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf"
 ]
