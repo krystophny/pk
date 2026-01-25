@@ -103,9 +103,9 @@ repology = "nextcloud-client"
 # Use nvidia-open for production, nvidia-open-latest for bleeding edge
 
 [packages.nvidia-open]
-version = "570.211.01"
+version = "590.48.01"
 version_check = "github:NVIDIA/open-gpu-kernel-modules"
-description = "NVIDIA open kernel modules + userspace (570 branch for Blackwell)"
+description = "NVIDIA open kernel modules + userspace (590 for Turing+)"
 url = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/${version}.tar.gz"
 source_dir = "open-gpu-kernel-modules-${version}"
 stage = 12
@@ -128,7 +128,8 @@ build_commands = [
     "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/glvnd/egl_vendor.d ${PKG}/etc/OpenCL/vendors",
     "mkdir -p ${PKG}/usr/share/vulkan/icd.d ${PKG}/etc/X11/xorg.conf.d ${PKG}/usr/share/nvidia",
     "mkdir -p ${PKG}/lib/firmware/nvidia/${version}",
-    "install -m755 userspace/libGL*.so.${version} userspace/libEGL*.so.${version} userspace/libGLESv*.so.${version} ${PKG}/usr/lib/ || true",
+    # Install GLVND vendor libraries (NOT the thin wrappers like libGL.so, libEGL.so - those come from mesa)
+    "install -m755 userspace/libGLX_nvidia.so.${version} userspace/libEGL_nvidia.so.${version} ${PKG}/usr/lib/",
     "install -m755 userspace/libcuda*.so.${version} userspace/libnvcuvid.so.${version} ${PKG}/usr/lib/ || true",
     "install -m755 userspace/libnvidia*.so.${version} ${PKG}/usr/lib/",
     "install -m755 userspace/nvidia_drv.so ${PKG}/usr/lib/xorg/modules/drivers/",
@@ -140,18 +141,22 @@ build_commands = [
     "install -m644 userspace/nvidia.icd ${PKG}/etc/OpenCL/vendors/",
     "install -m644 userspace/nvidia_icd.json ${PKG}/usr/share/vulkan/icd.d/",
     "install -m644 userspace/firmware/*.bin ${PKG}/lib/firmware/nvidia/${version}/ || true",
-    # Create library symlinks (use find to avoid TOML escaping issues)
-    "find ${PKG}/usr/lib -maxdepth 1 -name 'lib*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
-    # X11 config for nvidia driver (use separate echos to avoid TOML escaping issues)
-    "echo 'Section \"Device\"' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
-    "echo '    Identifier \"NVIDIA\"' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
-    "echo '    Driver \"nvidia\"' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
-    "echo '    Option \"AllowEmptyInitialConfiguration\"' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
-    "echo 'EndSection' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    # Create library symlinks for nvidia libs (.so and .so.1)
+    "find ${PKG}/usr/lib -maxdepth 1 -name 'libnvidia*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
+    "find ${PKG}/usr/lib -maxdepth 1 -name 'libcuda*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
+    "find ${PKG}/usr/lib -maxdepth 1 -name 'libnvcuvid*.so.${version}' -exec sh -c 'for f; do b=$(basename $f); ln -sf $b ${f%.${version}}; ln -sf $b ${f%.so.${version}}.so.1; done' _ {} +",
+    # Create GLVND vendor library symlinks (.so, .so.0, and .so.1)
+    "ln -sf libGLX_nvidia.so.${version} ${PKG}/usr/lib/libGLX_nvidia.so",
+    "ln -sf libGLX_nvidia.so.${version} ${PKG}/usr/lib/libGLX_nvidia.so.0",
+    "ln -sf libGLX_nvidia.so.${version} ${PKG}/usr/lib/libGLX_nvidia.so.1",
+    "ln -sf libEGL_nvidia.so.${version} ${PKG}/usr/lib/libEGL_nvidia.so",
+    "ln -sf libEGL_nvidia.so.${version} ${PKG}/usr/lib/libEGL_nvidia.so.0",
+    "ln -sf libEGL_nvidia.so.${version} ${PKG}/usr/lib/libEGL_nvidia.so.1",
+    # X11 config for nvidia driver
+    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
     # udev rules for nvidia device nodes
     "mkdir -p ${PKG}/usr/lib/udev/rules.d",
-    "echo 'KERNEL==\"nvidia\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' > ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
-    "echo 'KERNEL==\"nvidia_uvm\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' >> ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
+    "printf 'KERNEL==\"nvidia\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"\\nKERNEL==\"nvidia_uvm\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"\\n' > ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
     # Install nvidia-modprobe for device node creation
     "install -m4755 userspace/nvidia-modprobe ${PKG}/usr/bin/ || true",
     # modprobe config for nvidia-drm modeset
