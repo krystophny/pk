@@ -152,7 +152,13 @@ build_commands = [
     "echo 'KERNEL==\"nvidia\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' > ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
     "echo 'KERNEL==\"nvidia_uvm\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' >> ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
     # Install nvidia-modprobe for device node creation
-    "install -m4755 userspace/nvidia-modprobe ${PKG}/usr/bin/ || true"
+    "install -m4755 userspace/nvidia-modprobe ${PKG}/usr/bin/ || true",
+    # modprobe config for nvidia-drm modeset
+    "mkdir -p ${PKG}/etc/modprobe.d",
+    "echo 'options nvidia-drm modeset=1' > ${PKG}/etc/modprobe.d/nvidia-drm.conf",
+    # Auto-load nvidia-drm on boot
+    "mkdir -p ${PKG}/etc/modules-load.d",
+    "echo 'nvidia-drm' > ${PKG}/etc/modules-load.d/nvidia.conf"
 ]
 provides = ["/usr/lib/libnvidia-glcore.so.${version}", "/usr/bin/nvidia-smi"]
 
