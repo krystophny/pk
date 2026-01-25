@@ -43,6 +43,20 @@ build_order = 24
 # Stage 3 temporary tools (needed before glibc rebuild)
 # These come from LFS Chapter 7
 
+[packages.fvwm3]
+version = "1.1.4"
+version_check = "github:fvwmorg/fvwm3"
+description = "F? Virtual Window Manager version 3"
+url = "https://github.com/fvwmorg/fvwm3/archive/refs/tags/${version}.tar.gz"
+stage = 9
+depends = ["xorg-server", "libx11", "libxft", "libxrender", "libxext", "libxpm", "libxcursor", "libxrandr", "libxinerama", "libevent", "libpng"]
+build_commands = [
+    "meson setup build-pk/meson --prefix=/usr --buildtype=release",
+    "ninja -C build-pk/meson",
+    "DESTDIR=${PKG} ninja -C build-pk/meson install"
+]
+provides = ["/usr/bin/fvwm3"]
+
 [packages.freetype]
 version = "2.14.1"
 version_check = "savannah:freetype"
