@@ -1,3 +1,15 @@
+[packages.jq]
+version = "1.8.1"
+version_check = "github:jqlang/jq"
+description = "Command-line JSON processor"
+url = "https://github.com/jqlang/jq/releases/download/jq-${version}/jq-${version}.tar.gz"
+git_url = "https://github.com/jqlang/jq.git"
+use_git = false
+stage = 4
+build_order = 13
+configure_flags = "--disable-docs"
+provides = ["/usr/bin/jq"]
+
 [packages.julia]
 version = "1.11.2"
 version_check = "github:JuliaLang/julia"
