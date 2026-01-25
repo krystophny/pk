@@ -294,7 +294,7 @@ build_order = 7
 build_system = "meson"
 source_dir = "gtk+-${version}"
 depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false --wrap-mode=nodownload"
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false -Dbroadway_backend=false --wrap-mode=nodownload"
 provides = ["/usr/lib/libgtk-3.so"]
 
 [packages.garcon]

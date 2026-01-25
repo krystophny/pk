@@ -500,6 +500,15 @@ git_url = "https://gitlab.freedesktop.org/xorg/lib/libxt.git"
 use_git = false
 stage = 8
 
+[packages.libXtst]
+version = "1.2.5"
+version_check = "xorg:lib/libXtst"
+description = "X Test Extension library"
+url = "https://www.x.org/releases/individual/lib/libXtst-${version}.tar.xz"
+stage = 8
+build_system = "autotools"
+depends = ["libX11", "libXext", "libXi"]
+
 [packages.libXmu]
 version = "1.2.1"
 version_check = "xorg:lib/libXmu"

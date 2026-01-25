@@ -57,7 +57,18 @@ use_git = false
 stage = 9
 build_order = 5
 build_system = "meson"
-meson_flags = "-Dintrospection=false"
+meson_flags = "-Dintrospection=disabled"
+
+[packages.at-spi2-core]
+version = "2.54.0"
+version_check = "gnome:at-spi2-core"
+description = "Accessibility infrastructure"
+url = "https://download.gnome.org/sources/at-spi2-core/2.54/at-spi2-core-${version}.tar.xz"
+stage = 9
+build_order = 5
+build_system = "meson"
+depends = ["dbus", "glib", "libX11", "libXi", "libXtst"]
+meson_flags = "-Dintrospection=disabled -Dx11=enabled -Dsystemd_user_dir=/tmp --wrap-mode=nodownload"
 
 [packages.alsa-lib]
 version = "1.2.15"

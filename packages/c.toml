@@ -92,8 +92,8 @@ use_git = false
 stage = 9
 build_order = 2
 build_system = "meson"
-depends = ["pixman", "fontconfig", "freetype"]
-meson_flags = "-Dgtk_doc=false -Dtests=disabled -Dspectre=disabled -Dsymbol-lookup=disabled --wrap-mode=nodownload"
+depends = ["pixman", "fontconfig", "freetype", "libX11", "libXext", "libXrender", "libxcb"]
+meson_flags = "-Dgtk_doc=false -Dtests=disabled -Dspectre=disabled -Dsymbol-lookup=disabled -Dxlib=enabled -Dxcb=enabled --wrap-mode=nodownload"
 provides = ["/usr/lib/libcairo.so"]
 
 [packages.claws-mail]
