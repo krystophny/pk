@@ -179,6 +179,7 @@ stage = 14
 
 [packages.nspr]
 version = "4.38.2"
+version_check = "url:https://archive.mozilla.org/pub/nspr/releases/|v([0-9]+\\.[0-9]+\\.?[0-9]*)/src"
 description = "Netscape Portable Runtime"
 url = "https://archive.mozilla.org/pub/nspr/releases/v${version}/src/nspr-${version}.tar.gz"
 stage = 4
@@ -192,6 +193,7 @@ provides = ["/usr/lib/libnspr4.so"]
 
 [packages.nss]
 version = "3.108"
+version_check = "url:https://archive.mozilla.org/pub/security/nss/releases/|NSS_([0-9]+)_([0-9]+)_RTM"
 description = "Network Security Services"
 url = "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_108_RTM/src/nss-${version}.tar.gz"
 stage = 4
@@ -206,20 +208,6 @@ build_commands = [
     "NSS_DIST=$(ls -d dist/*_OPT.OBJ); install -m755 $NSS_DIST/bin/certutil $NSS_DIST/bin/pk12util ${PKG}/usr/bin/"
 ]
 provides = ["/usr/lib/libnss3.so"]
-
-# STAGE 15: HPC Compilers
-
-[packages.nvhpc]
-version = "100.630"
-version_check = "url:https://developer.nvidia.com/hpc-sdk-downloads|([0-9]+\.[0-9]+)"
-description = "NVIDIA HPC SDK (nvfortran, nvc, nvc++)"
-# Manual download required from NVIDIA developer site
-url = ""
-git_url = ""
-use_git = false
-stage = 15
-# Note: Binary distribution, install to /opt/nvidia/hpc_sdk
-# Includes: nvfortran, nvc, nvc++, CUDA, cuBLAS, cuFFT, nvcc
 
 [packages.nvme-cli]
 version = "2.16"

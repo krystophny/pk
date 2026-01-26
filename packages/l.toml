@@ -324,7 +324,7 @@ use_git = false
 stage = 8
 
 [packages.libXres]
-version = "1.2.2"
+version = "1.2.3"
 version_check = "xorg:lib/libXres"
 description = "X Resource extension library"
 url = "https://www.x.org/releases/individual/lib/libXres-${version}.tar.xz"
@@ -333,7 +333,7 @@ build_system = "autotools"
 depends = ["libX11", "libXext"]
 
 [packages.libXrandr]
-version = "1.5.4"
+version = "1.5.5"
 version_check = "xorg:lib/libXrandr"
 description = "X RandR extension library"
 url = "https://www.x.org/releases/individual/lib/libXrandr-${version}.tar.xz"
@@ -342,7 +342,7 @@ use_git = false
 stage = 8
 
 [packages.libXinerama]
-version = "1.1.5"
+version = "1.1.6"
 version_check = "xorg:lib/libXinerama"
 description = "X Xinerama extension library"
 url = "https://www.x.org/releases/individual/lib/libXinerama-${version}.tar.xz"
@@ -369,7 +369,7 @@ use_git = false
 stage = 8
 
 [packages.libXext]
-version = "1.3.6"
+version = "1.3.7"
 version_check = "xorg:lib/libXext"
 description = "X extension library"
 url = "https://www.x.org/releases/individual/lib/libXext-${version}.tar.xz"
@@ -378,7 +378,7 @@ use_git = false
 stage = 8
 
 [packages.libXcomposite]
-version = "0.4.6"
+version = "0.4.7"
 version_check = "xorg:lib/libXcomposite"
 description = "X Composite extension library"
 url = "https://www.x.org/releases/individual/lib/libXcomposite-${version}.tar.xz"
@@ -387,7 +387,7 @@ use_git = false
 stage = 8
 
 [packages.libXdamage]
-version = "1.1.6"
+version = "1.1.7"
 version_check = "xorg:lib/libXdamage"
 description = "X Damage extension library"
 url = "https://www.x.org/releases/individual/lib/libXdamage-${version}.tar.xz"
@@ -619,7 +619,7 @@ build_system = "autotools"
 depends = ["libX11", "libXext", "libXi"]
 
 [packages.libXxf86vm]
-version = "1.1.6"
+version = "1.1.7"
 version_check = "xorg:lib/libXxf86vm"
 description = "XFree86 VidMode extension library"
 url = "https://www.x.org/releases/individual/lib/libXxf86vm-${version}.tar.xz"
@@ -629,7 +629,7 @@ stage = 8
 depends = ["libX11", "libXext", "xorgproto"]
 
 [packages.libXmu]
-version = "1.2.1"
+version = "1.3.0"
 version_check = "xorg:lib/libXmu"
 description = "X miscellaneous utility library"
 url = "https://www.x.org/releases/individual/lib/libXmu-${version}.tar.xz"
@@ -647,7 +647,7 @@ use_git = false
 stage = 8
 
 [packages.libXpm]
-version = "3.5.17"
+version = "3.5.18"
 version_check = "xorg:lib/libXpm"
 description = "X Pixmap library"
 url = "https://www.x.org/releases/individual/lib/libXpm-${version}.tar.xz"
@@ -804,19 +804,6 @@ url = "https://github.com/lm-sensors/lm-sensors/archive/refs/tags/V${version}.ta
 git_url = "https://github.com/lm-sensors/lm-sensors.git"
 use_git = false
 stage = 19
-
-[packages.libshadow]
-version = "4.19.2"
-version_check = "github:shadow-maint/shadow"
-description = "Xorg shadow framebuffer module (built into xorg-server)"
-url = ""
-git_url = ""
-use_git = false
-stage = 20
-# Note: Shadow support is built into xorg-server, no separate package needed
-# Requires xorg-server to be built with shadow support enabled
-
-# For modesetting driver (built into xorg-server >= 1.18)
 
 [packages.libpipeline]
 version = "1.5.8"

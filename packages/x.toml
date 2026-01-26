@@ -112,7 +112,7 @@ use_git = false
 stage = 8
 
 [packages.xf86-video-fbdev]
-version = "0.5.0"
+version = "0.5.1"
 version_check = "xorg:driver/xf86-video-fbdev"
 description = "Xorg framebuffer video driver"
 url = "https://www.x.org/releases/individual/driver/xf86-video-fbdev-${version}.tar.bz2"
@@ -325,13 +325,3 @@ git_url = "https://bitbucket.org/multicoreware/x265_git.git"
 use_git = false
 stage = 16
 
-[packages.xorg-server-modesetting]
-version = "21.1.21"
-version_check = "xorg:xserver/xorg-server"
-description = "Xorg modesetting driver (built-in)"
-url = ""
-git_url = ""
-use_git = false
-stage = 20
-# Note: modesetting is built into xorg-server, enable in xorg.conf if needed
-# Works with virtio-gpu and most modern GPUs via KMS

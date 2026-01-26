@@ -42,16 +42,6 @@ meson_flags = "-Dvapi=false -Dgtk4=false -Dicu=false -D_systemd=false -Ddocs=fal
 provides = ["/usr/lib/libvte-2.91.so"]
 depends = ["gnutls", "gtk3", "pcre2"]
 
-[packages.virtio-gpu]
-version = "0.1"
-version_check = "url:https://github.com/nicwn/mtdev/releases|skip"
-description = "VirtIO GPU driver (built into kernel)"
-url = ""
-git_url = ""
-use_git = false
-stage = 12
-# Note: Enable CONFIG_DRM_VIRTIO_GPU in kernel config
-
 [packages.vkd3d-proton]
 version = "3.0b"
 version_check = "github:HansKristian-Work/vkd3d-proton"

@@ -14,12 +14,6 @@ build_commands = [
 ]
 provides = ["/usr/bin/gdb"]
 
-[packages.gcc-stable]
-version = "14.2.0"
-description = "GNU Compiler Collection (stable release for cross-compilation)"
-url = "https://ftpmirror.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz"
-stage = 0
-
 [packages.gcc]
 version = "16-20260118"
 version_check = "gcc-snapshot:"
@@ -182,6 +176,7 @@ build_commands = [
 
 [packages.gperf]
 version = "3.3"
+version_check = "gnu:gperf"
 description = "Perfect hash function generator"
 url = "https://ftpmirror.gnu.org/gnu/gperf/gperf-${version}.tar.gz"
 stage = 3
@@ -313,6 +308,7 @@ provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
 [packages.google-chrome]
 version = "stable"
+version_check = "url:https://dl.google.com/linux/direct/|skip"
 description = "Google Chrome browser (binary from Google)"
 url = "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 tarball = "google-chrome-stable_current_amd64.deb"
@@ -339,7 +335,7 @@ provides = ["/usr/lib/google-chrome/google-chrome"]
 
 [packages.gtk3]
 version = "3.24.43"
-version_check = "gnome:gtk"
+version_check = "gnome:gtk+"
 description = "GTK+ 3 toolkit"
 url = "https://download.gnome.org/sources/gtk+/3.24/gtk+-${version}.tar.xz"
 git_url = "https://gitlab.gnome.org/GNOME/gtk.git"

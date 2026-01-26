@@ -50,7 +50,7 @@ build_commands = [
 
 [packages.wine]
 version = "11.0"
-version_check = "github:wine-mirror/wine"
+version_check = "url:https://dl.winehq.org/wine/source/|>([0-9]+\\.[0-9]+)/<"
 description = "Windows compatibility layer"
 url = "https://dl.winehq.org/wine/source/11.0/wine-${version}.tar.xz"
 git_url = "https://gitlab.winehq.org/wine/wine.git"
