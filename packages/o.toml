@@ -15,7 +15,7 @@ build_commands = [
 ]
 
 [packages.openssh]
-version = "9.9p2"
+version = "10.2p1"
 version_check = "url:https://www.openssh.com/releasenotes.html|OpenSSH ([0-9]+\\.[0-9]+p[0-9]+)"
 description = "OpenSSH client and server"
 url = "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${version}.tar.gz"

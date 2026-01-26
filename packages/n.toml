@@ -192,10 +192,10 @@ build_commands = [
 provides = ["/usr/lib/libnspr4.so"]
 
 [packages.nss]
-version = "3.108"
+version = "3.120"
 version_check = "url:https://archive.mozilla.org/pub/security/nss/releases/|NSS_([0-9]+)_([0-9]+)_RTM"
 description = "Network Security Services"
-url = "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_108_RTM/src/nss-${version}.tar.gz"
+url = "https://archive.mozilla.org/pub/security/nss/releases/NSS_3_120_RTM/src/nss-${version}.tar.gz"
 stage = 4
 build_order = 11
 depends = ["nspr", "sqlite"]
