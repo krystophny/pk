@@ -16,7 +16,7 @@ build_commands = [
 
 [packages.ca-certificates]
 version = "2025-01-19"
-version_check = "url:https://curl.se/docs/caextract.html|CA-bundle \\(([0-9-]+)\\)"
+version_check = "url:https://curl.se/docs/caextract.html|cacert-([0-9]{4}-[0-9]{2}-[0-9]{2})\\.pem"
 description = "Mozilla CA certificate bundle"
 url = "https://curl.se/ca/cacert.pem"
 stage = 4
