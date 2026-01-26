@@ -49,6 +49,7 @@ build_commands = [
 
 [packages.gcc-pass1]
 version = "16-20260118"
+version_check = "gcc-snapshot:"
 description = "GCC cross-compiler pass 1"
 source_pkg = "gcc"
 stage = 1
