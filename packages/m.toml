@@ -113,7 +113,7 @@ git_url = "https://gitlab.freedesktop.org/mesa/mesa.git"
 use_git = false
 stage = 8
 build_system = "meson"
-meson_flags = "-Dgallium-drivers=softpipe -Dvulkan-drivers= -Dllvm=disabled -Dgallium-opencl=disabled -Dgallium-rusticl=false -Dplatforms=x11 -Dglx=dri -Degl=enabled -Dgbm=enabled -Dgles1=disabled -Dgles2=enabled -Dopengl=true"
+meson_flags = "-Dgallium-drivers=softpipe -Dvulkan-drivers= -Dllvm=disabled -Dgallium-rusticl=false -Dplatforms=x11 -Dglx=dri -Degl=enabled -Dgbm=enabled -Dgles1=disabled -Dgles2=enabled -Dopengl=true"
 depends = ["libdrm", "libX11", "libxshmfence", "libXext", "libXrandr", "libXfixes", "libxcb", "libglvnd", "zstd", "zlib", "expat"]
 
 [packages.mtdev]

@@ -45,11 +45,8 @@ stage = 4
 build_order = 9
 depends = ["openssl", "ca-certificates"]
 # disable LTO - libtool has issues with nm output parsing
-build_commands = [
-    "CFLAGS='-O2 -pipe' LDFLAGS='' ./configure --prefix=/usr --with-openssl --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt --enable-threaded-resolver --without-libpsl",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install"
-]
+skip_optimization = true
+configure_flags = "--with-openssl --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt --enable-threaded-resolver --without-libpsl"
 
 [packages.cmake]
 version = "4.2.2"

@@ -25,13 +25,14 @@ build_commands = [
 ]
 
 [packages.sqlite]
-version = "3.51.2"
+version = "3.48.0"
 version_check = "url:https://www.sqlite.org/download.html|sqlite-autoconf-([0-9]+)"
 description = "Self-contained SQL database engine"
 url = "https://www.sqlite.org/2025/sqlite-autoconf-3480000.tar.gz"
 git_url = "https://github.com/sqlite/sqlite.git"
 use_git = false
 stage = 3
+source_dir = "sqlite-autoconf-3480000"
 # TODO: PGO can provide ~10-30% gains but needs build script changes for proper variable handling
 build_commands = [
     "./configure --prefix=/usr --enable-fts5",

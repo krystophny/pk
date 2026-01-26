@@ -73,11 +73,13 @@ get_tracked_files() {
 # ============================================================================
 
 # Find packages directory - sets PACKAGES_DIR global
+# Note: prioritize pk's own packages directory to avoid conflicts with
+# source trees that have their own packages/ directory (e.g., curl)
 find_packages_dir() {
     [ -n "${PACKAGES_DIR:-}" ] && return 0
     PACKAGES_DIR=""
     SCRIPT_DIR="${SCRIPT_DIR:-$(dirname "$0")}"
-    for d in "./packages" "$SCRIPT_DIR/../packages" "/etc/pk/packages" "/usr/share/pk/packages"; do
+    for d in "$SCRIPT_DIR/../packages" "/etc/pk/packages" "/usr/share/pk/packages" "./packages"; do
         [ -d "$d" ] && PACKAGES_DIR="$(cd "$d" && pwd)" && return 0
     done
     die "packages directory not found"

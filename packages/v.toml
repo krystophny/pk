@@ -22,6 +22,12 @@ url = "https://github.com/vim/vim/archive/v${version}/vim-${version}.tar.gz"
 git_url = "https://github.com/vim/vim.git"
 use_git = false
 stage = 11
+build_commands = [
+    "cd src && ./configure --prefix=/usr --with-features=huge --enable-python3interp --with-python3-command=python3 --enable-multibyte --enable-cscope --disable-gui --without-x",
+    "cd src && make -j${NPROC}",
+    "cd src && make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/vim"]
 
 [packages.vte]
 version = "0.78.3"
@@ -63,15 +69,24 @@ url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/v${version}/Vulkan-
 git_url = "https://github.com/KhronosGroup/Vulkan-Loader.git"
 use_git = false
 stage = 13
+source_dir = "Vulkan-Loader-${version}"
+depends = ["vulkan-headers"]
+build_system = "cmake"
+cmake_flags = "-DCMAKE_BUILD_TYPE=Release -DVULKAN_HEADERS_INSTALL_DIR=/usr"
+provides = ["/usr/lib/libvulkan.so"]
 
 [packages.vulkan-headers]
 version = "1.4.341"
-version_check = "url:https://github.com/KhronosGroup/Vulkan-Headers/tags|v([0-9]+\.[0-9]+\.[0-9]+)"
+version_check = "url:https://github.com/KhronosGroup/Vulkan-Headers/tags|v([0-9]+\\.[0-9]+\\.[0-9]+)"
 description = "Vulkan header files"
 url = "https://github.com/KhronosGroup/Vulkan-Headers/archive/v${version}/Vulkan-Headers-${version}.tar.gz"
 git_url = "https://github.com/KhronosGroup/Vulkan-Headers.git"
 use_git = false
 stage = 13
+source_dir = "Vulkan-Headers-${version}"
+build_system = "cmake"
+cmake_flags = "-DCMAKE_BUILD_TYPE=Release"
+provides = ["/usr/include/vulkan/vulkan.h"]
 
 [packages.vscode]
 version = "1.108.2"

@@ -88,7 +88,8 @@ build_commands = [
 # Final native glibc
 
 [packages.glibc]
-version = "2.43"
+# Note: glibc 2.43 has SHADOW_STACK_POINTER_OFFSET build issues - staying on 2.40
+version = "2.40"
 version_check = "gnu:glibc"
 description = "GNU C Library"
 url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz"
