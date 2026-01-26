@@ -165,10 +165,10 @@ stage = 8
 build_system = "meson"
 
 [packages.pango]
-version = "1.56.0"
+version = "1.57.0"
 version_check = "gnome:pango"
 description = "Text layout and rendering library"
-url = "https://download.gnome.org/sources/pango/1.56/pango-${version}.tar.xz"
+url = "https://download.gnome.org/sources/pango/1.57/pango-${version}.tar.xz"
 git_url = "https://gitlab.gnome.org/GNOME/pango.git"
 use_git = false
 stage = 9

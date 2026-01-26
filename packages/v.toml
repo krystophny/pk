@@ -30,10 +30,10 @@ build_commands = [
 provides = ["/usr/bin/vim"]
 
 [packages.vte]
-version = "0.78.3"
+version = "0.82.3"
 version_check = "gnome:vte"
 description = "Virtual Terminal Emulator widget library"
-url = "https://download.gnome.org/sources/vte/0.78/vte-${version}.tar.xz"
+url = "https://download.gnome.org/sources/vte/0.82/vte-${version}.tar.xz"
 git_url = "https://gitlab.gnome.org/GNOME/vte.git"
 use_git = false
 stage = 10

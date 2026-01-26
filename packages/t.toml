@@ -77,7 +77,7 @@ stage = 17
 # Full install is ~7GB, use schemes for smaller installs
 
 [packages.texlive-iso]
-version = "2025"
+version = "2026"
 version_check = "url:https://tug.org/texlive/|TeX Live ([0-9]{4})"
 description = "TeX Live ISO image (full offline)"
 url = "https://mirror.ctan.org/systems/texlive/Images/texlive${version}.iso"

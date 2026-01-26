@@ -296,10 +296,10 @@ build_commands = [
 # STAGE 11: Applications
 
 [packages.xfce4-pulseaudio-plugin]
-version = "0.4.8"
+version = "0.5.1"
 version_check = "xfce:apps/xfce4-pulseaudio-plugin"
 description = "XFCE panel plugin for PulseAudio"
-url = "https://archive.xfce.org/src/panel-plugins/xfce4-pulseaudio-plugin/0.4/xfce4-pulseaudio-plugin-${version}.tar.bz2"
+url = "https://archive.xfce.org/src/panel-plugins/xfce4-pulseaudio-plugin/0.5/xfce4-pulseaudio-plugin-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/panel-plugins/xfce4-pulseaudio-plugin.git"
 use_git = false
 stage = 11

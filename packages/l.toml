@@ -167,10 +167,10 @@ configure_flags = "--with-python=/usr --with-history"
 provides = ["/usr/lib/libxml2.so", "/usr/bin/xmllint"]
 
 [packages.librsvg]
-version = "2.59.2"
+version = "2.61.3"
 version_check = "gnome:librsvg"
 description = "SVG rendering library (includes gdk-pixbuf SVG loader)"
-url = "https://download.gnome.org/sources/librsvg/2.59/librsvg-${version}.tar.xz"
+url = "https://download.gnome.org/sources/librsvg/2.61/librsvg-${version}.tar.xz"
 git_url = "https://gitlab.gnome.org/GNOME/librsvg.git"
 use_git = false
 stage = 9
@@ -269,10 +269,10 @@ build_commands = [
 provides = ["/usr/lib/liblz4.so"]
 
 [packages.libnl]
-version = "3.11.0"
+version = "3.12.0"
 version_check = "url:https://github.com/thom311/libnl/tags|libnl([0-9]+)_([0-9]+)_([0-9]+)"
 description = "Netlink protocol library suite"
-url = "https://github.com/thom311/libnl/releases/download/libnl3_11_0/libnl-${version}.tar.gz"
+url = "https://github.com/thom311/libnl/releases/download/libnl3_12_0/libnl-${version}.tar.gz"
 git_url = "https://github.com/thom311/libnl.git"
 use_git = false
 stage = 7
@@ -445,10 +445,10 @@ stage = 8
 build_system = "meson"
 
 [packages.libdisplay-info]
-version = "0.2.0"
+version = "0.3.0"
 version_check = "freedesktop:emersion/libdisplay-info"
 description = "EDID and DisplayID parsing library"
-url = "https://gitlab.freedesktop.org/emersion/libdisplay-info/-/releases/0.2.0/downloads/libdisplay-info-0.2.0.tar.xz"
+url = "https://gitlab.freedesktop.org/emersion/libdisplay-info/-/releases/${version}/downloads/libdisplay-info-${version}.tar.xz"
 stage = 8
 build_system = "meson"
 
