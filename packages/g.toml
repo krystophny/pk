@@ -308,7 +308,7 @@ stage = 9
 build_order = 6
 build_system = "meson"
 depends = ["shared-mime-info", "libjpeg-turbo", "libpng", "libtiff"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false -Dtests=false -Dbuiltin_loaders=none --wrap-mode=nodownload"
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false -Dtests=false -Dbuiltin_loaders=none -Dglycin=disabled --wrap-mode=nodownload"
 provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
 [packages.google-chrome]
