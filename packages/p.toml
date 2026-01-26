@@ -15,7 +15,7 @@ build_commands = [
 
 [packages.perl]
 version = "5.42.0"
-version_check = "cpan:perl"
+version_check = "perl:"
 description = "Practical Extraction and Report Language"
 url = "https://www.cpan.org/src/5.0/perl-${version}.tar.xz"
 git_url = "https://github.com/Perl/perl5.git"
