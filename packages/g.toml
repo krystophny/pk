@@ -343,12 +343,9 @@ url = "https://archive.xfce.org/src/xfce/garcon/4.20/garcon-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/xfce/garcon.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_order = 1
+depends = ["libxfce4ui", "libxfce4util", "gtk3"]
+build_system = "autotools"
 
 [packages.go]
 version = "1.25.6"

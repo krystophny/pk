@@ -35,14 +35,16 @@ description = "Python programming language"
 url = "https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz"
 git_url = "https://github.com/python/cpython.git"
 use_git = false
-stage = 3
-build_order = 4
-# Basic build for Stage 3, will rebuild with optimizations later
+source_dir = "Python-${version}"
+stage = 4
+build_order = 20
+depends = ["openssl", "libffi", "zlib", "xz", "bzip2", "readline", "ncurses", "sqlite"]
 build_commands = [
-    "./configure --prefix=/usr --enable-shared --without-ensurepip",
+    "./configure --prefix=/usr --enable-shared --enable-optimizations --with-lto --with-ensurepip=install",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install",
-    "ln -sf python3 ${PKG}/usr/bin/python"
+    "ln -sf python3 ${PKG}/usr/bin/python",
+    "ln -sf pip3 ${PKG}/usr/bin/pip"
 ]
 
 [packages.procps-ng]

@@ -162,7 +162,8 @@ git_url = "https://gitlab.gnome.org/GNOME/libxml2.git"
 use_git = false
 stage = 4
 build_order = 8
-configure_flags = "--without-python --with-history"
+depends = ["python"]
+configure_flags = "--with-python=/usr --with-history"
 provides = ["/usr/lib/libxml2.so", "/usr/bin/xmllint"]
 
 [packages.libxslt]
@@ -652,12 +653,7 @@ use_git = false
 stage = 9
 build_order = 10
 depends = ["glib"]
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_system = "autotools"
 
 [packages.libxfce4ui]
 version = "4.20.1"
@@ -669,12 +665,7 @@ use_git = false
 stage = 9
 build_order = 12
 depends = ["libxfce4util", "xfconf", "gtk3"]
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_system = "autotools"
 
 [packages.libxfce4windowing]
 version = "4.20.4"
@@ -686,12 +677,7 @@ use_git = false
 stage = 9
 build_order = 14
 depends = ["libxfce4util", "gtk3"]
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_system = "autotools"
 
 # STAGE 10: XFCE Desktop
 

@@ -156,12 +156,7 @@ use_git = false
 stage = 9
 build_order = 11
 depends = ["libxfce4util", "dbus"]
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_system = "autotools"
 
 [packages.xfce4-dev-tools]
 version = "4.20.0"
@@ -182,12 +177,9 @@ url = "https://archive.xfce.org/src/xfce/xfce4-panel/4.20/xfce4-panel-${version}
 git_url = "https://gitlab.xfce.org/xfce/xfce4-panel.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_order = 2
+depends = ["libxfce4ui", "libxfce4util", "libxfce4windowing", "xfconf", "garcon", "gtk3"]
+build_system = "autotools"
 
 [packages.xfce4-settings]
 version = "4.20.3"
@@ -197,12 +189,9 @@ url = "https://archive.xfce.org/src/xfce/xfce4-settings/4.20/xfce4-settings-${ve
 git_url = "https://gitlab.xfce.org/xfce/xfce4-settings.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_order = 3
+depends = ["libxfce4ui", "libxfce4util", "xfconf", "garcon", "gtk3"]
+build_system = "autotools"
 
 [packages.xfce4-session]
 version = "4.20.2"
@@ -212,12 +201,9 @@ url = "https://archive.xfce.org/src/xfce/xfce4-session/4.20/xfce4-session-${vers
 git_url = "https://gitlab.xfce.org/xfce/xfce4-session.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_order = 5
+depends = ["libxfce4ui", "libxfce4util", "xfconf", "gtk3"]
+build_system = "autotools"
 
 [packages.xfwm4]
 version = "4.20.0"
@@ -227,12 +213,9 @@ url = "https://archive.xfce.org/src/xfce/xfwm4/4.20/xfwm4-${version}.tar.bz2"
 git_url = "https://gitlab.xfce.org/xfce/xfwm4.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_order = 4
+depends = ["libxfce4ui", "libxfce4util", "libxfce4windowing", "xfconf", "gtk3"]
+build_system = "autotools"
 
 [packages.xfdesktop]
 version = "4.20.1"
@@ -242,12 +225,9 @@ url = "https://archive.xfce.org/src/xfce/xfdesktop/4.20/xfdesktop-${version}.tar
 git_url = "https://gitlab.xfce.org/xfce/xfdesktop.git"
 use_git = false
 stage = 10
-# Disable LTO - libtool nm issues
-build_commands = [
-    "unset CFLAGS CXXFLAGS LDFLAGS && ./configure --prefix=/usr CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
-    "make DESTDIR=${PKG} install"
-]
+build_order = 6
+depends = ["libxfce4ui", "libxfce4util", "libxfce4windowing", "xfconf", "garcon", "gtk3"]
+build_system = "autotools"
 
 [packages.xfce4-appfinder]
 version = "4.20.0"
@@ -257,6 +237,9 @@ url = "https://archive.xfce.org/src/xfce/xfce4-appfinder/4.20/xfce4-appfinder-${
 git_url = "https://gitlab.xfce.org/xfce/xfce4-appfinder.git"
 use_git = false
 stage = 10
+build_order = 7
+depends = ["libxfce4ui", "libxfce4util", "garcon", "gtk3"]
+build_system = "autotools"
 
 [packages.xfce4-terminal]
 version = "1.1.5"
@@ -266,7 +249,8 @@ url = "https://archive.xfce.org/src/apps/xfce4-terminal/1.1/xfce4-terminal-${ver
 git_url = "https://gitlab.xfce.org/apps/xfce4-terminal.git"
 use_git = false
 stage = 10
-depends = ["vte"]
+build_order = 8
+depends = ["libxfce4ui", "vte"]
 build_commands = [
     "sed -i '/subdir..doc../d' meson.build",
     "meson setup build-pk/meson --prefix=/usr --buildtype=plain",
