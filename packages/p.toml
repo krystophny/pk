@@ -199,6 +199,9 @@ url = "https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${ver
 git_url = "https://gitlab.freedesktop.org/pulseaudio/pulseaudio.git"
 use_git = false
 stage = 11
+build_system = "meson"
+skip_optimization = true
+meson_flags = "-Ddoxygen=false -Dtests=false -Ddatabase=simple -Dman=false"
 
 [packages.pavucontrol]
 version = "6.2"

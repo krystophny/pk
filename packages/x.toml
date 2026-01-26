@@ -299,11 +299,13 @@ build_commands = [
 version = "0.5.1"
 version_check = "xfce:apps/xfce4-pulseaudio-plugin"
 description = "XFCE panel plugin for PulseAudio"
-url = "https://archive.xfce.org/src/panel-plugins/xfce4-pulseaudio-plugin/0.5/xfce4-pulseaudio-plugin-${version}.tar.bz2"
+url = "https://archive.xfce.org/src/panel-plugins/xfce4-pulseaudio-plugin/0.5/xfce4-pulseaudio-plugin-${version}.tar.xz"
 git_url = "https://gitlab.xfce.org/panel-plugins/xfce4-pulseaudio-plugin.git"
 use_git = false
 stage = 11
 repology = "xfce4-pulseaudio-plugin"
+build_system = "meson"
+depends = ["pulseaudio", "xfce4-panel"]
 
 [packages.x264]
 version = "stable"
