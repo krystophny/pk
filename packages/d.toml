@@ -71,7 +71,7 @@ provides = ["/usr/share/fonts/dejavu/DejaVuSans.ttf"]
 
 [packages.docbook-xml]
 version = "4.5"
-version_check = "url:https://www.docbook.org/xml/|skip"
+version_check = "url:https://docbook.org/xml/|([0-9]+\\.[0-9]+)/"
 description = "DocBook XML DTDs"
 url = "https://archive.docbook.org/xml/${version}/docbook-xml-${version}.zip"
 stage = 4

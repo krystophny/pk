@@ -309,7 +309,7 @@ provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
 [packages.google-chrome]
 version = "stable"
-version_check = "url:https://dl.google.com/linux/direct/|skip"
+version_check = "repology:google-chrome"
 description = "Google Chrome browser (binary from Google)"
 url = "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
 tarball = "google-chrome-stable_current_amd64.deb"

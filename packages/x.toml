@@ -309,7 +309,7 @@ depends = ["pulseaudio", "xfce4-panel"]
 
 [packages.x264]
 version = "stable"
-version_check = "url:https://code.videolan.org/videolan/x264/-/tags|stable"
+version_check = "repology:x264"
 description = "H.264 video encoder"
 url = "https://code.videolan.org/videolan/x264/-/archive/stable/x264-stable.tar.bz2"
 git_url = "https://code.videolan.org/videolan/x264.git"

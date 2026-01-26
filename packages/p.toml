@@ -238,7 +238,7 @@ stage = 17
 
 [packages.pk]
 version = "0.0.2"
-version_check = "url:https://github.com/ert/pk/tags|skip"
+version_check = "github:krystophny/pk"
 description = "Minimal POSIX shell package manager"
 stage = 3
 build_order = 1

@@ -1,6 +1,6 @@
 [packages.unzip]
 version = "6.0"
-version_check = "url:https://infozip.sourceforge.net/UnZip.html|skip"
+version_check = "sourceforge:infozip"
 description = "ZIP archive extraction utility"
 url = "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
 source_dir = "unzip60"
