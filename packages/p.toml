@@ -201,7 +201,7 @@ use_git = false
 stage = 11
 
 [packages.pavucontrol]
-version = "6.0"
+version = "6.2"
 version_check = "freedesktop:pulseaudio/pavucontrol"
 description = "PulseAudio Volume Control"
 url = "https://www.freedesktop.org/software/pulseaudio/pavucontrol/pavucontrol-${version}.tar.xz"

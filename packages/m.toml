@@ -126,7 +126,7 @@ use_git = false
 stage = 8
 
 [packages.mangohud]
-version = "0.8.1"
+version = "0.8.2"
 version_check = "github:flightlessmango/MangoHud"
 description = "Vulkan/OpenGL overlay for monitoring"
 url = "https://github.com/flightlessmango/MangoHud/archive/refs/tags/v${version}.tar.gz"

@@ -25,14 +25,14 @@ build_commands = [
 ]
 
 [packages.sqlite]
-version = "3.48.0"
+version = "3.51.2"
 version_check = "sqlite:"
 description = "Self-contained SQL database engine"
-url = "https://www.sqlite.org/2025/sqlite-autoconf-3480000.tar.gz"
+url = "https://www.sqlite.org/2026/sqlite-autoconf-3510200.tar.gz"
 git_url = "https://github.com/sqlite/sqlite.git"
 use_git = false
 stage = 3
-source_dir = "sqlite-autoconf-3480000"
+source_dir = "sqlite-autoconf-3510200"
 # TODO: PGO can provide ~10-30% gains but needs build script changes for proper variable handling
 build_commands = [
     "./configure --prefix=/usr --enable-fts5",
@@ -127,7 +127,7 @@ use_git = false
 stage = 13
 
 [packages.sunshine]
-version = "2026.122.133140"
+version = "2026.125.191446"
 version_check = "github:LizardByte/Sunshine"
 description = "Self-hosted game streaming host"
 url = "https://github.com/LizardByte/Sunshine/archive/refs/tags/v${version}.tar.gz"

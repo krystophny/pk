@@ -1,5 +1,5 @@
 [packages.valgrind]
-version = "3.24.0"
+version = "3.26.0"
 version_check = "url:https://valgrind.org/downloads/current.html|valgrind-([0-9]+\\.[0-9]+\\.[0-9]+)"
 description = "Memory debugging and profiling tool (includes callgrind, cachegrind)"
 url = "https://sourceware.org/pub/valgrind/valgrind-${version}.tar.bz2"
@@ -99,7 +99,7 @@ stage = 14
 # Note: Binary distribution, extract to /opt/vscode
 
 [packages.vscode-source]
-version = "1.108.1"
+version = "1.108.2"
 version_check = "github:microsoft/vscode"
 description = "Visual Studio Code (source build)"
 url = "https://github.com/microsoft/vscode/archive/refs/tags/${version}.tar.gz"

@@ -59,7 +59,7 @@ stage = 13
 # Note: Build both 64-bit and 32-bit (multilib)
 
 [packages.which]
-version = "2.21"
+version = "2.23"
 version_check = "gnu:which"
 description = "Show full path of commands"
 url = "https://ftpmirror.gnu.org/gnu/which/which-${version}.tar.gz"

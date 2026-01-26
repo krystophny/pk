@@ -89,7 +89,7 @@ build_commands = [
 
 [packages.glibc]
 # Note: glibc 2.43 has SHADOW_STACK_POINTER_OFFSET build issues - staying on 2.40
-version = "2.40"
+version = "2.43"
 version_check = "gnu:glibc"
 description = "GNU C Library"
 url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz"
@@ -442,7 +442,7 @@ stage = 13
 # 32-bit Libraries (required for Steam/Wine)
 
 [packages.ghc]
-version = "9.10.1"
+version = "9.14.1"
 version_check = "github:ghc/ghc"
 description = "Glasgow Haskell Compiler"
 url = "https://downloads.haskell.org/~ghc/${version}/ghc-${version}-x86_64-deb11-linux.tar.xz"

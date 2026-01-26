@@ -57,7 +57,7 @@ build_order = 24
 # Built as part of GCC nvptx offload, not standalone
 
 [packages.nvptx-tools]
-version = "0.1"
+version = "0.20240810"
 version_check = "github:SourceryTools/nvptx-tools"
 description = "Assembler and linker for NVIDIA PTX (GCC offloading)"
 url = "https://github.com/SourceryTools/nvptx-tools/archive/refs/heads/master.tar.gz"
