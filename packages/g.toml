@@ -347,10 +347,9 @@ stage = 9
 build_order = 7
 source_dir = "gtk+-${version}"
 depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon"]
-skip_optimization = true
 # Fix NULL pointer crash in _gdk_x11_window_process_expose when antiexpose_area is NULL
 build_commands = [
-    "sed -i 's/cairo_region_subtract (invalidate_region, item->antiexpose_area);/if (item->antiexpose_area) cairo_region_subtract (invalidate_region, item->antiexpose_area);/' gdk/x11/gdkgeometry-x11.c",
+    "grep -q 'if (item->antiexpose_area) cairo_region_subtract' gdk/x11/gdkgeometry-x11.c || sed -i 's/cairo_region_subtract (invalidate_region, item->antiexpose_area);/if (item->antiexpose_area) cairo_region_subtract (invalidate_region, item->antiexpose_area);/' gdk/x11/gdkgeometry-x11.c",
     "meson setup build-pk/meson --prefix=/usr -Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false -Dbroadway_backend=false --wrap-mode=nodownload",
     "ninja -C build-pk/meson",
     "DESTDIR=${PKG} ninja -C build-pk/meson install"
