@@ -1,3 +1,19 @@
+[packages.gdb]
+version = "16.3"
+version_check = "gnu:gdb"
+description = "GNU Debugger"
+url = "https://ftpmirror.gnu.org/gnu/gdb/gdb-${version}.tar.xz"
+git_url = "https://sourceware.org/git/binutils-gdb.git"
+use_git = false
+stage = 4
+depends = ["python", "readline", "ncurses", "expat", "zlib", "xz"]
+build_commands = [
+    "./configure --prefix=/usr --with-system-readline --with-python=/usr/bin/python3 --enable-tui --with-curses",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/gdb"]
+
 [packages.gcc-stable]
 version = "14.2.0"
 description = "GNU Compiler Collection (stable release for cross-compilation)"
@@ -290,8 +306,8 @@ use_git = false
 stage = 9
 build_order = 6
 build_system = "meson"
-depends = ["shared-mime-info", "libjpeg-turbo", "libpng"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false -Dtests=false --wrap-mode=nodownload"
+depends = ["shared-mime-info", "libjpeg-turbo", "libpng", "libtiff"]
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false -Dtests=false -Dbuiltin_loaders=none --wrap-mode=nodownload"
 provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
 [packages.google-chrome]
@@ -329,10 +345,16 @@ git_url = "https://gitlab.gnome.org/GNOME/gtk.git"
 use_git = false
 stage = 9
 build_order = 7
-build_system = "meson"
 source_dir = "gtk+-${version}"
 depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false -Dbroadway_backend=false --wrap-mode=nodownload"
+skip_optimization = true
+# Fix NULL pointer crash in _gdk_x11_window_process_expose when antiexpose_area is NULL
+build_commands = [
+    "sed -i 's/cairo_region_subtract (invalidate_region, item->antiexpose_area);/if (item->antiexpose_area) cairo_region_subtract (invalidate_region, item->antiexpose_area);/' gdk/x11/gdkgeometry-x11.c",
+    "meson setup build-pk/meson --prefix=/usr -Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false -Dbroadway_backend=false --wrap-mode=nodownload",
+    "ninja -C build-pk/meson",
+    "DESTDIR=${PKG} ninja -C build-pk/meson install"
+]
 provides = ["/usr/lib/libgtk-3.so"]
 
 [packages.garcon]

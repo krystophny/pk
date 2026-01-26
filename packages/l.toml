@@ -166,6 +166,20 @@ depends = ["python"]
 configure_flags = "--with-python=/usr --with-history"
 provides = ["/usr/lib/libxml2.so", "/usr/bin/xmllint"]
 
+[packages.librsvg]
+version = "2.59.2"
+version_check = "gnome:librsvg"
+description = "SVG rendering library (includes gdk-pixbuf SVG loader)"
+url = "https://download.gnome.org/sources/librsvg/2.59/librsvg-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/librsvg.git"
+use_git = false
+stage = 9
+build_order = 7
+depends = ["gdk-pixbuf", "pango", "cairo", "libxml2", "rust"]
+build_system = "meson"
+meson_flags = "-Dpixbuf-loader=enabled -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled"
+provides = ["/usr/lib/librsvg-2.so", "/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-svg.so"]
+
 [packages.libxslt]
 version = "1.1.45"
 version_check = "gnome:libxslt"
