@@ -26,7 +26,7 @@ build_commands = [
 
 [packages.sqlite]
 version = "3.48.0"
-version_check = "url:https://www.sqlite.org/download.html|sqlite-autoconf-([0-9]+)"
+version_check = "sqlite:"
 description = "Self-contained SQL database engine"
 url = "https://www.sqlite.org/2025/sqlite-autoconf-3480000.tar.gz"
 git_url = "https://github.com/sqlite/sqlite.git"
