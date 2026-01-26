@@ -22,6 +22,7 @@ url = "https://curl.se/ca/cacert.pem"
 stage = 4
 build_order = 8
 depends = ["openssl"]
+source_dir = "."
 build_commands = [
     "mkdir -p ${PKG}/etc/ssl/certs",
     "cp cacert.pem ${PKG}/etc/ssl/certs/ca-certificates.crt",
