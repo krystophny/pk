@@ -31,16 +31,16 @@ build_commands = [
 [packages.python]
 version = "3.14.2"
 version_check = "python:"
-description = "Python programming language"
+description = "Python programming language with SSL, PGO, pip and venv"
 url = "https://www.python.org/ftp/python/${version}/Python-${version}.tar.xz"
 git_url = "https://github.com/python/cpython.git"
 use_git = false
 source_dir = "Python-${version}"
 stage = 4
 build_order = 20
-depends = ["openssl", "libffi", "zlib", "xz", "bzip2", "readline", "ncurses", "sqlite"]
+depends = ["openssl", "libffi", "zlib", "xz", "bzip2", "readline", "ncurses", "sqlite", "mpdecimal"]
 build_commands = [
-    "./configure --prefix=/usr --enable-shared --enable-optimizations --with-lto --with-ensurepip=install",
+    "export CFLAGS='-O3 -march=znver3 -mtune=znver3 -fno-semantic-interposition' && export CXXFLAGS=\"$CFLAGS\" && export LDFLAGS='-Wl,-O2 -Wl,--as-needed -fno-semantic-interposition' && ./configure --prefix=/usr --enable-shared --enable-optimizations --with-lto --with-openssl=/usr --with-openssl-rpath=auto --with-ensurepip=install",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install",
     "ln -sf python3 ${PKG}/usr/bin/python",
@@ -74,22 +74,6 @@ build_commands = [
     "make DESTDIR=${PKG} install"
 ]
 provides = ["/usr/bin/killall", "/usr/bin/fuser", "/usr/bin/pstree"]
-
-[packages.python-ssl]
-version = "3.14.2"
-description = "Python with SSL support, PGO, pip and venv"
-source_pkg = "python"
-source_dir = "Python-${version}"
-stage = 4
-build_order = 3
-depends = ["openssl", "mpdecimal"]
-build_commands = [
-    "export CFLAGS='-O3 -march=znver3 -mtune=znver3 -fno-semantic-interposition' && export CXXFLAGS=\"$CFLAGS\" && export LDFLAGS='-Wl,-O2 -Wl,--as-needed -fno-semantic-interposition' && ./configure --prefix=/usr --enable-shared --enable-optimizations --with-lto --with-openssl=/usr --with-openssl-rpath=auto --with-ensurepip=install",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install",
-    "ln -sf python3 ${PKG}/usr/bin/python",
-    "ln -sf pip3 ${PKG}/usr/bin/pip"
-]
 
 [packages.pcre2]
 version = "10.47"
