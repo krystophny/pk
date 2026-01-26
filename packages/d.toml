@@ -69,6 +69,47 @@ build_commands = [
 ]
 provides = ["/usr/share/fonts/dejavu/DejaVuSans.ttf"]
 
+[packages.docbook-xml]
+version = "4.5"
+version_check = "url:https://www.docbook.org/xml/|skip"
+description = "DocBook XML DTDs"
+url = "https://archive.docbook.org/xml/${version}/docbook-xml-${version}.zip"
+stage = 4
+# ZIP file extracts files directly, not into a directory - use python to extract
+build_commands = [
+    "mkdir -p /usr/src/docbook-xml-${version} && cd /usr/src/docbook-xml-${version} && python3 -m zipfile -e /usr/src/docbook-xml-${version}.zip .",
+    "cd /usr/src/docbook-xml-${version} && mkdir -p ${PKG}/usr/share/xml/docbook/xml-dtd-${version}",
+    "cd /usr/src/docbook-xml-${version} && cp -af docbook.cat *.dtd ent *.mod ${PKG}/usr/share/xml/docbook/xml-dtd-${version}/",
+    "mkdir -p ${PKG}/etc/xml",
+    "xmlcatalog --noout --create ${PKG}/etc/xml/docbook",
+    "xmlcatalog --noout --add 'public' '-//OASIS//DTD DocBook XML V${version}//EN' 'http://www.oasis-open.org/docbook/xml/${version}/docbookx.dtd' ${PKG}/etc/xml/docbook",
+    "xmlcatalog --noout --add 'system' 'http://www.oasis-open.org/docbook/xml/${version}/docbookx.dtd' 'file:///usr/share/xml/docbook/xml-dtd-${version}/docbookx.dtd' ${PKG}/etc/xml/docbook",
+    "xmlcatalog --noout --add 'rewriteSystem' 'http://www.oasis-open.org/docbook/xml/${version}' 'file:///usr/share/xml/docbook/xml-dtd-${version}' ${PKG}/etc/xml/docbook",
+    "xmlcatalog --noout --add 'rewriteURI' 'http://www.oasis-open.org/docbook/xml/${version}' 'file:///usr/share/xml/docbook/xml-dtd-${version}' ${PKG}/etc/xml/docbook"
+]
+depends = ["libxml2"]
+provides = ["/usr/share/xml/docbook/xml-dtd-4.5/docbookx.dtd"]
+
+[packages.docbook-xsl]
+version = "1.79.2"
+version_check = "github:docbook/xslt10-stylesheets"
+description = "DocBook XSL stylesheets"
+url = "https://github.com/docbook/xslt10-stylesheets/releases/download/release/${version}/docbook-xsl-nons-${version}.tar.bz2"
+source_dir = "docbook-xsl-nons-${version}"
+stage = 4
+build_commands = [
+    "mkdir -p ${PKG}/usr/share/xml/docbook/xsl-stylesheets-${version}",
+    "cp -af VERSION* assembly common eclipse epub epub3 extensions fo highlighting html htmlhelp images javahelp lib manpages params profiling roundtrip slides template tools webhelp website xhtml xhtml-1_1 xhtml5 ${PKG}/usr/share/xml/docbook/xsl-stylesheets-${version}/ 2>/dev/null || true",
+    "mkdir -p ${PKG}/etc/xml",
+    "test -f ${PKG}/etc/xml/catalog || xmlcatalog --noout --create ${PKG}/etc/xml/catalog",
+    "xmlcatalog --noout --add 'rewriteSystem' 'http://docbook.sourceforge.net/release/xsl/${version}' 'file:///usr/share/xml/docbook/xsl-stylesheets-${version}' ${PKG}/etc/xml/catalog",
+    "xmlcatalog --noout --add 'rewriteURI' 'http://docbook.sourceforge.net/release/xsl/${version}' 'file:///usr/share/xml/docbook/xsl-stylesheets-${version}' ${PKG}/etc/xml/catalog",
+    "xmlcatalog --noout --add 'rewriteSystem' 'http://docbook.sourceforge.net/release/xsl/current' 'file:///usr/share/xml/docbook/xsl-stylesheets-${version}' ${PKG}/etc/xml/catalog",
+    "xmlcatalog --noout --add 'rewriteURI' 'http://docbook.sourceforge.net/release/xsl/current' 'file:///usr/share/xml/docbook/xsl-stylesheets-${version}' ${PKG}/etc/xml/catalog"
+]
+depends = ["libxslt", "docbook-xml"]
+provides = ["/usr/share/xml/docbook/xsl-stylesheets-1.79.2/html/docbook.xsl"]
+
 [packages.dejagnu]
 version = "1.6.3"
 version_check = "gnu:dejagnu"

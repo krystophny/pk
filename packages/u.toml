@@ -1,3 +1,16 @@
+[packages.unzip]
+version = "6.0"
+version_check = "url:https://infozip.sourceforge.net/UnZip.html|skip"
+description = "ZIP archive extraction utility"
+url = "https://downloads.sourceforge.net/infozip/unzip60.tar.gz"
+source_dir = "unzip60"
+stage = 4
+build_commands = [
+    "make -f unix/Makefile generic LOCAL_UNZIP=-DLARGE_FILE_SUPPORT",
+    "make prefix=${PKG}/usr MANDIR=${PKG}/usr/share/man/man1 -f unix/Makefile install"
+]
+provides = ["/usr/bin/unzip"]
+
 [packages.util-macros]
 version = "1.20.2"
 version_check = "xorg:util/macros"

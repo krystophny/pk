@@ -16,6 +16,41 @@ build_commands = [
 
 # Binutils Pass 2 - Cross binutils for temp tools (after glibc)
 
+[packages.xmlto]
+version = "0.0.29"
+version_check = "url:https://releases.pagure.org/xmlto/|xmlto-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "XML to other formats converter"
+url = "https://releases.pagure.org/xmlto/xmlto-${version}.tar.bz2"
+stage = 4
+build_commands = [
+    "autoreconf -fi",
+    "./configure --prefix=/usr",
+    "XML_CATALOG_FILES=/etc/xml/catalog make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+depends = ["libxslt", "docbook-xsl"]
+provides = ["/usr/bin/xmlto"]
+
+[packages.xdg-utils]
+version = "1.2.1"
+version_check = "freedesktop:xdg/xdg-utils"
+description = "Desktop integration utilities (xdg-open, xdg-mime, etc.)"
+url = "https://gitlab.freedesktop.org/xdg/xdg-utils/-/archive/v${version}/xdg-utils-v${version}.tar.gz"
+git_url = "https://gitlab.freedesktop.org/xdg/xdg-utils.git"
+use_git = false
+stage = 9
+source_dir = "xdg-utils-v${version}"
+build_commands = [
+    "./configure --prefix=/usr",
+    "touch scripts/xdg-{desktop-menu,desktop-icon,mime,icon-resource,open,email,screensaver,settings}.txt",
+    "XML_CATALOG_FILES=/etc/xml/catalog make -C scripts man",
+    "make -C scripts xdg-desktop-menu xdg-desktop-icon xdg-mime xdg-icon-resource xdg-open xdg-email xdg-screensaver xdg-settings",
+    "mkdir -p ${PKG}/usr/bin ${PKG}/usr/share/man/man1",
+    "cd scripts && install -m755 xdg-desktop-menu xdg-desktop-icon xdg-mime xdg-icon-resource xdg-open xdg-email xdg-screensaver xdg-settings ${PKG}/usr/bin/ && install -m644 man/*.1 ${PKG}/usr/share/man/man1/"
+]
+depends = ["xmlto"]
+provides = ["/usr/bin/xdg-open"]
+
 [packages.xorg-server]
 version = "21.1.21"
 version_check = "xorg:xserver/xorg-server"
