@@ -9,7 +9,7 @@ stage = 4
 build_order = 7
 
 [packages.elfutils]
-version = "0.193"
+version = "0.194"
 version_check = "url:https://sourceware.org/elfutils/ftp/|elfutils-([0-9.]+)\\.tar"
 description = "ELF handling libraries"
 url = "https://sourceware.org/elfutils/ftp/${version}/elfutils-${version}.tar.bz2"

@@ -1,5 +1,5 @@
 [packages.wget]
-version = "1.24.5"
+version = "1.25.0"
 version_check = "gnu:wget"
 description = "Network downloader"
 url = "https://ftpmirror.gnu.org/gnu/wget/wget-${version}.tar.gz"

@@ -1,5 +1,5 @@
 [packages.kmod]
-version = "34"
+version = "34.2"
 version_check = "github:kmod-project/kmod"
 description = "Linux kernel module tools (modprobe, insmod, lsmod, etc.)"
 url = "https://github.com/kmod-project/kmod/archive/refs/tags/v${version}.tar.gz"

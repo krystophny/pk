@@ -76,7 +76,7 @@ use_git = false
 stage = 8
 
 [packages.xauth]
-version = "1.1.4"
+version = "1.1.5"
 version_check = "xorg:app/xauth"
 description = "X authority file utility"
 url = "https://www.x.org/releases/individual/app/xauth-${version}.tar.xz"
@@ -205,7 +205,7 @@ build_order = 13
 depends = ["glib"]
 
 [packages.xfce4-panel]
-version = "4.20.4"
+version = "4.20.6"
 version_check = "xfce:xfce/xfce4-panel"
 description = "Xfce panel"
 url = "https://archive.xfce.org/src/xfce/xfce4-panel/4.20/xfce4-panel-${version}.tar.bz2"
@@ -229,7 +229,7 @@ depends = ["libxfce4ui", "libxfce4util", "xfconf", "garcon", "gtk3"]
 build_system = "autotools"
 
 [packages.xfce4-session]
-version = "4.20.2"
+version = "4.20.3"
 version_check = "xfce:xfce/xfce4-session"
 description = "Xfce session manager"
 url = "https://archive.xfce.org/src/xfce/xfce4-session/4.20/xfce4-session-${version}.tar.bz2"

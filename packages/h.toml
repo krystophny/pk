@@ -8,7 +8,7 @@ use_git = false
 stage = 8
 
 [packages.harfbuzz]
-version = "12.3.1"
+version = "12.3.2"
 version_check = "github:harfbuzz/harfbuzz"
 description = "Text shaping library"
 url = "https://github.com/harfbuzz/harfbuzz/releases/download/${version}/harfbuzz-${version}.tar.xz"

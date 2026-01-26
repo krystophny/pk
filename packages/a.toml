@@ -71,7 +71,7 @@ depends = ["dbus", "glib", "libX11", "libXi", "libXtst"]
 meson_flags = "-Dintrospection=disabled -Dx11=enabled -Dsystemd_user_dir=/tmp --wrap-mode=nodownload"
 
 [packages.alsa-lib]
-version = "1.2.15"
+version = "1.2.15.3"
 version_check = "alsa:lib"
 description = "ALSA sound library"
 url = "https://www.alsa-project.org/files/pub/lib/alsa-lib-${version}.tar.bz2"
@@ -80,7 +80,7 @@ use_git = false
 stage = 11
 
 [packages.alsa-utils]
-version = "1.2.15"
+version = "1.2.15.2"
 version_check = "alsa:utils"
 description = "ALSA sound utilities"
 url = "https://www.alsa-project.org/files/pub/utils/alsa-utils-${version}.tar.bz2"

@@ -69,7 +69,7 @@ build_commands = [
 # STAGE 8: X11/Xorg
 
 [packages.rust]
-version = "1.87.0"
+version = "1.93.0"
 version_check = "github:rust-lang/rust"
 description = "Rust programming language"
 url = "https://static.rust-lang.org/dist/rustc-${version}-src.tar.xz"
@@ -83,7 +83,7 @@ build_commands = [
 ]
 
 [packages.ripgrep]
-version = "14.1.1"
+version = "15.1.0"
 version_check = "github:BurntSushi/ripgrep"
 description = "Fast regex-based search tool"
 url = "https://github.com/BurntSushi/ripgrep/archive/${version}/ripgrep-${version}.tar.gz"

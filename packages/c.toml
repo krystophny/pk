@@ -97,7 +97,7 @@ meson_flags = "-Dgtk_doc=false -Dtests=disabled -Dspectre=disabled -Dsymbol-look
 provides = ["/usr/lib/libcairo.so"]
 
 [packages.cups]
-version = "2.4.13"
+version = "2.4.16"
 version_check = "github:OpenPrinting/cups"
 description = "Common Unix Printing System"
 url = "https://github.com/OpenPrinting/cups/releases/download/v${version}/cups-${version}-source.tar.gz"

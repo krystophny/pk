@@ -178,7 +178,7 @@ use_git = false
 stage = 14
 
 [packages.nspr]
-version = "4.36"
+version = "4.38.2"
 description = "Netscape Portable Runtime"
 url = "https://archive.mozilla.org/pub/nspr/releases/v${version}/src/nspr-${version}.tar.gz"
 stage = 4

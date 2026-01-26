@@ -48,7 +48,7 @@ build_commands = [
 ]
 
 [packages.thunar]
-version = "4.20.2"
+version = "4.20.7"
 version_check = "xfce:xfce/thunar"
 description = "Xfce file manager"
 url = "https://archive.xfce.org/src/xfce/thunar/4.20/thunar-${version}.tar.bz2"

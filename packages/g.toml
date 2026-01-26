@@ -1,5 +1,5 @@
 [packages.gdb]
-version = "16.3"
+version = "17.1"
 version_check = "gnu:gdb"
 description = "GNU Debugger"
 url = "https://ftpmirror.gnu.org/gnu/gdb/gdb-${version}.tar.xz"
@@ -88,7 +88,7 @@ build_commands = [
 # Final native glibc
 
 [packages.glibc]
-version = "2.40"
+version = "2.43"
 version_check = "gnu:glibc"
 description = "GNU C Library"
 url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz"
@@ -180,7 +180,7 @@ build_commands = [
 ]
 
 [packages.gperf]
-version = "3.1"
+version = "3.3"
 description = "Perfect hash function generator"
 url = "https://ftpmirror.gnu.org/gnu/gperf/gperf-${version}.tar.gz"
 stage = 3
@@ -219,7 +219,7 @@ build_commands = [
 ]
 
 [packages.git]
-version = "2.48.1"
+version = "2.52.0"
 version_check = "github:git/git"
 description = "Distributed version control system"
 url = "https://www.kernel.org/pub/software/scm/git/git-${version}.tar.xz"
@@ -430,7 +430,7 @@ use_git = false
 stage = 13
 
 [packages.glslang]
-version = "16.1.0"
+version = "16.2.0"
 version_check = "github:KhronosGroup/glslang"
 description = "Khronos GLSL/HLSL to SPIR-V compiler"
 url = "https://github.com/KhronosGroup/glslang/archive/${version}/glslang-${version}.tar.gz"

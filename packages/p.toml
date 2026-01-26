@@ -48,7 +48,7 @@ build_commands = [
 ]
 
 [packages.procps-ng]
-version = "4.0.4"
+version = "4.0.5"
 version_check = "github:procps-ng/procps"
 description = "Process monitoring utilities (ps, top, pgrep)"
 url = "https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-${version}.tar.xz"
@@ -92,7 +92,7 @@ build_commands = [
 ]
 
 [packages.pcre2]
-version = "10.45"
+version = "10.47"
 version_check = "github:PCRE2Project/pcre2"
 description = "Perl Compatible Regular Expressions"
 url = "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${version}/pcre2-${version}.tar.bz2"
@@ -123,7 +123,7 @@ build_commands = [
 ]
 
 [packages.pciutils]
-version = "3.13.0"
+version = "3.14.0"
 version_check = "url:https://mj.ucw.cz/download/linux/pci/|pciutils-([0-9.]+)\\.tar"
 description = "PCI utilities (lspci, setpci)"
 url = "https://mj.ucw.cz/download/linux/pci/pciutils-${version}.tar.gz"
