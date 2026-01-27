@@ -56,6 +56,22 @@ stage = 3
 build_order = 24
 # Built as part of GCC nvptx offload, not standalone
 
+[packages.newlib-riscv-elf]
+version = "4.6.0.20260123"
+version_check = "url:ftp://sourceware.org/pub/newlib/|newlib-([0-9.]+)\\.tar\\.gz"
+description = "Newlib C library for RISC-V bare-metal"
+url = "ftp://sourceware.org/pub/newlib/newlib-${version}.tar.gz"
+tarball = "newlib-${version}.tar.gz"
+stage = 15
+depends = ["binutils-riscv-elf"]
+skip_optimization = true
+build_commands = [
+    "mkdir -p build && cd build && ../configure --prefix=/usr --target=riscv64-elf --disable-newlib-supplied-syscalls --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-mb --enable-newlib-reent-check-verify",
+    "cd build && make -j${NPROC}",
+    "cd build && make DESTDIR=${PKG} install"
+]
+provides = ["/usr/riscv64-elf/lib/libc.a"]
+
 [packages.nvptx-tools]
 version = "0.20240810"
 version_check = "github:SourceryTools/nvptx-tools"

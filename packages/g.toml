@@ -545,4 +545,21 @@ build_system = "meson"
 meson_flags = "-Dgtk=3"
 provides = ["/usr/bin/gtkwave"]
 
+[packages.gcc-riscv-elf]
+version = "15.2.0"
+version_check = "url:https://ftpmirror.gnu.org/gnu/gcc/|gcc-([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "GCC cross-compiler for RISC-V bare-metal (riscv64-elf)"
+url = "https://ftpmirror.gnu.org/gnu/gcc/gcc-${version}/gcc-${version}.tar.xz"
+git_url = "git://gcc.gnu.org/git/gcc.git"
+use_git = false
+stage = 15
+depends = ["binutils-riscv-elf", "gmp", "mpfr", "mpc", "newlib-riscv-elf"]
+skip_optimization = true
+build_commands = [
+    "mkdir -p build && cd build && ../configure --prefix=/usr --target=riscv64-elf --with-sysroot=/usr/riscv64-elf --with-native-system-header-dir=/include --enable-languages=c,c++ --disable-shared --disable-threads --disable-libssp --disable-libgomp --disable-libmudflap --disable-libquadmath --disable-libatomic --disable-nls --disable-multilib --with-newlib --with-arch=rv64gc --with-abi=lp64d",
+    "cd build && make -j${NPROC}",
+    "cd build && make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/riscv64-elf-gcc", "/usr/bin/riscv64-elf-g++"]
+
 # STAGE 18: Scientific Computing Languages
