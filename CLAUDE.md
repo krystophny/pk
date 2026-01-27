@@ -21,29 +21,12 @@ build_commands = [
 
 Use multiple `echo` commands with `>` (first line) and `>>` (subsequent lines) instead.
 
-## Multilib Bootstrap (32-bit support)
+## Multilib Build Order (32-bit support)
 
-Building GCC with `--enable-multilib` requires 32-bit libc to be present first. Bootstrap procedure:
+Building 32-bit support requires this order:
 
-1. **Download 32-bit libc from Debian:**
-   ```sh
-   curl -LO "http://deb.debian.org/debian/pool/main/g/glibc/libc6_2.42-11_i386.deb"
-   curl -LO "http://deb.debian.org/debian/pool/main/g/glibc/libc6-dev_2.42-11_i386.deb"
-   ```
+1. **lib32-glibc** (stage 3, build_order 26) - Built using `gcc -m32` from existing 64-bit GCC. glibc's configure detects cross-compilation and doesn't run test programs.
 
-2. **Extract and install to /usr/lib32:**
-   ```sh
-   mkdir extract && cd extract && ar x ../libc6*.deb && tar xf data.tar.xz
-   sudo cp -a usr/lib/i386-linux-gnu/* /usr/lib32/
-   sudo ln -sf /usr/lib32/ld-linux.so.2 /lib/ld-linux.so.2
-   sudo ln -sf libc.so.6 /usr/lib32/libc.so
-   ```
+2. **gcc** (stage 3, build_order 27) - Rebuilt with `--enable-multilib` after lib32-glibc provides the 32-bit runtime.
 
-3. **Also create /lib/cpp symlink:**
-   ```sh
-   sudo ln -sf /usr/bin/cpp /lib/cpp
-   ```
-
-4. **Then build GCC with multilib.**
-
-After GCC multilib is built, rebuild lib32-glibc from source to replace the Debian bootstrap.
+3. **Other lib32-* packages** (stage 13) - Built after multilib GCC is available.

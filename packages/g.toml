@@ -31,18 +31,18 @@ provides = ["/usr/bin/gdb"]
 [packages.gcc]
 version = "16-20260118"
 version_check = "gcc-snapshot:"
-description = "GNU Compiler Collection (development snapshot, multilib + RISC-V)"
+description = "GNU Compiler Collection (multilib + RISC-V cross-compilation)"
 url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-16/gcc-${version}.tar.xz"
 git_url = "git://gcc.gnu.org/git/gcc.git"
 use_git = false
 checksum_url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-16/sha512.sum"
 stage = 3
-build_order = 25
-depends = ["gmp", "mpfr", "mpc", "flex", "nvptx-tools", "newlib"]
+build_order = 27
+depends = ["gmp", "mpfr", "mpc", "flex", "nvptx-tools", "newlib", "lib32-glibc"]
 languages = "c,c++,fortran"
 # PGO+LTO: profiledbootstrap with BOOT_CFLAGS for LTO
-# External LTO breaks symbol versioning - use GCC's BOOT_CFLAGS mechanism instead
 # Multilib enabled for 32-bit support (Steam/Wine)
+# Requires lib32-glibc to be built first for 32-bit runtime libraries
 skip_optimization = true
 build_commands = [
     "ln -sf /usr/src/newlib-*/newlib newlib",
@@ -51,8 +51,9 @@ build_commands = [
     "(cd build && make DESTDIR=${PKG} install)",
     "mkdir -p ${PKG}/usr/lib32",
     "mv ${PKG}/usr/lib/../lib32/* ${PKG}/usr/lib32/ 2>/dev/null || true",
-    "ln -sfv ../lib32/libstdc++.so.6 ${PKG}/usr/lib/32/libstdc++.so.6 2>/dev/null || true",
     "mkdir -p ${PKG}/usr/lib/bfd-plugins && (cd ${PKG}/usr/lib/bfd-plugins && ln -svf ../libexec/gcc/*/*/liblto_plugin.so .)",
+    "mkdir -p ${PKG}/lib",
+    "ln -svf /usr/bin/cpp ${PKG}/lib/cpp",
     "ln -svf gcc ${PKG}/usr/bin/cc",
     "echo '#!/bin/sh' > ${PKG}/usr/bin/c99",
     "echo 'exec gcc -std=c99 \"$@\"' >> ${PKG}/usr/bin/c99",
