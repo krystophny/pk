@@ -133,11 +133,12 @@ url = "https://ffmpeg.org/releases/ffmpeg-${version}.tar.xz"
 git_url = "https://git.ffmpeg.org/ffmpeg.git"
 use_git = false
 stage = 16
+build_order = 15
+depends = ["nv-codec-headers", "libva"]
 # Note: --disable-x86asm until nasm package is added (hand-optimized asm improves performance)
-# TODO: Add --enable-nvenc --enable-cuda --enable-vaapi when GPU drivers available
 skip_optimization = true
 build_commands = [
-    "./configure --prefix=/usr --enable-shared --disable-static --disable-debug --enable-gpl --enable-version3 --disable-doc --disable-x86asm",
+    "./configure --prefix=/usr --enable-shared --disable-static --disable-debug --enable-gpl --enable-version3 --disable-doc --disable-x86asm --enable-vaapi --enable-nvenc --enable-nvdec --enable-ffnvcodec",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install"
 ]

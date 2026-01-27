@@ -242,6 +242,36 @@ build_commands = [
 ]
 provides = ["/usr/lib/libnss3.so"]
 
+[packages.nv-codec-headers]
+version = "13.0.19.0"
+version_check = "github:FFmpeg/nv-codec-headers"
+description = "NVIDIA codec headers for FFmpeg"
+url = "https://github.com/FFmpeg/nv-codec-headers/releases/download/n${version}/nv-codec-headers-${version}.tar.gz"
+stage = 16
+build_order = 5
+build_commands = [
+    "make PREFIX=/usr DESTDIR=${PKG} install"
+]
+provides = ["/usr/include/ffnvcodec/nvEncodeAPI.h", "/usr/lib/pkgconfig/ffnvcodec.pc"]
+
+[packages.nvidia-vaapi-driver]
+version = "0.0.14"
+version_check = "github:elFarto/nvidia-vaapi-driver"
+description = "VA-API driver for NVIDIA GPUs"
+url = "https://github.com/elFarto/nvidia-vaapi-driver/archive/refs/tags/v${version}.tar.gz"
+stage = 16
+build_order = 30
+depends = ["libva", "nv-codec-headers", "libdrm", "gst-plugins-bad", "nvidia-open"]
+build_system = "meson"
+build_commands = [
+    "mkdir -p ${PKG}/etc/profile.d",
+    "meson setup build --prefix=/usr",
+    "meson compile -C build",
+    "DESTDIR=${PKG} meson install -C build",
+    "printf 'export LIBVA_DRIVER_NAME=nvidia\\nexport MOZ_DISABLE_RDD_SANDBOX=1\\nexport NVD_BACKEND=direct\\n' > ${PKG}/etc/profile.d/nvidia-vaapi.sh"
+]
+provides = ["/usr/lib/dri/nvidia_drv_video.so", "/etc/profile.d/nvidia-vaapi.sh"]
+
 [packages.nvme-cli]
 version = "2.16"
 version_check = "github:linux-nvme/nvme-cli"

@@ -43,6 +43,17 @@ git_url = "https://gitlab.xiph.org/xiph/opus.git"
 use_git = false
 stage = 16
 
+[packages.orc]
+version = "0.4.42"
+version_check = "url:https://gstreamer.freedesktop.org/src/orc/|orc-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "Optimized Inner Loops Runtime Compiler"
+url = "https://gstreamer.freedesktop.org/src/orc/orc-${version}.tar.xz"
+stage = 16
+build_order = 8
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dbenchmarks=disabled"
+provides = ["/usr/lib/liborc-0.4.so"]
+
 [packages.octave]
 version = "10.3.0"
 version_check = "gnu:octave"
