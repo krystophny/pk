@@ -577,7 +577,7 @@ stage = 16
 build_order = 10
 depends = ["glib", "gobject-introspection"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dintrospection=enabled"
+meson_flags = "-Ddoc=disabled -Dtests=disabled -Dexamples=disabled -Dintrospection=enabled"
 provides = ["/usr/lib/libgstreamer-1.0.so", "/usr/bin/gst-launch-1.0"]
 
 [packages.gst-plugins-base]
@@ -589,7 +589,7 @@ stage = 16
 build_order = 11
 depends = ["gstreamer", "orc", "mesa", "libdrm", "alsa-lib", "pango", "cairo"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dintrospection=enabled -Dorc=enabled"
+meson_flags = "-Ddoc=disabled -Dtests=disabled -Dexamples=disabled -Dintrospection=enabled -Dorc=enabled"
 provides = ["/usr/lib/libgstvideo-1.0.so", "/usr/lib/libgstaudio-1.0.so"]
 
 [packages.gst-plugins-good]
@@ -601,7 +601,7 @@ stage = 16
 build_order = 12
 depends = ["gst-plugins-base", "orc", "libpng", "libjpeg-turbo", "zlib"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled"
+meson_flags = "-Ddoc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled"
 provides = ["/usr/lib/gstreamer-1.0/libgstpng.so"]
 
 [packages.gst-plugins-bad]
@@ -613,7 +613,7 @@ stage = 16
 build_order = 13
 depends = ["gst-plugins-base", "orc", "openssl", "curl", "libdrm", "mesa"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled -Dintrospection=enabled"
+meson_flags = "-Ddoc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled -Dintrospection=enabled"
 provides = ["/usr/lib/libgstcodecparsers-1.0.so", "/usr/lib/pkgconfig/gstreamer-codecparsers-1.0.pc"]
 
 [packages.gst-plugins-ugly]
@@ -625,7 +625,7 @@ stage = 16
 build_order = 14
 depends = ["gst-plugins-base", "orc", "x264"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled"
+meson_flags = "-Ddoc=disabled -Dtests=disabled -Dorc=enabled"
 provides = ["/usr/lib/gstreamer-1.0/libgstx264.so"]
 
 [packages.gst-libav]
@@ -637,19 +637,11 @@ stage = 16
 build_order = 20
 depends = ["gst-plugins-base", "ffmpeg"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled"
+meson_flags = "-Ddoc=disabled -Dtests=disabled"
 provides = ["/usr/lib/gstreamer-1.0/libgstlibav.so"]
 
-[packages.gstreamer-vaapi]
-version = "1.28.0"
-version_check = "url:https://gstreamer.freedesktop.org/src/gstreamer-vaapi/|gstreamer-vaapi-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
-description = "GStreamer VA-API plugin"
-url = "https://gstreamer.freedesktop.org/src/gstreamer-vaapi/gstreamer-vaapi-${version}.tar.xz"
-stage = 16
-build_order = 25
-depends = ["gst-plugins-bad", "libva", "libdrm"]
-build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled"
-provides = ["/usr/lib/gstreamer-1.0/libgstvaapi.so"]
+# Note: gstreamer-vaapi is deprecated - VA-API support is now included in gst-plugins-bad
+# The new "va" plugins in gst-plugins-bad provide better VA-API integration
+# Legacy gstreamer-vaapi is at 1.26.10 but not needed for modern setups
 
 # STAGE 18: Scientific Computing Languages

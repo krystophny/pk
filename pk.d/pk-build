@@ -113,6 +113,10 @@ build_commands=$(extract_array "$pkgname" "build_commands")
 
 build_failed=0
 
+# Redirect all build output to stderr so only the final archive path goes to stdout
+exec 3>&1  # save original stdout
+exec 1>&2  # redirect stdout to stderr for build commands
+
 if [ -n "$build_commands" ]; then
     # Custom build commands - use temp file to avoid subshell issue with pipe
     tmpfile=$(mktemp)
@@ -148,6 +152,9 @@ elif [ -f "$srcdir/Makefile" ]; then
 else
     die "unknown build system for $pkgname"
 fi
+
+exec 1>&3  # restore stdout
+exec 3>&-  # close fd 3
 
 # Check for build failure or empty package
 if [ $build_failed -ne 0 ]; then

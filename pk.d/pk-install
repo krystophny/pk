@@ -34,8 +34,8 @@ version="$2"
 dbdir="$DB_DIR/$pkgname"
 mkdir -p "$dbdir"
 
-# Extract to root (defaults to / for chroot/native use)
-root="${PK_ROOT:-/}"
+# Extract to PK_ROOT (defaults to / in pk-common)
+root="$PK_ROOT"
 
 # List files in archive
 tar -tf "$archive" > "$dbdir/files"
@@ -90,6 +90,11 @@ if grep -q "usr/lib/gtk-3.0/.*/immodules/" "$dbdir/files" 2>/dev/null; then
     for dir in "${root}usr/lib/gtk-3.0"/*/immodules/; do
         [ -d "$dir" ] && run_if_installed gio-querymodules "$dir"
     done
+fi
+
+# Run ldconfig if any shared libraries were installed
+if grep -qE "usr/lib/.*\.so" "$dbdir/files" 2>/dev/null; then
+    run_if_installed ldconfig
 fi
 
 # Restart services if package defines them and we're doing a system install

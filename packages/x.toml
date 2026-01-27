@@ -315,6 +315,12 @@ url = "https://code.videolan.org/videolan/x264/-/archive/stable/x264-stable.tar.
 git_url = "https://code.videolan.org/videolan/x264.git"
 use_git = false
 stage = 16
+build_commands = [
+    "./configure --prefix=/usr --enable-shared --disable-cli --disable-asm",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libx264.so"]
 
 [packages.x265]
 version = "4.1"

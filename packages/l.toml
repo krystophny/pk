@@ -800,7 +800,7 @@ stage = 16
 build_order = 6
 depends = ["libdrm", "libX11", "libXext", "libXfixes", "mesa"]
 build_system = "meson"
-meson_flags = "-Dwith_x11=yes -Dwith_wayland=no -Dwith_drm=yes -Ddisable_drm=false"
+meson_flags = "-Dwith_x11=yes -Dwith_wayland=no -Ddisable_drm=false"
 provides = ["/usr/lib/libva.so", "/usr/lib/libva-drm.so", "/usr/lib/libva-x11.so"]
 
 [packages.libavif]

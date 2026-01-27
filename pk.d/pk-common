@@ -8,12 +8,10 @@ VERSION="0.0.3"
 PK_REPO_URL="${PK_REPO_URL:-https://github.com/krystophny/pk.git}"
 PK_REPO_DIR="${PK_REPO_DIR:-/var/lib/pk/repo}"
 
-# Paths - PK_ROOT must end with / (or be empty for local/safe mode)
-# If PK_ROOT is unset/empty, paths are relative (safe, installs locally)
-# If PK_ROOT="/", paths are absolute (system install)
-# If PK_ROOT="/mnt/lfs/", paths go to chroot
+# Paths - PK_ROOT defaults to "/" for system install
+# Set PK_ROOT="/mnt/lfs/" for chroot installs
+: "${PK_ROOT:=/}"
 case "$PK_ROOT" in
-    "") ;; # empty is fine (relative paths)
     */) ;; # ends with slash is fine
     *)  PK_ROOT="${PK_ROOT}/" ;; # add trailing slash
 esac
@@ -23,14 +21,15 @@ SOURCES_DIR="${PK_ROOT}usr/src"
 
 die() { echo "pk: $*" >&2; exit 1; }
 warn() { echo "pk: warning: $*" >&2; }
-info() { echo "pk: $*"; }
+info() { echo "pk: $*" >&2; }
 
-# Safety check - warn if PK_ROOT is empty (relative/local mode)
+# Safety check - verify PK_ROOT is set and valid
 safety_check() {
-    if [ -z "$PK_ROOT" ]; then
-        warn "PK_ROOT is empty - using relative paths (local mode)"
-        warn "Set PK_ROOT=/ for system install or PK_ROOT=/mnt/lfs/ for chroot"
-    fi
+    case "$PK_ROOT" in
+        /) ;; # system install
+        /*/);; # chroot install (e.g., /mnt/lfs/)
+        *) die "invalid PK_ROOT='$PK_ROOT' - must be / or /path/to/chroot/" ;;
+    esac
 }
 
 # Parse package name and version from filename

@@ -51,7 +51,7 @@ url = "https://gstreamer.freedesktop.org/src/orc/orc-${version}.tar.xz"
 stage = 16
 build_order = 8
 build_system = "meson"
-meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dbenchmarks=disabled"
+meson_flags = "-Dhotdoc=disabled -Dtests=disabled -Dbenchmarks=disabled"
 provides = ["/usr/lib/liborc-0.4.so"]
 
 [packages.octave]
