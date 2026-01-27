@@ -115,7 +115,7 @@ build_commands = [
     "mv ${PKG}/usr/bin/steam ${PKG}/usr/lib/steam/steam.sh",
     "echo '#!/bin/sh' > ${PKG}/usr/bin/steam",
     "echo 'export LD_LIBRARY_PATH=/usr/lib/steam:$LD_LIBRARY_PATH' >> ${PKG}/usr/bin/steam",
-    "echo 'exec /usr/lib/steam/steam.sh \"$@\"' >> ${PKG}/usr/bin/steam",
+    "echo 'exec /usr/lib/steam/bin_steam.sh \"$@\"' >> ${PKG}/usr/bin/steam",
     "chmod +x ${PKG}/usr/bin/steam"
 ]
 provides = ["/usr/bin/steam"]
