@@ -31,7 +31,7 @@ provides = ["/usr/bin/gdb"]
 [packages.gcc]
 version = "16-20260118"
 version_check = "gcc-snapshot:"
-description = "GNU Compiler Collection (development snapshot)"
+description = "GNU Compiler Collection (development snapshot, multilib + RISC-V)"
 url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-16/gcc-${version}.tar.xz"
 git_url = "git://gcc.gnu.org/git/gcc.git"
 use_git = false
@@ -42,14 +42,16 @@ depends = ["gmp", "mpfr", "mpc", "flex", "nvptx-tools", "newlib"]
 languages = "c,c++,fortran"
 # PGO+LTO: profiledbootstrap with BOOT_CFLAGS for LTO
 # External LTO breaks symbol versioning - use GCC's BOOT_CFLAGS mechanism instead
+# Multilib enabled for 32-bit support (Steam/Wine)
 skip_optimization = true
 build_commands = [
-    "case $(uname -m) in x86_64) sed -e '/m64=/s/lib64/lib/' -i.orig gcc/config/i386/t-linux64 ;; esac",
     "ln -sf /usr/src/newlib-*/newlib newlib",
-    "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran,lto --enable-default-pie --enable-default-ssp --disable-multilib --with-system-zlib --enable-plugin --disable-werror --enable-threads=posix --enable-tls --enable-libgomp --enable-libatomic --enable-libquadmath --enable-libssp --enable-libstdcxx --enable-shared --enable-__cxa_atexit --enable-clocale=gnu --enable-lto --enable-checking=release --enable-offload-targets=nvptx-none --enable-offload-defaulted)",
+    "(mkdir -p build && cd build && ../configure --prefix=/usr --enable-languages=c,c++,fortran,lto --enable-default-pie --enable-default-ssp --enable-multilib --with-system-zlib --enable-plugin --disable-werror --enable-threads=posix --enable-tls --enable-libgomp --enable-libatomic --enable-libquadmath --enable-libssp --enable-libstdcxx --enable-shared --enable-__cxa_atexit --enable-clocale=gnu --enable-lto --enable-checking=release --enable-offload-targets=nvptx-none --enable-offload-defaulted --enable-targets=all)",
     "(cd build && make -j${NPROC} BOOT_CFLAGS='-O3 -march=znver3 -mtune=znver3 -flto=auto -g' profiledbootstrap)",
     "(cd build && make DESTDIR=${PKG} install)",
-    "cp -v ${PKG}/usr/include/c++/*/x86_64-pc-linux-gnu/bits/c++config.h ${PKG}/usr/include/c++/*/bits/c++config.h",
+    "mkdir -p ${PKG}/usr/lib32",
+    "mv ${PKG}/usr/lib/../lib32/* ${PKG}/usr/lib32/ 2>/dev/null || true",
+    "ln -sfv ../lib32/libstdc++.so.6 ${PKG}/usr/lib/32/libstdc++.so.6 2>/dev/null || true",
     "mkdir -p ${PKG}/usr/lib/bfd-plugins && (cd ${PKG}/usr/lib/bfd-plugins && ln -svf ../libexec/gcc/*/*/liblto_plugin.so .)",
     "ln -svf gcc ${PKG}/usr/bin/cc",
     "echo '#!/bin/sh' > ${PKG}/usr/bin/c99",
