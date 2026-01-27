@@ -97,6 +97,11 @@ if grep -qE "usr/lib/.*\.so" "$dbdir/files" 2>/dev/null; then
     run_if_installed ldconfig
 fi
 
+# Run depmod if kernel modules were installed
+if grep -qE "lib/modules/.*/.*\.ko" "$dbdir/files" 2>/dev/null; then
+    run_if_installed depmod -a
+fi
+
 # Restart services if package defines them and we're doing a system install
 if [ "$root" = "/" ]; then
     services=$(get_pkg_services "$pkgname" 2>/dev/null)
