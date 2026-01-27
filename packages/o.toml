@@ -32,6 +32,7 @@ build_commands = [
     "chmod 755 ${PKG}/var/lib/sshd"
 ]
 provides = ["/usr/bin/ssh", "/usr/sbin/sshd"]
+services = ["sshd"]
 
 [packages.opus]
 version = "1.6.1"

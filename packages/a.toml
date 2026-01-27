@@ -7,8 +7,13 @@ git_url = ""
 use_git = false
 stage = 9
 build_order = 0
-build_system = "autotools"
-configure_flags = "--disable-static"
+skip_optimization = true
+# GCC 16 requires -fpermissive for older C++ code
+build_commands = [
+    "CXXFLAGS='-O2 -fpermissive' ./configure --prefix=/usr --disable-static",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
 provides = ["/usr/bin/aspell", "/usr/lib/libaspell.so"]
 
 [packages.aspell-en]
@@ -85,18 +90,20 @@ use_git = false
 stage = 9
 build_order = 5
 build_system = "meson"
-meson_flags = "-Dintrospection=disabled"
+depends = ["gobject-introspection"]
+meson_flags = "-Dintrospection=true"
 
 [packages.at-spi2-core]
 version = "2.58.3"
 version_check = "gnome:at-spi2-core"
-description = "Accessibility infrastructure"
+description = "Accessibility infrastructure (includes ATK)"
 url = "https://download.gnome.org/sources/at-spi2-core/2.58/at-spi2-core-${version}.tar.xz"
 stage = 9
 build_order = 5
 build_system = "meson"
-depends = ["dbus", "glib", "libX11", "libXi", "libXtst"]
-meson_flags = "-Dintrospection=disabled -Dx11=enabled -Dsystemd_user_dir=/tmp --wrap-mode=nodownload"
+depends = ["dbus", "glib", "libX11", "libXi", "libXtst", "gobject-introspection"]
+meson_flags = "-Dintrospection=enabled -Dx11=enabled -Dsystemd_user_dir=/tmp --wrap-mode=nodownload"
+provides = ["/usr/lib/libatk-1.0.so", "/usr/lib/libatk-bridge-2.0.so"]
 
 [packages.alsa-lib]
 version = "1.2.15.3"

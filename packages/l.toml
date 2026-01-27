@@ -200,6 +200,7 @@ description = "TIFF image library"
 url = "https://download.osgeo.org/libtiff/tiff-${version}.tar.gz"
 git_url = "https://gitlab.com/libtiff/libtiff.git"
 use_git = false
+source_dir = "tiff-${version}"
 stage = 8
 build_system = "cmake"
 cmake_flags = "-DBUILD_SHARED_LIBS=ON -Dtiff-tests=OFF -Dtiff-docs=OFF"
@@ -818,18 +819,18 @@ use_git = false
 stage = 19
 
 [packages.libpeas]
-version = "2.2.0"
-version_check = "gnome:libpeas"
-description = "Plugin engine for GNOME applications"
-url = "https://download.gnome.org/sources/libpeas/${version_mm}/libpeas-${version}.tar.xz"
+version = "1.36.0"
+version_check = "skip:"
+description = "Plugin engine for GNOME applications (1.x for gedit compatibility)"
+url = "https://download.gnome.org/sources/libpeas/1.36/libpeas-${version}.tar.xz"
 git_url = "https://gitlab.gnome.org/GNOME/libpeas.git"
 use_git = false
 stage = 9
 build_order = 4
 depends = ["gtk3", "gobject-introspection"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=false -Dintrospection=false -Dvapi=false -Ddemos=false -Dglade_catalog=false"
-provides = ["/usr/lib/libpeas-1.0.so"]
+meson_flags = "-Dgtk_doc=false -Dvapi=false -Dglade_catalog=false -Ddemos=false -Dlua51=false -Dpython3=false"
+provides = ["/usr/lib/libpeas-1.0.so", "/usr/lib/libpeas-gtk-1.0.so"]
 
 [packages.libgedit-tepl]
 version = "6.12.0"
@@ -840,10 +841,10 @@ git_url = "https://gitlab.gnome.org/World/gedit/libgedit-tepl.git"
 use_git = false
 stage = 9
 build_order = 6
-depends = ["gtk3", "libgedit-gtksourceview", "libgedit-amtk", "icu"]
+depends = ["gtk3", "libgedit-gtksourceview", "libgedit-amtk", "libgedit-gfls", "icu", "gobject-introspection"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=false -Dintrospection=false -Dgobject_introspection=false"
-provides = ["/usr/lib/libgedit-tepl-6.so"]
+meson_flags = "-Dgtk_doc=false -Dgobject_introspection=true"
+provides = ["/usr/lib/libgedit-tepl-6.so", "/usr/share/gir-1.0/Tepl-6.gir"]
 
 [packages.libgedit-gtksourceview]
 version = "299.4.0"
@@ -854,10 +855,10 @@ git_url = "https://gitlab.gnome.org/World/gedit/libgedit-gtksourceview.git"
 use_git = false
 stage = 9
 build_order = 2
-depends = ["gtk3", "libxml2"]
+depends = ["gtk3", "libxml2", "gobject-introspection"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=false -Dintrospection=false"
-provides = ["/usr/lib/libgedit-gtksourceview-300.so"]
+meson_flags = "-Dgtk_doc=false -Dgobject_introspection=true"
+provides = ["/usr/lib/libgedit-gtksourceview-300.so", "/usr/share/gir-1.0/GtkSource-300.gir"]
 
 [packages.libgedit-amtk]
 version = "5.9.0"
@@ -868,10 +869,43 @@ git_url = "https://gitlab.gnome.org/World/gedit/libgedit-amtk.git"
 use_git = false
 stage = 9
 build_order = 3
-depends = ["gtk3"]
+depends = ["gtk3", "gobject-introspection"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=false -Dintrospection=false"
-provides = ["/usr/lib/libgedit-amtk-5.so"]
+meson_flags = "-Dgtk_doc=false -Dgobject_introspection=true"
+provides = ["/usr/lib/libgedit-amtk-5.so", "/usr/share/gir-1.0/Amtk-5.gir"]
+
+[packages.libgedit-gfls]
+version = "0.2.1"
+version_check = "gnome:libgedit-gfls"
+description = "GIO wrapper library for file loading and saving"
+url = "https://download.gnome.org/sources/libgedit-gfls/${version_mm}/libgedit-gfls-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/World/gedit/libgedit-gfls.git"
+use_git = false
+stage = 9
+build_order = 4
+depends = ["glib", "gobject-introspection"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=false -Dgobject_introspection=true"
+provides = ["/usr/lib/libgedit-gfls-1.so", "/usr/share/gir-1.0/Gfls-1.gir"]
+
+[packages.libhandy]
+version = "1.8.3"
+version_check = "gnome:libhandy"
+description = "GTK+ widgets for mobile UI"
+url = "https://download.gnome.org/sources/libhandy/${version_mm}/libhandy-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/libhandy.git"
+use_git = false
+stage = 9
+build_order = 5
+depends = ["gtk3"]
+skip_optimization = true
+# GCC 16 + stack protector issue - must disable stack protector explicitly
+build_commands = [
+    "CFLAGS='-O2 -march=znver3 -fno-stack-protector' meson setup --prefix=/usr --libdir=lib -Dgtk_doc=false -Dintrospection=disabled -Dvapi=false -Dtests=false -Dexamples=false build-pk/meson",
+    "ninja -C build-pk/meson -j${NPROC}",
+    "DESTDIR=${PKG} ninja -C build-pk/meson install"
+]
+provides = ["/usr/lib/libhandy-1.so"]
 
 [packages.libpipeline]
 version = "1.5.8"

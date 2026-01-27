@@ -79,6 +79,7 @@ build_commands = [
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install"
 ]
+services = ["cronie"]
 
 [packages.cairo]
 version = "1.18.4"

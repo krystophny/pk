@@ -111,14 +111,9 @@ skip_optimization = true
 # Steam is a binary launcher - just install the bootstrap scripts
 build_commands = [
     "make DESTDIR=${PKG} install",
-    # Create steam wrapper that sets up library paths
-    "mkdir -p ${PKG}/usr/bin",
+    "mkdir -p ${PKG}/usr/lib/steam",
     "mv ${PKG}/usr/bin/steam ${PKG}/usr/lib/steam/steam.sh",
-    "cat > ${PKG}/usr/bin/steam << 'STEAM_WRAPPER'",
-    "#!/bin/sh",
-    "export LD_LIBRARY_PATH=/usr/lib/steam:$LD_LIBRARY_PATH",
-    "exec /usr/lib/steam/steam.sh \"$@\"",
-    "STEAM_WRAPPER",
+    "printf '#!/bin/sh\\nexport LD_LIBRARY_PATH=/usr/lib/steam:$LD_LIBRARY_PATH\\nexec /usr/lib/steam/steam.sh \"$@\"\\n' > ${PKG}/usr/bin/steam",
     "chmod +x ${PKG}/usr/bin/steam"
 ]
 provides = ["/usr/bin/steam"]

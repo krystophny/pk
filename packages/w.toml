@@ -33,6 +33,7 @@ build_commands = [
     "make -j${NPROC}",
     "make DESTDIR=${PKG} BINDIR=/usr/sbin LIBDIR=/usr/lib install"
 ]
+services = ["wpa_supplicant"]
 
 [packages.wireless-tools]
 version = "29"

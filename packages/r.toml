@@ -26,12 +26,14 @@ stage = 6
 # runit extracts to admin/runit-X.Y.Z, but build script cd's to admin/
 build_commands = [
     "cd runit-*/src && make",
-    "mkdir -p ${PKG}/usr/bin ${PKG}/sbin",
+    "mkdir -p ${PKG}/usr/bin ${PKG}/sbin ${PKG}/etc/profile.d",
     "cd runit-*/src && install -m 755 runit ${PKG}/sbin/",
     "cd runit-*/src && install -m 755 runit-init ${PKG}/sbin/",
     "cd runit-*/src && install -m 755 sv runsv runsvdir runsvchdir svlogd chpst ${PKG}/usr/bin/",
-    "ln -sf runit-init ${PKG}/sbin/init"
+    "ln -sf runit-init ${PKG}/sbin/init",
+    "echo 'export SVDIR=/etc/runit/runsvdir/current' > ${PKG}/etc/profile.d/runit.sh"
 ]
+provides = ["/sbin/runit", "/etc/profile.d/runit.sh"]
 
 # STAGE 7: Networking
 

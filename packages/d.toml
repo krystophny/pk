@@ -1,3 +1,15 @@
+[packages.desktop-file-utils]
+version = "0.28"
+version_check = "freedesktop:xdg/desktop-file-utils"
+description = "Utilities for .desktop files"
+url = "https://www.freedesktop.org/software/desktop-file-utils/releases/desktop-file-utils-${version}.tar.xz"
+git_url = "https://gitlab.freedesktop.org/xdg/desktop-file-utils.git"
+use_git = false
+stage = 8
+build_system = "meson"
+depends = ["glib"]
+provides = ["/usr/bin/update-desktop-database"]
+
 [packages.diffutils]
 version = "3.12"
 version_check = "gnu:diffutils"
@@ -21,6 +33,7 @@ url = "https://github.com/NetworkConfiguration/dhcpcd/releases/download/v${versi
 git_url = "https://github.com/NetworkConfiguration/dhcpcd.git"
 use_git = false
 stage = 7
+services = ["dhcpcd"]
 
 [packages.duktape]
 version = "2.7.0"
@@ -54,6 +67,7 @@ build_commands = [
     "meson compile -C build",
     "DESTDIR=${PKG} meson install -C build"
 ]
+services = ["dbus"]
 
 [packages.dejavu-fonts]
 version = "2.37"

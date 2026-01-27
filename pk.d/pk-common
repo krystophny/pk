@@ -140,3 +140,16 @@ get_pkg_cmake_flags()  { extract_field "$1" "cmake_flags"; }
 get_pkg_depends()      { extract_array "$1" "depends"; }
 get_pkg_build_commands() { extract_array "$1" "build_commands"; }
 get_pkg_provides()     { extract_array "$1" "provides"; }
+get_pkg_services()     { extract_array "$1" "services"; }
+
+# Restart a runit service if running
+restart_service() {
+    local svc="$1"
+    local svdir="${SVDIR:-/etc/runit/runsvdir/current}"
+
+    # Check if service exists and is running
+    if [ -d "$svdir/$svc" ] && sv check "$svc" >/dev/null 2>&1; then
+        info "restarting service: $svc"
+        sv restart "$svc" 2>/dev/null || warn "failed to restart $svc"
+    fi
+}

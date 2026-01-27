@@ -158,8 +158,8 @@ use_git = false
 stage = 9
 build_order = 4
 build_system = "meson"
-depends = ["harfbuzz", "cairo", "fribidi", "fontconfig"]
-meson_flags = "-Dintrospection=disabled -Ddocumentation=false --wrap-mode=nodownload"
+depends = ["harfbuzz", "cairo", "fribidi", "fontconfig", "gobject-introspection"]
+meson_flags = "-Dintrospection=enabled -Ddocumentation=false --wrap-mode=nodownload"
 provides = ["/usr/lib/libpango-1.0.so"]
 
 [packages.polkit]

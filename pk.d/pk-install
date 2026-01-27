@@ -92,4 +92,14 @@ if grep -q "^usr/lib/gtk-3.0/.*/immodules/" "$dbdir/files" 2>/dev/null; then
     done
 fi
 
+# Restart services if package defines them and we're doing a system install
+if [ "$root" = "/" ]; then
+    services=$(get_pkg_services "$pkgname" 2>/dev/null)
+    if [ -n "$services" ]; then
+        for svc in $services; do
+            restart_service "$svc"
+        done
+    fi
+fi
+
 info "installed $pkgname $version"

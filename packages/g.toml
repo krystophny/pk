@@ -299,9 +299,9 @@ git_url = "https://gitlab.gnome.org/GNOME/glib.git"
 use_git = false
 stage = 4
 build_order = 40
-depends = ["meson", "pcre2", "libffi", "zlib"]
+depends = ["meson", "pcre2", "libffi", "zlib", "gobject-introspection"]
 build_commands = [
-    "meson setup build --prefix=/usr --buildtype=release -Dman-pages=disabled -Ddtrace=disabled -Dsystemtap=disabled -Dgtk_doc=false -Dintrospection=disabled -Dtests=false",
+    "meson setup build --prefix=/usr --buildtype=release -Dman-pages=disabled -Ddtrace=disabled -Dsystemtap=disabled -Dgtk_doc=false -Dintrospection=enabled -Dtests=false",
     "meson compile -C build",
     "DESTDIR=${PKG} meson install -C build"
 ]
@@ -317,8 +317,8 @@ use_git = false
 stage = 9
 build_order = 6
 build_system = "meson"
-depends = ["shared-mime-info", "libjpeg-turbo", "libpng", "libtiff"]
-meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=disabled -Dinstalled_tests=false -Dtests=false -Dbuiltin_loaders=none -Dglycin=disabled --wrap-mode=nodownload"
+depends = ["shared-mime-info", "libjpeg-turbo", "libpng", "libtiff", "gobject-introspection"]
+meson_flags = "-Dman=false -Dgtk_doc=false -Dintrospection=enabled -Dinstalled_tests=false -Dtests=false -Dbuiltin_loaders=none -Dglycin=disabled --wrap-mode=nodownload"
 provides = ["/usr/lib/libgdk_pixbuf-2.0.so"]
 
 [packages.google-chrome]
@@ -358,11 +358,11 @@ use_git = false
 stage = 9
 build_order = 7
 source_dir = "gtk+-${version}"
-depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon"]
+depends = ["pango", "cairo", "gdk-pixbuf", "atk", "libepoxy", "libxkbcommon", "gobject-introspection"]
 # Fix NULL pointer crash in _gdk_x11_window_process_expose when antiexpose_area is NULL
 build_commands = [
     "grep -q 'if (item->antiexpose_area) cairo_region_subtract' gdk/x11/gdkgeometry-x11.c || sed -i 's/cairo_region_subtract (invalidate_region, item->antiexpose_area);/if (item->antiexpose_area) cairo_region_subtract (invalidate_region, item->antiexpose_area);/' gdk/x11/gdkgeometry-x11.c",
-    "meson setup build-pk/meson --prefix=/usr -Dman=false -Dgtk_doc=false -Dintrospection=false -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false -Dbroadway_backend=false --wrap-mode=nodownload",
+    "meson setup build-pk/meson --prefix=/usr -Dman=false -Dgtk_doc=false -Dintrospection=true -Ddemos=false -Dexamples=false -Dtests=false -Dwayland_backend=false -Dbroadway_backend=false --wrap-mode=nodownload",
     "ninja -C build-pk/meson",
     "DESTDIR=${PKG} ninja -C build-pk/meson install"
 ]
@@ -413,6 +413,20 @@ build_commands = [
     "cp bin/gh ${PKG}/usr/bin/"
 ]
 
+[packages.gsettings-desktop-schemas]
+version = "47"
+version_check = "gnome:gsettings-desktop-schemas"
+description = "GSettings desktop-wide schemas"
+url = "https://download.gnome.org/sources/gsettings-desktop-schemas/${version}/gsettings-desktop-schemas-${version}.tar.xz"
+git_url = "https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas.git"
+use_git = false
+stage = 8
+build_order = 50
+depends = ["glib"]
+build_system = "meson"
+meson_flags = "-Dintrospection=false"
+provides = ["/usr/share/glib-2.0/schemas/org.gnome.desktop.interface.gschema.xml"]
+
 [packages.gspell]
 version = "1.14.2"
 version_check = "gnome:gspell"
@@ -424,7 +438,7 @@ stage = 9
 build_order = 5
 depends = ["gtk3", "enchant", "icu"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=false -Dintrospection=false -Dvapi=false -Dinstall_tests=false"
+meson_flags = "-Dgtk_doc=false -Dgobject_introspection=false -Dvapi=false -Dinstall_tests=false"
 provides = ["/usr/lib/libgspell-1.so"]
 
 [packages.gedit]
@@ -435,9 +449,9 @@ url = "https://download.gnome.org/sources/gedit/48/gedit-${version}.tar.xz"
 git_url = "https://gitlab.gnome.org/GNOME/gedit.git"
 use_git = false
 stage = 11
-depends = ["gtk3", "gspell", "libpeas", "libgedit-tepl"]
+depends = ["gtk3", "gspell", "libpeas", "libgedit-tepl", "desktop-file-utils", "appstream-glib"]
 build_system = "meson"
-meson_flags = "-Dgtk_doc=false -Dintrospection=false -Dvapi=false"
+meson_flags = "-Dgtk_doc=false -Duser_documentation=false"
 provides = ["/usr/bin/gedit"]
 
 [packages.gamemode]

@@ -17,8 +17,8 @@ use_git = false
 stage = 9
 build_order = 3
 build_system = "meson"
-depends = ["cairo", "freetype", "glib"]
-meson_flags = "-Ddocs=disabled -Dintrospection=disabled -Dtests=disabled -Dcairo=enabled -Dfreetype=enabled -Dglib=enabled --wrap-mode=nodownload"
+depends = ["cairo", "freetype", "glib", "gobject-introspection"]
+meson_flags = "-Ddocs=disabled -Dintrospection=enabled -Dtests=disabled -Dcairo=enabled -Dfreetype=enabled -Dglib=enabled --wrap-mode=nodownload"
 
 [packages.hicolor-icon-theme]
 version = "0.18"
