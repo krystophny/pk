@@ -6,9 +6,9 @@ url = "https://download.qemu.org/qemu-${version}.tar.xz"
 git_url = "https://gitlab.com/qemu-project/qemu.git"
 use_git = false
 stage = 15
-depends = ["glib", "pixman", "libslirp", "libusb", "sdl2"]
+depends = ["glib", "pixman"]
 build_commands = [
-    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --enable-kvm --enable-slirp --enable-sdl --enable-usb-redir --enable-linux-user --target-list=x86_64-softmmu,x86_64-linux-user,riscv32-softmmu,riscv32-linux-user,riscv64-softmmu,riscv64-linux-user",
+    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --enable-kvm --disable-slirp --disable-sdl --disable-usb-redir --enable-linux-user --target-list=x86_64-softmmu,x86_64-linux-user,riscv32-softmmu,riscv32-linux-user,riscv64-softmmu,riscv64-linux-user",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install"
 ]

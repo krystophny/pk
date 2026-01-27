@@ -56,37 +56,37 @@ run_if_installed() {
 }
 
 # Check what was installed and run appropriate hooks
-if grep -q "^usr/share/mime/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/share/mime/" "$dbdir/files" 2>/dev/null; then
     run_if_installed update-mime-database "${root}usr/share/mime"
 fi
 
-if grep -q "^usr/lib/gdk-pixbuf-2.0/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/lib/gdk-pixbuf-2.0/" "$dbdir/files" 2>/dev/null; then
     run_if_installed gdk-pixbuf-query-loaders --update-cache
 fi
 
-if grep -q "^usr/lib/gio/modules/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/lib/gio/modules/" "$dbdir/files" 2>/dev/null; then
     run_if_installed gio-querymodules "${root}usr/lib/gio/modules"
 fi
 
-if grep -q "^usr/share/icons/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/share/icons/" "$dbdir/files" 2>/dev/null; then
     for dir in "${root}usr/share/icons"/*/; do
         [ -d "$dir" ] && run_if_installed gtk-update-icon-cache -q "$dir"
     done
 fi
 
-if grep -q "^usr/share/applications/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/share/applications/.*\.desktop" "$dbdir/files" 2>/dev/null; then
     run_if_installed update-desktop-database -q "${root}usr/share/applications"
 fi
 
-if grep -q "^usr/share/fonts/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/share/fonts/" "$dbdir/files" 2>/dev/null; then
     run_if_installed fc-cache -f
 fi
 
-if grep -q "^usr/share/glib-2.0/schemas/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/share/glib-2.0/schemas/.*\.xml" "$dbdir/files" 2>/dev/null; then
     run_if_installed glib-compile-schemas "${root}usr/share/glib-2.0/schemas"
 fi
 
-if grep -q "^usr/lib/gtk-3.0/.*/immodules/" "$dbdir/files" 2>/dev/null; then
+if grep -q "usr/lib/gtk-3.0/.*/immodules/" "$dbdir/files" 2>/dev/null; then
     for dir in "${root}usr/lib/gtk-3.0"/*/immodules/; do
         [ -d "$dir" ] && run_if_installed gio-querymodules "$dir"
     done

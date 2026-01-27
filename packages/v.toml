@@ -38,9 +38,9 @@ git_url = "https://gitlab.gnome.org/GNOME/vte.git"
 use_git = false
 stage = 10
 build_system = "meson"
-meson_flags = "-Dvapi=false -Dgtk4=false -Dicu=false -D_systemd=false -Ddocs=false -Dgir=false -Dglade=false"
+meson_flags = "-Dvapi=false -Dgtk4=false -Dicu=true -D_systemd=false -Ddocs=false -Dgir=false -Dglade=false"
 provides = ["/usr/lib/libvte-2.91.so"]
-depends = ["gnutls", "gtk3", "pcre2"]
+depends = ["gnutls", "gtk3", "pcre2", "icu", "fribidi"]
 
 [packages.vkd3d-proton]
 version = "3.0b"

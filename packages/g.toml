@@ -566,4 +566,90 @@ build_commands = [
 ]
 provides = ["/usr/bin/riscv64-elf-gcc", "/usr/bin/riscv64-elf-g++"]
 
+# GStreamer multimedia framework
+
+[packages.gstreamer]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gstreamer/|gstreamer-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer multimedia framework"
+url = "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${version}.tar.xz"
+stage = 16
+build_order = 10
+depends = ["glib", "gobject-introspection"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dintrospection=enabled"
+provides = ["/usr/lib/libgstreamer-1.0.so", "/usr/bin/gst-launch-1.0"]
+
+[packages.gst-plugins-base]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gst-plugins-base/|gst-plugins-base-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer base plugins"
+url = "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-${version}.tar.xz"
+stage = 16
+build_order = 11
+depends = ["gstreamer", "orc", "mesa", "libdrm", "alsa-lib", "pango", "cairo"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dintrospection=enabled -Dorc=enabled"
+provides = ["/usr/lib/libgstvideo-1.0.so", "/usr/lib/libgstaudio-1.0.so"]
+
+[packages.gst-plugins-good]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gst-plugins-good/|gst-plugins-good-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer good plugins"
+url = "https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-${version}.tar.xz"
+stage = 16
+build_order = 12
+depends = ["gst-plugins-base", "orc", "libpng", "libjpeg-turbo", "zlib"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled"
+provides = ["/usr/lib/gstreamer-1.0/libgstpng.so"]
+
+[packages.gst-plugins-bad]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gst-plugins-bad/|gst-plugins-bad-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer bad plugins (includes codec parsers)"
+url = "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-${version}.tar.xz"
+stage = 16
+build_order = 13
+depends = ["gst-plugins-base", "orc", "openssl", "curl", "libdrm", "mesa"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled -Dintrospection=enabled"
+provides = ["/usr/lib/libgstcodecparsers-1.0.so", "/usr/lib/pkgconfig/gstreamer-codecparsers-1.0.pc"]
+
+[packages.gst-plugins-ugly]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gst-plugins-ugly/|gst-plugins-ugly-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer ugly plugins (patent-encumbered codecs)"
+url = "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-${version}.tar.xz"
+stage = 16
+build_order = 14
+depends = ["gst-plugins-base", "orc", "x264"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled -Dorc=enabled"
+provides = ["/usr/lib/gstreamer-1.0/libgstx264.so"]
+
+[packages.gst-libav]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gst-libav/|gst-libav-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer FFmpeg/libav plugin"
+url = "https://gstreamer.freedesktop.org/src/gst-libav/gst-libav-${version}.tar.xz"
+stage = 16
+build_order = 20
+depends = ["gst-plugins-base", "ffmpeg"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled"
+provides = ["/usr/lib/gstreamer-1.0/libgstlibav.so"]
+
+[packages.gstreamer-vaapi]
+version = "1.28.0"
+version_check = "url:https://gstreamer.freedesktop.org/src/gstreamer-vaapi/|gstreamer-vaapi-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GStreamer VA-API plugin"
+url = "https://gstreamer.freedesktop.org/src/gstreamer-vaapi/gstreamer-vaapi-${version}.tar.xz"
+stage = 16
+build_order = 25
+depends = ["gst-plugins-bad", "libva", "libdrm"]
+build_system = "meson"
+meson_flags = "-Dgtk_doc=disabled -Dtests=disabled -Dexamples=disabled"
+provides = ["/usr/lib/gstreamer-1.0/libgstvaapi.so"]
+
 # STAGE 18: Scientific Computing Languages
