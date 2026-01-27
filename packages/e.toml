@@ -129,3 +129,17 @@ build_commands = [
     "unset CFLAGS CXXFLAGS LDFLAGS && make -j${NPROC} CFLAGS='-O2 -march=znver3' LDFLAGS=''",
     "make DESTDIR=${PKG} install"
 ]
+
+# FPGA/EDA Tools
+
+[packages.eigen]
+version = "5.0.1"
+version_check = "gitlab:libeigen/eigen"
+description = "C++ template library for linear algebra"
+url = "https://gitlab.com/libeigen/eigen/-/archive/${version}/eigen-${version}.tar.gz"
+git_url = "https://gitlab.com/libeigen/eigen.git"
+use_git = false
+stage = 8
+build_system = "cmake"
+cmake_flags = "-DBUILD_TESTING=OFF"
+provides = ["/usr/include/eigen3/Eigen/Core"]

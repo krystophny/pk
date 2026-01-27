@@ -780,7 +780,7 @@ build_commands = [
     "cd build-stage1 && ninja clang lld",
     "mkdir -p profiles && cd build-stage1 && LLVM_PROFILE_FILE=$(pwd)/../profiles/profile-%p.profraw bin/clang -O2 -c ../clang/lib/Sema/*.cpp 2>/dev/null || true",
     "build-stage1/bin/llvm-profdata merge -output=profdata.prof profiles/*.profraw",
-    "mkdir -p build-pgo && cd build-pgo && cmake -G Ninja ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld;clang-tools-extra;compiler-rt;mlir;flang;lldb;polly' -DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind' -DLLVM_TARGETS_TO_BUILD='X86;NVPTX;AMDGPU' -DCMAKE_INSTALL_PREFIX=/usr -DLLVM_PROFDATA_FILE=$(pwd)/../profdata.prof -DLLVM_ENABLE_LTO=Thin -DLLVM_PARALLEL_LINK_JOBS=2 -DFLANG_ENABLE_WERROR=OFF -DMLIR_ENABLE_BINDINGS_PYTHON=ON -DLLVM_INSTALL_UTILS=ON",
+    "mkdir -p build-pgo && cd build-pgo && cmake -G Ninja ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='clang;lld;clang-tools-extra;compiler-rt;mlir;flang;lldb;polly' -DLLVM_ENABLE_RUNTIMES='libcxx;libcxxabi;libunwind' -DLLVM_TARGETS_TO_BUILD='X86;RISCV;NVPTX;AMDGPU' -DCMAKE_INSTALL_PREFIX=/usr -DLLVM_PROFDATA_FILE=$(pwd)/../profdata.prof -DLLVM_ENABLE_LTO=Thin -DLLVM_PARALLEL_LINK_JOBS=2 -DFLANG_ENABLE_WERROR=OFF -DMLIR_ENABLE_BINDINGS_PYTHON=ON -DLLVM_INSTALL_UTILS=ON",
     "cd build-pgo && ninja",
     "cd build-pgo && DESTDIR=${PKG} ninja install"
 ]

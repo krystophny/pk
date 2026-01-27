@@ -113,3 +113,37 @@ stage = 19
 # Required for Intel Wi-Fi 6 AX200 [8086:2723]
 
 # Bluetooth firmware
+
+# FPGA/EDA Tools
+
+[packages.iverilog]
+version = "12.0"
+version_check = "github:steveicarus/iverilog"
+description = "Icarus Verilog simulator and synthesizer"
+url = "https://github.com/steveicarus/iverilog/archive/refs/tags/v${version_us}.tar.gz"
+git_url = "https://github.com/steveicarus/iverilog.git"
+use_git = false
+source_dir = "iverilog-${version_us}"
+stage = 15
+depends = ["bison", "flex", "gperf"]
+build_commands = [
+    "sh autoconf.sh",
+    "./configure --prefix=/usr",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/iverilog", "/usr/bin/vvp"]
+
+[packages.icestorm]
+version = "0.0.20250603"
+version_check = "skip:"
+description = "Project IceStorm - iCE40 FPGA bitstream tools"
+git_url = "https://github.com/YosysHQ/icestorm.git"
+git_commit = "f31c39cc2eadd0ab7f29f34becba1348ae9f8721"
+use_git = true
+stage = 15
+build_commands = [
+    "make -j${NPROC} PREFIX=/usr",
+    "make PREFIX=/usr DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/icepack", "/usr/bin/iceprog", "/usr/bin/icetime"]

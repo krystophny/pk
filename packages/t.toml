@@ -99,3 +99,19 @@ build_order = 11
 depends = ["libevent", "ncurses"]
 configure_flags = ""
 provides = ["/usr/bin/tmux"]
+
+# FPGA/EDA Tools
+
+[packages.tinyprog]
+version = "1.0.23"
+version_check = "pypi:tinyprog"
+description = "TinyFPGA BX programmer"
+url = "https://github.com/tinyfpga/TinyFPGA-Bootloader/archive/refs/heads/master.tar.gz"
+git_url = "https://github.com/tinyfpga/TinyFPGA-Bootloader.git"
+use_git = true
+stage = 15
+depends = ["python"]
+build_commands = [
+    "cd programmer && pip install --root=${PKG} --prefix=/usr --no-deps ."
+]
+provides = ["/usr/bin/tinyprog"]
