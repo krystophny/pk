@@ -960,3 +960,14 @@ build_commands = [
     "make DESTDIR=${PKG} install"
 ]
 provides = ["/usr/bin/libreoffice"]
+
+[packages.libva-utils]
+version = "2.23.0"
+version_check = "github:intel/libva-utils"
+description = "VA-API utilities (vainfo, etc.)"
+url = "https://github.com/intel/libva-utils/releases/download/${version}/libva-utils-${version}.tar.bz2"
+stage = 16
+build_order = 7
+depends = ["libva"]
+build_system = "autotools"
+provides = ["/usr/bin/vainfo"]
