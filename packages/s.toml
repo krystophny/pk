@@ -113,7 +113,9 @@ build_commands = [
     "make DESTDIR=${PKG} install",
     "mkdir -p ${PKG}/usr/lib/steam",
     "mv ${PKG}/usr/bin/steam ${PKG}/usr/lib/steam/steam.sh",
-    "printf '#!/bin/sh\\nexport LD_LIBRARY_PATH=/usr/lib/steam:$LD_LIBRARY_PATH\\nexec /usr/lib/steam/steam.sh \"$@\"\\n' > ${PKG}/usr/bin/steam",
+    "echo '#!/bin/sh' > ${PKG}/usr/bin/steam",
+    "echo 'export LD_LIBRARY_PATH=/usr/lib/steam:$LD_LIBRARY_PATH' >> ${PKG}/usr/bin/steam",
+    "echo 'exec /usr/lib/steam/steam.sh \"$@\"' >> ${PKG}/usr/bin/steam",
     "chmod +x ${PKG}/usr/bin/steam"
 ]
 provides = ["/usr/bin/steam"]

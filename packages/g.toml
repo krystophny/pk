@@ -52,7 +52,9 @@ build_commands = [
     "cp -v ${PKG}/usr/include/c++/*/x86_64-pc-linux-gnu/bits/c++config.h ${PKG}/usr/include/c++/*/bits/c++config.h",
     "mkdir -p ${PKG}/usr/lib/bfd-plugins && (cd ${PKG}/usr/lib/bfd-plugins && ln -svf ../libexec/gcc/*/*/liblto_plugin.so .)",
     "ln -svf gcc ${PKG}/usr/bin/cc",
-    "printf '#!/bin/sh\\nexec gcc -std=c99 \"$@\"\\n' > ${PKG}/usr/bin/c99 && chmod +x ${PKG}/usr/bin/c99",
+    "echo '#!/bin/sh' > ${PKG}/usr/bin/c99",
+    "echo 'exec gcc -std=c99 \"$@\"' >> ${PKG}/usr/bin/c99",
+    "chmod +x ${PKG}/usr/bin/c99",
     "ln -svf ../bin/cpp ${PKG}/usr/lib/cpp",
     "ln -svf gcc.1 ${PKG}/usr/share/man/man1/cc.1"
 ]

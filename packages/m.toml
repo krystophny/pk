@@ -67,7 +67,10 @@ build_commands = [
     "mkdir -p ${PKG}/usr/lib/python3.14/site-packages",
     "cp -r mesonbuild ${PKG}/usr/lib/python3.14/site-packages/",
     "mkdir -p ${PKG}/usr/bin",
-    "printf '%s\\n' '#!/usr/bin/env python3' 'import sys' 'from mesonbuild import mesonmain' 'sys.exit(mesonmain.main())' > ${PKG}/usr/bin/meson",
+    "echo '#!/usr/bin/env python3' > ${PKG}/usr/bin/meson",
+    "echo 'import sys' >> ${PKG}/usr/bin/meson",
+    "echo 'from mesonbuild import mesonmain' >> ${PKG}/usr/bin/meson",
+    "echo 'sys.exit(mesonmain.main())' >> ${PKG}/usr/bin/meson",
     "chmod 755 ${PKG}/usr/bin/meson"
 ]
 

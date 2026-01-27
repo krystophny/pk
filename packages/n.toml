@@ -186,10 +186,15 @@ build_commands = [
     "ln -sf libEGL_nvidia.so.${version} ${PKG}/usr/lib/libEGL_nvidia.so.0",
     "ln -sf libEGL_nvidia.so.${version} ${PKG}/usr/lib/libEGL_nvidia.so.1",
     # X11 config for nvidia driver
-    "printf 'Section \"Device\"\\n    Identifier \"NVIDIA\"\\n    Driver \"nvidia\"\\n    Option \"AllowEmptyInitialConfiguration\"\\nEndSection\\n' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    "echo 'Section \"Device\"' > ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    "echo '    Identifier \"NVIDIA\"' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    "echo '    Driver \"nvidia\"' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    "echo '    Option \"AllowEmptyInitialConfiguration\"' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
+    "echo 'EndSection' >> ${PKG}/etc/X11/xorg.conf.d/20-nvidia.conf",
     # udev rules for nvidia device nodes
     "mkdir -p ${PKG}/usr/lib/udev/rules.d",
-    "printf 'KERNEL==\"nvidia\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"\\nKERNEL==\"nvidia_uvm\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"\\n' > ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
+    "echo 'KERNEL==\"nvidia\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' > ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
+    "echo 'KERNEL==\"nvidia_uvm\", RUN+=\"/usr/bin/nvidia-modprobe -c 0 -u\"' >> ${PKG}/usr/lib/udev/rules.d/70-nvidia.rules",
     # Install nvidia-modprobe for device node creation
     "install -m4755 userspace/nvidia-modprobe ${PKG}/usr/bin/ || true",
     # modprobe config for nvidia-drm modeset
