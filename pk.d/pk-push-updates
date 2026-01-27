@@ -1,0 +1,86 @@
+#!/bin/sh
+# pk-push-updates - Commit and push package definition changes
+# For maintainers: commits TOML changes and pushes to remote
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/pk-common"
+
+usage() {
+    cat <<EOF
+Usage: pk push-updates [OPTIONS]
+
+Commit and push package definition changes to remote repository.
+For maintainers who have write access to the pk repository.
+
+Options:
+    -m, --message MSG   Custom commit message
+    -n, --dry-run       Show what would be committed without doing it
+    -h, --help          Show this help
+
+Environment:
+    PK_REPO_DIR     Local clone directory (default: /var/lib/pk/repo)
+
+Examples:
+    pk push-updates                     # Commit and push TOML changes
+    pk push-updates -m "Bump gcc"       # With custom message
+    pk push-updates -n                  # Show what would be committed
+EOF
+    exit 0
+}
+
+MESSAGE="Update package versions"
+DRY_RUN=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -m|--message) MESSAGE="$2"; shift 2 ;;
+        -n|--dry-run) DRY_RUN=1; shift ;;
+        -h|--help) usage ;;
+        *) die "Unknown option: $1" ;;
+    esac
+done
+
+PK_REPO_DIR="${PK_REPO_DIR:-/var/lib/pk/repo}"
+
+[ -d "$PK_REPO_DIR/.git" ] || die "Repository not found at $PK_REPO_DIR (run 'pk sync' first)"
+
+cd "$PK_REPO_DIR"
+
+# Check for changes
+if ! git diff --quiet packages/*.toml 2>/dev/null && ! git diff --cached --quiet packages/*.toml 2>/dev/null; then
+    :  # Has changes
+elif git status --porcelain packages/*.toml 2>/dev/null | grep -q .; then
+    :  # Has untracked or modified files
+else
+    info "No package definition changes to commit"
+    exit 0
+fi
+
+# Show what would be committed
+echo "Changes to commit:"
+git status --short packages/*.toml
+echo ""
+
+git diff packages/*.toml 2>/dev/null | head -50
+DIFF_LINES=$(git diff packages/*.toml 2>/dev/null | wc -l)
+if [ "$DIFF_LINES" -gt 50 ]; then
+    echo "... (truncated, $DIFF_LINES total lines)"
+fi
+echo ""
+
+if [ "$DRY_RUN" = "1" ]; then
+    info "Dry run - no changes committed"
+    exit 0
+fi
+
+# Stage and commit
+git add packages/*.toml
+git commit -m "$MESSAGE"
+
+# Push
+info "Pushing to origin..."
+git push origin main
+
+info "Package updates pushed"

@@ -1,0 +1,136 @@
+#!/bin/sh
+# pk-upgrade - Upgrade outdated packages
+# Like 'apt upgrade' - builds and installs packages with newer versions available
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/pk-common"
+
+usage() {
+    cat <<EOF
+Usage: pk upgrade [OPTIONS] [PACKAGE...]
+
+Build and install packages that have newer versions available.
+
+Options:
+    -n, --dry-run   Show what would be upgraded without doing it
+    -y, --yes       Skip confirmation prompts
+    -h, --help      Show this help
+
+Arguments:
+    PACKAGE...      Specific packages to upgrade (default: all outdated)
+
+Examples:
+    pk upgrade              # Upgrade all outdated packages
+    pk upgrade gcc          # Upgrade only gcc
+    pk upgrade -n           # Show what would be upgraded
+EOF
+    exit 0
+}
+
+DRY_RUN=0
+YES=0
+PACKAGES=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -n|--dry-run) DRY_RUN=1; shift ;;
+        -y|--yes) YES=1; shift ;;
+        -h|--help) usage ;;
+        -*) die "Unknown option: $1" ;;
+        *) PACKAGES="$PACKAGES $1"; shift ;;
+    esac
+done
+
+# Check for pk check-updates command
+CHECK_UPDATES="$SCRIPT_DIR/pk-check-updates"
+[ -x "$CHECK_UPDATES" ] || die "pk check-updates not found"
+
+# Get list of outdated packages
+info "Checking for outdated packages..."
+
+if [ -n "$PACKAGES" ]; then
+    # Check specific packages
+    OUTDATED=$("$CHECK_UPDATES" --parseable $PACKAGES 2>/dev/null || true)
+else
+    # Check all packages
+    OUTDATED=$("$CHECK_UPDATES" --parseable 2>/dev/null || true)
+fi
+
+if [ -z "$OUTDATED" ]; then
+    info "All packages are up to date"
+    exit 0
+fi
+
+# Display what will be upgraded
+echo ""
+echo "Packages to upgrade:"
+echo "$OUTDATED" | while IFS='|' read -r pkg current new; do
+    printf "  %-25s %s -> %s\n" "$pkg" "$current" "$new"
+done
+echo ""
+
+COUNT=$(echo "$OUTDATED" | wc -l)
+info "$COUNT package(s) will be upgraded"
+
+# Dry run exits here
+if [ "$DRY_RUN" = "1" ]; then
+    exit 0
+fi
+
+# Confirm unless --yes
+if [ "$YES" != "1" ]; then
+    printf "Continue? [y/N] "
+    read -r answer
+    case "$answer" in
+        [Yy]*) ;;
+        *) die "Aborted" ;;
+    esac
+fi
+
+# Upgrade each package
+FAILED=""
+echo "$OUTDATED" | while IFS='|' read -r pkg current new; do
+    echo ""
+    info "Upgrading $pkg ($current -> $new)..."
+
+    # Download
+    if ! "$SCRIPT_DIR/pk-download" "$pkg"; then
+        warn "Failed to download $pkg"
+        FAILED="$FAILED $pkg"
+        continue
+    fi
+
+    # Build
+    if ! "$SCRIPT_DIR/pk-build" "$pkg"; then
+        warn "Failed to build $pkg"
+        FAILED="$FAILED $pkg"
+        continue
+    fi
+
+    # Find the built package
+    PKG_FILE=$(ls -t "${CACHE_DIR}/${pkg}-"*.pk.tar.xz 2>/dev/null | head -1)
+    if [ -z "$PKG_FILE" ]; then
+        warn "Built package not found for $pkg"
+        FAILED="$FAILED $pkg"
+        continue
+    fi
+
+    # Install
+    if ! "$SCRIPT_DIR/pk-install" "$PKG_FILE"; then
+        warn "Failed to install $pkg"
+        FAILED="$FAILED $pkg"
+        continue
+    fi
+
+    info "Upgraded $pkg to $new"
+done
+
+echo ""
+if [ -n "$FAILED" ]; then
+    warn "Failed packages:$FAILED"
+    exit 1
+fi
+
+info "Upgrade complete"

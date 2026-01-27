@@ -14,7 +14,7 @@ fi
 
 usage() {
     cat <<EOF
-pk - minimal package manager (v0.0.2)
+pk - minimal package manager (v0.0.3)
 
 Usage: pk <command> [args]
 
@@ -31,6 +31,12 @@ Build commands:
   d, download <pkgname>    Download package source
   bs, build-stage <N>      Build all packages in stage N
 
+Update commands:
+  sync                     Sync package database from remote git
+  check-updates            Check for available package updates
+  upgrade [pkgname]        Build and install outdated packages
+  push-updates             Commit and push TOML changes (maintainers)
+
 System commands:
   c, check [dirs...]       Check for untracked files
   v, version               Show version
@@ -38,6 +44,8 @@ System commands:
 Environment:
   PK_ROOT         Target root (default: / or chroot)
   PK_FORCE_ROOT   Set to 1 to allow installing to host root
+  PK_REPO_URL     Git repository for pk sync
+  PK_REPO_DIR     Local clone directory for pk sync
 EOF
 }
 
@@ -59,6 +67,8 @@ case "$cmd" in
     bs) cmd="build-stage" ;;
     c) cmd="check" ;;
     v) cmd="version" ;;
+    u) cmd="upgrade" ;;
+    cu) cmd="check-updates" ;;
     -h|--help|help) usage; exit 0 ;;
 esac
 

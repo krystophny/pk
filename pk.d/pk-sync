@@ -1,0 +1,92 @@
+#!/bin/sh
+# pk-sync - Sync package database from remote git repository
+# Like 'apt update' - pulls latest package definitions
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/pk-common"
+
+usage() {
+    cat <<EOF
+Usage: pk sync [OPTIONS]
+
+Sync package definitions from remote git repository.
+
+Options:
+    -f, --force     Force re-clone (discard local changes)
+    -h, --help      Show this help
+
+Environment:
+    PK_REPO_URL     Git repository URL (default: https://github.com/krystophny/pk.git)
+    PK_REPO_DIR     Local clone directory (default: /var/lib/pk/repo)
+
+Examples:
+    pk sync              # Pull latest package definitions
+    pk sync --force      # Force re-clone
+EOF
+    exit 0
+}
+
+FORCE=0
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -f|--force) FORCE=1; shift ;;
+        -h|--help) usage ;;
+        *) die "Unknown option: $1" ;;
+    esac
+done
+
+# Default repository settings
+PK_REPO_URL="${PK_REPO_URL:-https://github.com/krystophny/pk.git}"
+PK_REPO_DIR="${PK_REPO_DIR:-/var/lib/pk/repo}"
+
+# Ensure directory exists
+mkdir -p "$(dirname "$PK_REPO_DIR")"
+
+# Force re-clone if requested
+if [ "$FORCE" = "1" ] && [ -d "$PK_REPO_DIR" ]; then
+    info "Removing existing repo..."
+    rm -rf "$PK_REPO_DIR"
+fi
+
+# Clone or update
+if [ -d "$PK_REPO_DIR/.git" ]; then
+    info "Updating package database..."
+    if ! git -C "$PK_REPO_DIR" pull --ff-only 2>/dev/null; then
+        warn "Fast-forward failed, trying fetch + reset..."
+        git -C "$PK_REPO_DIR" fetch origin
+        git -C "$PK_REPO_DIR" reset --hard origin/main
+    fi
+else
+    info "Cloning package database..."
+    git clone --depth 1 "$PK_REPO_URL" "$PK_REPO_DIR"
+fi
+
+# Symlink packages directory to /etc/pk/packages
+PACKAGES_LINK="${PK_ROOT}etc/pk/packages"
+PACKAGES_SRC="$PK_REPO_DIR/packages"
+
+if [ -d "$PACKAGES_SRC" ]; then
+    mkdir -p "$(dirname "$PACKAGES_LINK")"
+
+    # Remove existing (file or symlink)
+    if [ -e "$PACKAGES_LINK" ] || [ -L "$PACKAGES_LINK" ]; then
+        rm -rf "$PACKAGES_LINK"
+    fi
+
+    ln -sf "$PACKAGES_SRC" "$PACKAGES_LINK"
+    info "Packages linked: $PACKAGES_LINK -> $PACKAGES_SRC"
+fi
+
+# Also link build.conf if it exists
+BUILD_CONF_SRC="$PK_REPO_DIR/config/build.conf"
+BUILD_CONF_LINK="${PK_ROOT}etc/pk/build.conf"
+if [ -f "$BUILD_CONF_SRC" ]; then
+    ln -sf "$BUILD_CONF_SRC" "$BUILD_CONF_LINK"
+fi
+
+info "Package database synced"
+echo ""
+echo "Packages: $(ls "$PACKAGES_SRC"/*.toml 2>/dev/null | wc -l) definition files"
+echo "Source:   $PK_REPO_URL"

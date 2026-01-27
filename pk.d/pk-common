@@ -2,7 +2,11 @@
 # pk-common - shared functions for pk package manager
 # Sourced by pk subcommands
 
-VERSION="0.0.2"
+VERSION="0.0.3"
+
+# Repository sync settings
+PK_REPO_URL="${PK_REPO_URL:-https://github.com/krystophny/pk.git}"
+PK_REPO_DIR="${PK_REPO_DIR:-/var/lib/pk/repo}"
 
 # Paths - PK_ROOT must end with / (or be empty for local/safe mode)
 # If PK_ROOT is unset/empty, paths are relative (safe, installs locally)
