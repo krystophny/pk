@@ -62,13 +62,14 @@ version_check = "url:ftp://sourceware.org/pub/newlib/|newlib-([0-9.]+)\\.tar\\.g
 description = "Newlib C library for RISC-V bare-metal"
 url = "ftp://sourceware.org/pub/newlib/newlib-${version}.tar.gz"
 tarball = "newlib-${version}.tar.gz"
+source_dir = "newlib-${version}"
 stage = 15
 depends = ["binutils-riscv-elf"]
 skip_optimization = true
 build_commands = [
-    "mkdir -p build && cd build && ../configure --prefix=/usr --target=riscv64-elf --disable-newlib-supplied-syscalls --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-mb --enable-newlib-reent-check-verify",
-    "cd build && make -j${NPROC}",
-    "cd build && make DESTDIR=${PKG} install"
+    "mkdir -p ${srcdir}/build-riscv && cd ${srcdir}/build-riscv && ${srcdir}/configure --prefix=/usr --target=riscv64-elf --disable-newlib-supplied-syscalls --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-mb --enable-newlib-reent-check-verify",
+    "cd ${srcdir}/build-riscv && make -j${NPROC}",
+    "cd ${srcdir}/build-riscv && make DESTDIR=${PKG} install"
 ]
 provides = ["/usr/riscv64-elf/lib/libc.a"]
 

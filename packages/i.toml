@@ -143,8 +143,9 @@ git_url = "https://github.com/YosysHQ/icestorm.git"
 git_commit = "f31c39cc2eadd0ab7f29f34becba1348ae9f8721"
 use_git = true
 stage = 15
+# Skip iceprog (needs libftdi) - TinyFPGA BX uses tinyprog instead
 build_commands = [
-    "make -j${NPROC} PREFIX=/usr",
-    "make PREFIX=/usr DESTDIR=${PKG} install"
+    "make -j${NPROC} PREFIX=/usr SUBDIRS='icebox icepack icemulti icepll icebram icetime'",
+    "make PREFIX=/usr DESTDIR=${PKG} SUBDIRS='icebox icepack icemulti icepll icebram icetime' install"
 ]
-provides = ["/usr/bin/icepack", "/usr/bin/iceprog", "/usr/bin/icetime"]
+provides = ["/usr/bin/icepack", "/usr/bin/icetime"]

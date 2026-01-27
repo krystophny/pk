@@ -151,13 +151,15 @@ version = "2.45.1"
 version_check = "gnu:binutils"
 description = "GNU binutils for RISC-V bare-metal (cross-compiler)"
 url = "https://ftpmirror.gnu.org/gnu/binutils/binutils-${version}.tar.xz"
+tarball = "binutils-${version}.tar.xz"
+source_dir = "binutils-${version}"
 git_url = "git://sourceware.org/git/binutils-gdb.git"
 use_git = false
 stage = 15
 build_commands = [
-    "mkdir -p build && cd build && ../configure --prefix=/usr --target=riscv64-elf --with-sysroot --disable-nls --disable-werror --enable-64-bit-bfd",
-    "cd build && make -j${NPROC}",
-    "cd build && make DESTDIR=${PKG} install"
+    "mkdir -p ${srcdir}/build-riscv && cd ${srcdir}/build-riscv && ${srcdir}/configure --prefix=/usr --target=riscv64-elf --with-sysroot --disable-nls --disable-werror --enable-64-bit-bfd",
+    "cd ${srcdir}/build-riscv && make -j${NPROC}",
+    "cd ${srcdir}/build-riscv && make DESTDIR=${PKG} install"
 ]
 provides = ["/usr/bin/riscv64-elf-as", "/usr/bin/riscv64-elf-ld", "/usr/bin/riscv64-elf-objcopy"]
 
