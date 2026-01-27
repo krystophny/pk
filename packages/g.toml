@@ -309,6 +309,17 @@ build_commands = [
 ]
 provides = ["/usr/lib/libglib-2.0.so"]
 
+[packages.glib-networking]
+version = "2.80.1"
+version_check = "gnome:glib-networking"
+description = "Network-related GIO modules for glib"
+url = "https://download.gnome.org/sources/glib-networking/2.80/glib-networking-${version}.tar.xz"
+stage = 5
+depends = ["glib", "gnutls"]
+build_system = "meson"
+meson_flags = "-Dgnutls=enabled -Dopenssl=disabled -Dlibproxy=disabled -Dgnome_proxy=disabled"
+provides = ["/usr/lib/gio/modules/libgiognutls.so"]
+
 [packages.gdk-pixbuf]
 version = "2.44.4"
 version_check = "gnome:gdk-pixbuf"
@@ -645,6 +656,20 @@ provides = ["/usr/lib/gstreamer-1.0/libgstlibav.so"]
 # Note: gstreamer-vaapi is deprecated - VA-API support is now included in gst-plugins-bad
 # The new "va" plugins in gst-plugins-bad provide better VA-API integration
 # Legacy gstreamer-vaapi is at 1.26.10 but not needed for modern setups
+
+[packages.gnupg]
+version = "2.4.7"
+version_check = "url:https://gnupg.org/ftp/gcrypt/gnupg/|gnupg-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GNU Privacy Guard"
+url = "https://gnupg.org/ftp/gcrypt/gnupg/gnupg-${version}.tar.bz2"
+stage = 5
+depends = ["libgpg-error", "libassuan", "libgcrypt", "libksba", "npth"]
+build_commands = [
+    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/gpg"]
 
 [packages.gpgme]
 version = "2.0.1"

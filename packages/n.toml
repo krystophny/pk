@@ -35,6 +35,32 @@ build_commands = [
     "ln -svf libncurses.so ${PKG}/usr/lib/libcurses.so"
 ]
 
+[packages.npth]
+version = "1.8"
+version_check = "url:https://gnupg.org/ftp/gcrypt/npth/|npth-([0-9]+\\.[0-9]+)\\.tar"
+description = "New Portable Threads Library"
+url = "https://gnupg.org/ftp/gcrypt/npth/npth-${version}.tar.bz2"
+stage = 5
+build_commands = [
+    "./configure --prefix=/usr",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libnpth.so"]
+
+[packages.nghttp2]
+version = "1.65.0"
+version_check = "github:nghttp2/nghttp2"
+description = "HTTP/2 C Library"
+url = "https://github.com/nghttp2/nghttp2/releases/download/v${version}/nghttp2-${version}.tar.xz"
+stage = 5
+build_commands = [
+    "./configure --prefix=/usr --disable-static --enable-lib-only",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libnghttp2.so"]
+
 [packages.nettle]
 version = "3.10.2"
 version_check = "gnu:nettle"

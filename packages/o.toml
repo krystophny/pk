@@ -59,10 +59,11 @@ version = "2025.3"
 version_check = "github:ostreedev/ostree"
 description = "Operating system and container binary deployment and upgrades"
 url = "https://github.com/ostreedev/ostree/releases/download/v${version}/libostree-${version}.tar.xz"
+source_dir = "libostree-${version}"
 stage = 10
 depends = ["glib", "gpgme", "fuse3", "libarchive", "curl", "libsoup3", "e2fsprogs"]
 build_commands = [
-    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-curl --with-soup3 --with-gpgme --without-avahi",
+    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-curl --with-soup3 --with-gpgme --without-avahi --without-libmount --disable-libsystemd --disable-man",
     "make -j${NPROC}",
     "make DESTDIR=${PKG} install"
 ]

@@ -165,6 +165,18 @@ depends = ["glib", "gdk-pixbuf", "libarchive", "curl"]
 meson_flags = "-Dgtk-doc=false -Dintrospection=false -Dman=false -Drpm=false -Dstemmer=false"
 provides = ["/usr/share/gettext/its/metainfo.its"]
 
+[packages.appstream]
+version = "1.0.4"
+version_check = "github:ximion/appstream"
+description = "AppStream metadata library and tools"
+url = "https://github.com/ximion/appstream/archive/refs/tags/v${version}.tar.gz"
+source_dir = "appstream-${version}"
+stage = 9
+depends = ["glib", "libxml2", "curl", "libxmlb"]
+build_system = "meson"
+meson_flags = "-Dgir=false -Dvapi=false -Ddocs=false -Dstemming=false -Dapidocs=false"
+provides = ["/usr/lib/libappstream.so"]
+
 [packages.amdgpu-firmware]
 version = "20260110"
 version_check = "url:https://www.kernel.org/pub/linux/kernel/firmware/|linux-firmware-([0-9]+)\.tar"
