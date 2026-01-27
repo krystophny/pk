@@ -99,14 +99,29 @@ use_git = false
 stage = 12
 
 [packages.steam]
-version = "1.0.0.81"
-version_check = "url:https://repo.steampowered.com/steam/archive/stable/|steam_([0-9]+\.[0-9]+\.[0-9]+)"
+version = "1.0.0.85"
+version_check = "url:https://repo.steampowered.com/steam/archive/stable/|steam_([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)"
 description = "Steam gaming platform"
-url = "https://repo.steampowered.com/steam/archive/precise/steam_${version}.tar.gz"
+url = "https://repo.steampowered.com/steam/archive/stable/steam_${version}.tar.gz"
 git_url = ""
 use_git = false
 stage = 13
-# Note: Steam is distributed as a binary, requires 32-bit libs
+source_dir = "steam-launcher"
+skip_optimization = true
+# Steam is a binary launcher - just install the bootstrap scripts
+build_commands = [
+    "make DESTDIR=${PKG} install",
+    # Create steam wrapper that sets up library paths
+    "mkdir -p ${PKG}/usr/bin",
+    "mv ${PKG}/usr/bin/steam ${PKG}/usr/lib/steam/steam.sh",
+    "cat > ${PKG}/usr/bin/steam << 'STEAM_WRAPPER'",
+    "#!/bin/sh",
+    "export LD_LIBRARY_PATH=/usr/lib/steam:$LD_LIBRARY_PATH",
+    "exec /usr/lib/steam/steam.sh \"$@\"",
+    "STEAM_WRAPPER",
+    "chmod +x ${PKG}/usr/bin/steam"
+]
+provides = ["/usr/bin/steam"]
 
 [packages.spirv-headers]
 version = "1.4.335"
