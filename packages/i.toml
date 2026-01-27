@@ -117,13 +117,13 @@ stage = 19
 # FPGA/EDA Tools
 
 [packages.iverilog]
-version = "12.0"
+version = "12_0"
 version_check = "github:steveicarus/iverilog"
 description = "Icarus Verilog simulator and synthesizer"
-url = "https://github.com/steveicarus/iverilog/archive/refs/tags/v${version_us}.tar.gz"
+url = "https://github.com/steveicarus/iverilog/archive/refs/tags/v${version}.tar.gz"
 git_url = "https://github.com/steveicarus/iverilog.git"
 use_git = false
-source_dir = "iverilog-${version_us}"
+source_dir = "iverilog-${version}"
 stage = 15
 depends = ["bison", "flex", "gperf"]
 build_commands = [
@@ -135,7 +135,8 @@ build_commands = [
 provides = ["/usr/bin/iverilog", "/usr/bin/vvp"]
 
 [packages.icestorm]
-version = "0.0.20250603"
+version = "20250603"
+# No releases - track git commits manually. Check: https://github.com/YosysHQ/icestorm/commits/main
 version_check = "skip:"
 description = "Project IceStorm - iCE40 FPGA bitstream tools"
 git_url = "https://github.com/YosysHQ/icestorm.git"

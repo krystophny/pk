@@ -425,6 +425,7 @@ build_order = 50
 depends = ["glib"]
 build_system = "meson"
 meson_flags = "-Dintrospection=false"
+triggers = ["glib-schemas"]
 provides = ["/usr/share/glib-2.0/schemas/org.gnome.desktop.interface.gschema.xml"]
 
 [packages.gspell]
@@ -452,6 +453,7 @@ stage = 11
 depends = ["gtk3", "gspell", "libpeas", "libgedit-tepl", "desktop-file-utils", "appstream-glib"]
 build_system = "meson"
 meson_flags = "-Dgtk_doc=false -Duser_documentation=false"
+triggers = ["glib-schemas"]
 provides = ["/usr/bin/gedit"]
 
 [packages.gamemode]
@@ -531,7 +533,7 @@ provides = ["/usr/lib/libgdbm.so"]
 # FPGA/EDA Tools
 
 [packages.gtkwave]
-version = "3.3.121"
+version = "3.3.116"
 version_check = "github:gtkwave/gtkwave"
 description = "Waveform viewer for VCD, LXT, FST simulation dumps"
 url = "https://github.com/gtkwave/gtkwave/archive/refs/tags/v${version}.tar.gz"

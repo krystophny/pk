@@ -1,6 +1,22 @@
+[packages.qemu]
+version = "10.2.0"
+version_check = "url:https://www.qemu.org/download/|QEMU ([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "QEMU system emulator (x86_64, RISC-V, KVM)"
+url = "https://download.qemu.org/qemu-${version}.tar.xz"
+git_url = "https://gitlab.com/qemu-project/qemu.git"
+use_git = false
+stage = 15
+depends = ["glib", "pixman", "libslirp", "libusb", "sdl2"]
+build_commands = [
+    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib --enable-kvm --enable-slirp --enable-sdl --enable-usb-redir --enable-linux-user --target-list=x86_64-softmmu,x86_64-linux-user,riscv32-softmmu,riscv32-linux-user,riscv64-softmmu,riscv64-linux-user",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/qemu-system-x86_64", "/usr/bin/qemu-system-riscv32", "/usr/bin/qemu-system-riscv64"]
+
 [packages.qemu-guest-agent]
-version = "10.2.0-rc4"
-version_check = "github:qemu/qemu"
+version = "10.2.0"
+version_check = "url:https://www.qemu.org/download/|QEMU ([0-9]+\\.[0-9]+\\.[0-9]+)"
 description = "QEMU guest agent"
 url = "https://download.qemu.org/qemu-${version}.tar.xz"
 git_url = "https://gitlab.com/qemu-project/qemu.git"

@@ -134,7 +134,7 @@ build_commands = [
 
 [packages.eigen]
 version = "5.0.1"
-version_check = "gitlab:libeigen/eigen"
+version_check = "url:https://gitlab.com/libeigen/eigen/-/tags|tags/([0-9]+\\.[0-9]+\\.[0-9]+)"
 description = "C++ template library for linear algebra"
 url = "https://gitlab.com/libeigen/eigen/-/archive/${version}/eigen-${version}.tar.gz"
 git_url = "https://gitlab.com/libeigen/eigen.git"
