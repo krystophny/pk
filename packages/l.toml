@@ -230,7 +230,7 @@ build_system = "custom"
 build_commands = [
     "make mrproper",
     "make defconfig",
-    "scripts/config --enable CONFIG_VGA_CONSOLE --enable CONFIG_FRAMEBUFFER_CONSOLE --enable CONFIG_FB --enable CONFIG_FB_EFI --enable CONFIG_FB_VESA --enable CONFIG_DRM --enable CONFIG_DRM_FBDEV_EMULATION --enable CONFIG_DRM_VIRTIO_GPU --disable CONFIG_DRM_NOUVEAU --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_MMIO --enable CONFIG_EXT4_FS --enable CONFIG_EFIVAR_FS --enable CONFIG_EFI_PARTITION --enable CONFIG_BLK_DEV_NVME --enable CONFIG_NVME_CORE --enable CONFIG_SATA_AHCI --enable CONFIG_ATA_PIIX --enable CONFIG_DEVTMPFS --enable CONFIG_DEVTMPFS_MOUNT --enable CONFIG_TMPFS --enable CONFIG_NET --enable CONFIG_INET --enable CONFIG_NETDEVICES --enable CONFIG_VIRTIO_NET --enable CONFIG_E1000 --enable CONFIG_E1000E --enable CONFIG_IGC --enable CONFIG_R8169 --enable CONFIG_REALTEK_PHY --enable CONFIG_WIRELESS --enable CONFIG_CFG80211 --enable CONFIG_MAC80211 --enable CONFIG_IWLWIFI --enable CONFIG_IWLMVM --enable CONFIG_USB --enable CONFIG_USB_XHCI_HCD --enable CONFIG_USB_EHCI_HCD --enable CONFIG_INPUT_EVDEV --enable CONFIG_HID --enable CONFIG_USB_HID --enable CONFIG_USB_ACM --enable CONFIG_USB_SERIAL --enable CONFIG_USB_SERIAL_GENERIC --enable CONFIG_USB_SERIAL_CH341 --enable CONFIG_USB_SERIAL_FTDI_SIO --enable CONFIG_USB_SERIAL_CP210X --enable CONFIG_FW_LOADER --enable CONFIG_EXTRA_FIRMWARE_DIR=/lib/firmware --enable CONFIG_MODULES --enable CONFIG_MODULE_UNLOAD --enable CONFIG_MODVERSIONS --disable CONFIG_STACKPROTECTOR --disable CONFIG_STACKPROTECTOR_STRONG --enable CONFIG_USER_NS",
+    "scripts/config --enable CONFIG_VGA_CONSOLE --enable CONFIG_FRAMEBUFFER_CONSOLE --enable CONFIG_FB --enable CONFIG_FB_EFI --enable CONFIG_FB_VESA --enable CONFIG_DRM --enable CONFIG_DRM_FBDEV_EMULATION --enable CONFIG_DRM_VIRTIO_GPU --disable CONFIG_DRM_NOUVEAU --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_MMIO --enable CONFIG_EXT4_FS --enable CONFIG_EFIVAR_FS --enable CONFIG_EFI_PARTITION --enable CONFIG_BLK_DEV_NVME --enable CONFIG_NVME_CORE --enable CONFIG_SATA_AHCI --enable CONFIG_ATA_PIIX --enable CONFIG_DEVTMPFS --enable CONFIG_DEVTMPFS_MOUNT --enable CONFIG_TMPFS --enable CONFIG_NET --enable CONFIG_INET --enable CONFIG_NETDEVICES --enable CONFIG_VIRTIO_NET --enable CONFIG_E1000 --enable CONFIG_E1000E --enable CONFIG_IGC --enable CONFIG_R8169 --enable CONFIG_REALTEK_PHY --enable CONFIG_WIRELESS --enable CONFIG_CFG80211 --enable CONFIG_MAC80211 --enable CONFIG_IWLWIFI --enable CONFIG_IWLMVM --enable CONFIG_USB --enable CONFIG_USB_XHCI_HCD --enable CONFIG_USB_EHCI_HCD --enable CONFIG_INPUT_EVDEV --enable CONFIG_HID --enable CONFIG_USB_HID --enable CONFIG_USB_ACM --enable CONFIG_USB_SERIAL --enable CONFIG_USB_SERIAL_GENERIC --enable CONFIG_USB_SERIAL_CH341 --enable CONFIG_USB_SERIAL_FTDI_SIO --enable CONFIG_USB_SERIAL_CP210X --enable CONFIG_FW_LOADER --enable CONFIG_EXTRA_FIRMWARE_DIR=/lib/firmware --enable CONFIG_MODULES --enable CONFIG_MODULE_UNLOAD --enable CONFIG_MODVERSIONS --disable CONFIG_STACKPROTECTOR --disable CONFIG_STACKPROTECTOR_STRONG",
     "make olddefconfig",
     "make -j${NPROC}",
     "make INSTALL_MOD_PATH=${PKG} modules_install",
@@ -741,24 +741,8 @@ description = "GNU C Library (32-bit)"
 url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz"
 git_url = ""
 use_git = false
-stage = 3
-build_order = 26
-depends = ["glibc", "linux-headers"]
-# Build 32-bit glibc using gcc -m32. This works because glibc's configure
-# detects cross-compilation and doesn't try to run test programs.
-# Must be built BEFORE gcc-multilib, then gcc is rebuilt with full multilib.
-build_commands = [
-    "mkdir -p build32",
-    "cd build32 && echo 'rootsbindir=/usr/sbin' > configparms",
-    "cd build32 && CC='gcc -m32' CXX='g++ -m32' ../configure --prefix=/usr --host=i686-pc-linux-gnu --build=x86_64-pc-linux-gnu --libdir=/usr/lib32 --enable-kernel=5.4 --enable-stack-protector=strong --disable-nscd --disable-werror libc_cv_slibdir=/usr/lib32",
-    "cd build32 && make -j${NPROC}",
-    "cd build32 && make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/bin ${PKG}/usr/sbin ${PKG}/usr/share ${PKG}/etc ${PKG}/var",
-    "mkdir -p ${PKG}/lib ${PKG}/usr/include/gnu",
-    "ln -sf ../usr/lib32/ld-linux.so.2 ${PKG}/lib/ld-linux.so.2",
-    "cp ${PKG}/usr/include/gnu/stubs-32.h /usr/include/gnu/ 2>/dev/null || true"
-]
-provides = ["/usr/lib32/libc.so.6", "/lib/ld-linux.so.2", "/usr/include/gnu/stubs-32.h"]
+stage = 13
+# Note: Build with --host=i686-pc-linux-gnu
 
 [packages.lib32-mesa]
 version = "25.3.4"
@@ -768,32 +752,6 @@ url = "https://mesa.freedesktop.org/archive/mesa-${version}.tar.xz"
 git_url = ""
 use_git = false
 stage = 13
-depends = ["lib32-glibc", "mesa"]
-build_commands = [
-    "echo '[binaries]' > cross32.txt",
-    "echo \"c = 'gcc'\" >> cross32.txt",
-    "echo \"cpp = 'g++'\" >> cross32.txt",
-    "echo \"ar = 'ar'\" >> cross32.txt",
-    "echo \"strip = 'strip'\" >> cross32.txt",
-    "echo \"pkgconfig = 'pkg-config'\" >> cross32.txt",
-    "echo '' >> cross32.txt",
-    "echo '[built-in options]' >> cross32.txt",
-    "echo \"c_args = ['-m32']\" >> cross32.txt",
-    "echo \"c_link_args = ['-m32']\" >> cross32.txt",
-    "echo \"cpp_args = ['-m32']\" >> cross32.txt",
-    "echo \"cpp_link_args = ['-m32']\" >> cross32.txt",
-    "echo '' >> cross32.txt",
-    "echo '[host_machine]' >> cross32.txt",
-    "echo \"system = 'linux'\" >> cross32.txt",
-    "echo \"cpu_family = 'x86'\" >> cross32.txt",
-    "echo \"cpu = 'i686'\" >> cross32.txt",
-    "echo \"endian = 'little'\" >> cross32.txt",
-    "PKG_CONFIG_PATH=/usr/lib32/pkgconfig meson setup build32 --cross-file cross32.txt --prefix=/usr --libdir=/usr/lib32 -Dgallium-drivers=softpipe -Dvulkan-drivers= -Dllvm=disabled -Dgallium-rusticl=false -Dplatforms=x11 -Dglx=dri -Degl=enabled -Dgbm=enabled -Dgles1=disabled -Dgles2=enabled -Dopengl=true",
-    "meson compile -C build32",
-    "DESTDIR=${PKG} meson install -C build32",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share ${PKG}/usr/bin"
-]
-provides = ["/usr/lib32/libGL.so.1"]
 
 [packages.lib32-vulkan-loader]
 version = "1.4.341"
@@ -803,136 +761,6 @@ url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/v${version}/Vulkan-
 git_url = ""
 use_git = false
 stage = 13
-source_dir = "Vulkan-Loader-${version}"
-depends = ["lib32-glibc", "vulkan-headers"]
-build_commands = [
-    "mkdir -p build32",
-    "cd build32 && CFLAGS='-m32' CXXFLAGS='-m32' LDFLAGS='-m32' cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib32 -DVULKAN_HEADERS_INSTALL_DIR=/usr",
-    "cd build32 && make -j${NPROC}",
-    "cd build32 && make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share"
-]
-provides = ["/usr/lib32/libvulkan.so.1"]
-
-[packages.lib32-zlib]
-version = "1.3.1"
-version_check = "github:madler/zlib"
-description = "Compression library (32-bit)"
-url = "https://github.com/madler/zlib/releases/download/v${version}/zlib-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-depends = ["lib32-glibc"]
-build_commands = [
-    "CFLAGS='-m32' LDFLAGS='-m32' ./configure --prefix=/usr --libdir=/usr/lib32",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share"
-]
-provides = ["/usr/lib32/libz.so.1"]
-
-[packages.lib32-expat]
-version = "2.7.1"
-version_check = "github:libexpat/libexpat"
-description = "XML parser library (32-bit)"
-url = "https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-depends = ["lib32-glibc"]
-build_commands = [
-    "CFLAGS='-m32' CXXFLAGS='-m32' LDFLAGS='-m32' ./configure --prefix=/usr --libdir=/usr/lib32",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share ${PKG}/usr/bin"
-]
-provides = ["/usr/lib32/libexpat.so.1"]
-
-[packages.lib32-libdrm]
-version = "2.4.125"
-version_check = "freedesktop:mesa/drm"
-description = "Direct Rendering Manager library (32-bit)"
-url = "https://dri.freedesktop.org/libdrm/libdrm-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-depends = ["lib32-glibc"]
-build_commands = [
-    "echo '[binaries]' > cross32.txt",
-    "echo \"c = 'gcc'\" >> cross32.txt",
-    "echo \"cpp = 'g++'\" >> cross32.txt",
-    "echo \"ar = 'ar'\" >> cross32.txt",
-    "echo \"strip = 'strip'\" >> cross32.txt",
-    "echo \"pkgconfig = 'pkg-config'\" >> cross32.txt",
-    "echo '' >> cross32.txt",
-    "echo '[built-in options]' >> cross32.txt",
-    "echo \"c_args = ['-m32']\" >> cross32.txt",
-    "echo \"c_link_args = ['-m32']\" >> cross32.txt",
-    "echo \"cpp_args = ['-m32']\" >> cross32.txt",
-    "echo \"cpp_link_args = ['-m32']\" >> cross32.txt",
-    "echo '' >> cross32.txt",
-    "echo '[host_machine]' >> cross32.txt",
-    "echo \"system = 'linux'\" >> cross32.txt",
-    "echo \"cpu_family = 'x86'\" >> cross32.txt",
-    "echo \"cpu = 'i686'\" >> cross32.txt",
-    "echo \"endian = 'little'\" >> cross32.txt",
-    "PKG_CONFIG_PATH=/usr/lib32/pkgconfig meson setup build32 --cross-file cross32.txt --prefix=/usr --libdir=/usr/lib32",
-    "meson compile -C build32",
-    "DESTDIR=${PKG} meson install -C build32",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share ${PKG}/usr/bin"
-]
-provides = ["/usr/lib32/libdrm.so.2"]
-
-[packages.lib32-libxcb]
-version = "1.18.0"
-version_check = "freedesktop:xcb/libxcb"
-description = "X11 C Bindings library (32-bit)"
-url = "https://xorg.freedesktop.org/archive/individual/lib/libxcb-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-depends = ["lib32-glibc"]
-build_commands = [
-    "CFLAGS='-m32' LDFLAGS='-m32' ./configure --prefix=/usr --libdir=/usr/lib32 --disable-static",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share"
-]
-provides = ["/usr/lib32/libxcb.so.1"]
-
-[packages.lib32-libX11]
-version = "1.8.12"
-version_check = "freedesktop:xorg/lib/libX11"
-description = "X11 client-side library (32-bit)"
-url = "https://xorg.freedesktop.org/archive/individual/lib/libX11-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-depends = ["lib32-glibc", "lib32-libxcb"]
-build_commands = [
-    "CFLAGS='-m32' LDFLAGS='-m32' ./configure --prefix=/usr --libdir=/usr/lib32 --disable-static",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share"
-]
-provides = ["/usr/lib32/libX11.so.6"]
-
-[packages.lib32-libXext]
-version = "1.3.6"
-version_check = "freedesktop:xorg/lib/libXext"
-description = "X11 miscellaneous extensions library (32-bit)"
-url = "https://xorg.freedesktop.org/archive/individual/lib/libXext-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-depends = ["lib32-glibc", "lib32-libX11"]
-build_commands = [
-    "CFLAGS='-m32' LDFLAGS='-m32' ./configure --prefix=/usr --libdir=/usr/lib32 --disable-static",
-    "make -j${NPROC}",
-    "make DESTDIR=${PKG} install",
-    "rm -rf ${PKG}/usr/include ${PKG}/usr/share"
-]
-provides = ["/usr/lib32/libXext.so.6"]
 
 # STAGE 14: Development Tools (heavy builds)
 
