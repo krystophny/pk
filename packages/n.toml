@@ -268,7 +268,9 @@ build_commands = [
     "meson setup build --prefix=/usr",
     "meson compile -C build",
     "DESTDIR=${PKG} meson install -C build",
-    "printf 'export LIBVA_DRIVER_NAME=nvidia\\nexport MOZ_DISABLE_RDD_SANDBOX=1\\nexport NVD_BACKEND=direct\\n' > ${PKG}/etc/profile.d/nvidia-vaapi.sh"
+    "echo 'export LIBVA_DRIVER_NAME=nvidia' > ${PKG}/etc/profile.d/nvidia-vaapi.sh",
+    "echo 'export MOZ_DISABLE_RDD_SANDBOX=1' >> ${PKG}/etc/profile.d/nvidia-vaapi.sh",
+    "echo 'export NVD_BACKEND=direct' >> ${PKG}/etc/profile.d/nvidia-vaapi.sh"
 ]
 provides = ["/usr/lib/dri/nvidia_drv_video.so", "/etc/profile.d/nvidia-vaapi.sh"]
 
