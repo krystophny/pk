@@ -646,4 +646,18 @@ provides = ["/usr/lib/gstreamer-1.0/libgstlibav.so"]
 # The new "va" plugins in gst-plugins-bad provide better VA-API integration
 # Legacy gstreamer-vaapi is at 1.26.10 but not needed for modern setups
 
+[packages.gpgme]
+version = "2.0.1"
+version_check = "url:https://gnupg.org/ftp/gcrypt/gpgme/|gpgme-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "GnuPG Made Easy - library for GnuPG"
+url = "https://gnupg.org/ftp/gcrypt/gpgme/gpgme-${version}.tar.bz2"
+stage = 5
+depends = ["libgpg-error", "libassuan", "gnupg"]
+build_commands = [
+    "./configure --prefix=/usr --disable-gpg-test",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libgpgme.so"]
+
 # STAGE 18: Scientific Computing Languages

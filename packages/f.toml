@@ -143,3 +143,27 @@ build_commands = [
     "make DESTDIR=${PKG} install"
 ]
 provides = ["/usr/bin/ffmpeg", "/usr/lib/libavcodec.so"]
+
+[packages.fuse3]
+version = "3.17.1"
+version_check = "github:libfuse/libfuse"
+description = "Filesystem in Userspace"
+url = "https://github.com/libfuse/libfuse/releases/download/fuse-${version}/fuse-${version}.tar.gz"
+stage = 5
+build_system = "meson"
+meson_flags = "-Dexamples=false"
+provides = ["/usr/lib/libfuse3.so"]
+
+[packages.flatpak]
+version = "1.16.1"
+version_check = "github:flatpak/flatpak"
+description = "Linux application sandboxing and distribution framework"
+url = "https://github.com/flatpak/flatpak/releases/download/${version}/flatpak-${version}.tar.xz"
+stage = 10
+depends = ["glib", "ostree", "bubblewrap", "json-glib", "libsoup3", "appstream-glib", "polkit", "fuse3", "gpgme", "libseccomp", "libarchive", "dbus", "libxml2", "curl"]
+build_commands = [
+    "./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --with-system-bubblewrap --with-system-dbus-proxy --disable-documentation",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/flatpak"]

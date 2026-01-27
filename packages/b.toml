@@ -163,4 +163,14 @@ build_commands = [
 ]
 provides = ["/usr/bin/riscv64-elf-as", "/usr/bin/riscv64-elf-ld", "/usr/bin/riscv64-elf-objcopy"]
 
+[packages.bubblewrap]
+version = "0.11.0"
+version_check = "github:containers/bubblewrap"
+description = "Unprivileged sandboxing tool"
+url = "https://github.com/containers/bubblewrap/releases/download/v${version}/bubblewrap-${version}.tar.xz"
+stage = 10
+depends = ["libcap"]
+build_system = "meson"
+provides = ["/usr/bin/bwrap"]
+
 # NVMe tools

@@ -15,6 +15,16 @@ build_commands = [
 ]
 provides = ["/usr/bin/jq"]
 
+[packages.json-glib]
+version = "1.10.6"
+version_check = "gnome:json-glib"
+description = "JSON library built on GLib"
+url = "https://download.gnome.org/sources/json-glib/1.10/json-glib-${version}.tar.xz"
+stage = 9
+depends = ["glib"]
+build_system = "meson"
+provides = ["/usr/lib/libjson-glib-1.0.so"]
+
 [packages.julia]
 version = "1.12.4"
 version_check = "github:JuliaLang/julia"

@@ -447,6 +447,30 @@ stage = 8
 build_system = "cmake"
 cmake_flags = "-DCMAKE_INSTALL_LIBDIR=lib -DENABLE_STATIC=OFF -DWITH_JAVA=OFF"
 
+[packages.libseccomp]
+version = "2.5.5"
+version_check = "github:seccomp/libseccomp"
+description = "Enhanced seccomp library"
+url = "https://github.com/seccomp/libseccomp/releases/download/v${version}/libseccomp-${version}.tar.gz"
+stage = 5
+build_commands = [
+    "./configure --prefix=/usr --disable-static",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/lib/libseccomp.so"]
+
+[packages.libsoup3]
+version = "3.6.4"
+version_check = "gnome:libsoup"
+description = "HTTP client/server library for GNOME (version 3)"
+url = "https://download.gnome.org/sources/libsoup/3.6/libsoup-${version}.tar.xz"
+stage = 9
+depends = ["glib", "libpsl", "libxml2", "sqlite", "nghttp2"]
+build_system = "meson"
+meson_flags = "-Dtests=false -Dintrospection=disabled -Dvapi=disabled -Ddocs=disabled"
+provides = ["/usr/lib/libsoup-3.0.so"]
+
 [packages.libsndfile]
 version = "1.2.2"
 version_check = "github:libsndfile/libsndfile"
@@ -733,34 +757,6 @@ build_commands = [
     "install -m644 *.ttf ${PKG}/usr/share/fonts/liberation/"
 ]
 provides = ["/usr/share/fonts/liberation/LiberationSans-Regular.ttf"]
-
-[packages.lib32-glibc]
-version = "2.43"
-version_check = "gnu:glibc"
-description = "GNU C Library (32-bit)"
-url = "https://ftpmirror.gnu.org/gnu/glibc/glibc-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-# Note: Build with --host=i686-pc-linux-gnu
-
-[packages.lib32-mesa]
-version = "25.3.4"
-version_check = "freedesktop:mesa/mesa"
-description = "OpenGL implementation (32-bit)"
-url = "https://mesa.freedesktop.org/archive/mesa-${version}.tar.xz"
-git_url = ""
-use_git = false
-stage = 13
-
-[packages.lib32-vulkan-loader]
-version = "1.4.341"
-version_check = "github:KhronosGroup/Vulkan-Loader"
-description = "Vulkan ICD loader (32-bit)"
-url = "https://github.com/KhronosGroup/Vulkan-Loader/archive/v${version}/Vulkan-Loader-${version}.tar.gz"
-git_url = ""
-use_git = false
-stage = 13
 
 # STAGE 14: Development Tools (heavy builds)
 
