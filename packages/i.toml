@@ -1,8 +1,8 @@
 [packages.icu]
-version = "78.2"
+version = "77.1"
 version_check = "github:unicode-org/icu"
 description = "International Components for Unicode"
-url = "https://github.com/unicode-org/icu/releases/download/release-78-2/icu4c-78_2-src.tgz"
+url = "https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz"
 git_url = "https://github.com/unicode-org/icu.git"
 use_git = false
 source_dir = "icu/source"

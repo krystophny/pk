@@ -2,7 +2,7 @@
 version = "0.60.8.1"
 version_check = "gnu:aspell"
 description = "Spell checker"
-url = "https://ftpmirror.gnu.org/gnu/aspell/aspell-${version}.tar.gz"
+url = "https://mirrors.kernel.org/gnu/aspell/aspell-${version}.tar.gz"
 git_url = ""
 use_git = false
 stage = 9
@@ -13,9 +13,9 @@ provides = ["/usr/bin/aspell", "/usr/lib/libaspell.so"]
 
 [packages.aspell-en]
 version = "2020.12.07-0"
-version_check = "url:https://ftpmirror.gnu.org/gnu/aspell/dict/en/|aspell6-en-([0-9.-]+)\\.tar"
+version_check = "url:https://mirrors.kernel.org/gnu/aspell/dict/en/|aspell6-en-([0-9.-]+)\\.tar"
 description = "English dictionary for aspell"
-url = "https://ftpmirror.gnu.org/gnu/aspell/dict/en/aspell6-en-${version}.tar.bz2"
+url = "https://mirrors.kernel.org/gnu/aspell/dict/en/aspell6-en-${version}.tar.bz2"
 source_dir = "aspell6-en-${version}"
 stage = 9
 build_order = 1
