@@ -1,0 +1,16 @@
+# Environment files (contain secrets)
+.env
+.env.local
+.env.*
+
+# Build artifacts
+*.tar.xz
+*.tar.gz
+*.tar.bz2
+
+# Editor/IDE
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
