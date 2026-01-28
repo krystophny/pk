@@ -158,13 +158,11 @@ stage = 11
 repology = "nextcloud-client"
 
 # STAGE 12: GPU Drivers
-# NVIDIA open-source kernel modules (recommended by upstream)
-# Use nvidia-open for production, nvidia-open-latest for bleeding edge
 
-[packages.nvidia-open]
+[packages.nvidia]
 version = "590.48.01"
 version_check = "github:NVIDIA/open-gpu-kernel-modules"
-description = "NVIDIA open kernel modules + userspace (590 for Turing+)"
+description = "NVIDIA open kernel modules + X11 driver (Turing and newer)"
 url = "https://github.com/NVIDIA/open-gpu-kernel-modules/archive/refs/tags/${version}.tar.gz"
 source_dir = "open-gpu-kernel-modules-${version}"
 stage = 12
@@ -292,7 +290,7 @@ description = "VA-API driver for NVIDIA GPUs"
 url = "https://github.com/elFarto/nvidia-vaapi-driver/archive/refs/tags/v${version}.tar.gz"
 stage = 16
 build_order = 30
-depends = ["libva", "nv-codec-headers", "libdrm", "gst-plugins-bad", "nvidia-open"]
+depends = ["libva", "nv-codec-headers", "libdrm", "gst-plugins-bad", "nvidia"]
 build_system = "meson"
 build_commands = [
     "mkdir -p ${PKG}/etc/profile.d",
