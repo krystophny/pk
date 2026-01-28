@@ -89,6 +89,19 @@ build_system = "meson"
 depends = ["libxml2"]
 meson_flags = "-Dupdate-mimedb=false"
 
+[packages.socat]
+version = "1.8.0.3"
+version_check = "url:http://www.dest-unreach.org/socat/download/|socat-([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "Multipurpose relay for bidirectional data transfer"
+url = "http://www.dest-unreach.org/socat/download/socat-${version}.tar.gz"
+stage = 10
+build_commands = [
+    "./configure --prefix=/usr",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/bin/socat"]
+
 [packages.spice-vdagent]
 version = "0.23.0"
 version_check = "url:https://www.spice-space.org/download/releases/|spice-vdagent-([0-9]+\.[0-9]+\.[0-9]+)\.tar"

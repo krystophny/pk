@@ -172,9 +172,12 @@ description = "AppStream metadata library and tools"
 url = "https://github.com/ximion/appstream/archive/refs/tags/v${version}.tar.gz"
 source_dir = "appstream-${version}"
 stage = 9
-depends = ["glib", "libxml2", "curl", "libxmlb"]
-build_system = "meson"
-meson_flags = "-Dgir=false -Dvapi=false -Ddocs=false -Dstemming=false -Dapidocs=false"
+depends = ["glib", "libxml2", "curl", "libxmlb", "docbook-xsl"]
+build_commands = [
+    "XML_CATALOG_FILES=/etc/xml/catalog meson setup build-pk/meson --prefix=/usr -Dgir=false -Dvapi=false -Ddocs=false -Dstemming=false -Dapidocs=false -Dsystemd=false --wrap-mode=nodownload",
+    "XML_CATALOG_FILES=/etc/xml/catalog ninja -C build-pk/meson",
+    "DESTDIR=${PKG} ninja -C build-pk/meson install"
+]
 provides = ["/usr/lib/libappstream.so"]
 
 [packages.amdgpu-firmware]

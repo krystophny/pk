@@ -175,7 +175,7 @@ stage = 9
 depends = ["glib", "libxml2"]
 skip_optimization = true
 build_commands = [
-    "meson setup build-pk/meson --prefix=/usr -Dgtkdoc=false -Dintrospection=false -Dtests=false",
+    "CFLAGS='-O2 -march=znver3 -fno-stack-protector' meson setup build-pk/meson --prefix=/usr -Dgtkdoc=false -Dintrospection=false -Dtests=false",
     "ninja -C build-pk/meson",
     "DESTDIR=${PKG} ninja -C build-pk/meson install"
 ]
@@ -186,6 +186,7 @@ version = "0.2.5"
 version_check = "github:yaml/libyaml"
 description = "YAML parser and emitter library"
 url = "https://github.com/yaml/libyaml/releases/download/${version}/yaml-${version}.tar.gz"
+source_dir = "yaml-${version}"
 stage = 5
 provides = ["/usr/lib/libyaml.so"]
 
