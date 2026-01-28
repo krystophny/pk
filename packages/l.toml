@@ -253,7 +253,52 @@ build_system = "custom"
 build_commands = [
     "make mrproper",
     "make defconfig",
-    "scripts/config --enable CONFIG_VGA_CONSOLE --enable CONFIG_FRAMEBUFFER_CONSOLE --enable CONFIG_FB --enable CONFIG_FB_EFI --enable CONFIG_FB_VESA --enable CONFIG_DRM --enable CONFIG_DRM_FBDEV_EMULATION --enable CONFIG_DRM_VIRTIO_GPU --disable CONFIG_DRM_NOUVEAU --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_MMIO --enable CONFIG_EXT4_FS --enable CONFIG_EFIVAR_FS --enable CONFIG_EFI_PARTITION --enable CONFIG_BLK_DEV_NVME --enable CONFIG_NVME_CORE --enable CONFIG_SATA_AHCI --enable CONFIG_ATA_PIIX --enable CONFIG_DEVTMPFS --enable CONFIG_DEVTMPFS_MOUNT --enable CONFIG_TMPFS --enable CONFIG_NET --enable CONFIG_INET --enable CONFIG_NETDEVICES --enable CONFIG_VIRTIO_NET --enable CONFIG_E1000 --enable CONFIG_E1000E --enable CONFIG_IGC --enable CONFIG_R8169 --enable CONFIG_REALTEK_PHY --enable CONFIG_WIRELESS --enable CONFIG_CFG80211 --enable CONFIG_MAC80211 --enable CONFIG_IWLWIFI --enable CONFIG_IWLMVM --enable CONFIG_USB --enable CONFIG_USB_XHCI_HCD --enable CONFIG_USB_EHCI_HCD --enable CONFIG_INPUT_EVDEV --enable CONFIG_HID --enable CONFIG_USB_HID --enable CONFIG_USB_ACM --enable CONFIG_USB_SERIAL --enable CONFIG_USB_SERIAL_GENERIC --enable CONFIG_USB_SERIAL_CH341 --enable CONFIG_USB_SERIAL_FTDI_SIO --enable CONFIG_USB_SERIAL_CP210X --enable CONFIG_FW_LOADER --enable CONFIG_EXTRA_FIRMWARE_DIR=/lib/firmware --enable CONFIG_MODULES --enable CONFIG_MODULE_UNLOAD --enable CONFIG_MODVERSIONS --disable CONFIG_STACKPROTECTOR --disable CONFIG_STACKPROTECTOR_STRONG",
+    # Framebuffer and display
+    "scripts/config --enable CONFIG_VGA_CONSOLE --enable CONFIG_FRAMEBUFFER_CONSOLE --enable CONFIG_FB --enable CONFIG_FB_EFI --enable CONFIG_FB_VESA --enable CONFIG_DRM --enable CONFIG_DRM_FBDEV_EMULATION --enable CONFIG_DRM_VIRTIO_GPU --disable CONFIG_DRM_NOUVEAU",
+    # Virtio and storage
+    "scripts/config --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_MMIO --enable CONFIG_EXT4_FS --enable CONFIG_EFIVAR_FS --enable CONFIG_EFI_PARTITION --enable CONFIG_BLK_DEV_NVME --enable CONFIG_NVME_CORE --enable CONFIG_SATA_AHCI --enable CONFIG_ATA_PIIX",
+    # MD RAID support (RAID0, RAID1, RAID10, RAID5/6)
+    "scripts/config --enable CONFIG_MD --enable CONFIG_BLK_DEV_MD --enable CONFIG_MD_AUTODETECT --enable CONFIG_MD_RAID0 --enable CONFIG_MD_RAID1 --enable CONFIG_MD_RAID10 --enable CONFIG_MD_RAID456 --enable CONFIG_ASYNC_CORE --enable CONFIG_ASYNC_MEMCPY --enable CONFIG_ASYNC_XOR --enable CONFIG_ASYNC_PQ --enable CONFIG_ASYNC_RAID6_RECOV",
+    # Devtmpfs and tmpfs
+    "scripts/config --enable CONFIG_DEVTMPFS --enable CONFIG_DEVTMPFS_MOUNT --enable CONFIG_TMPFS",
+    # Networking core
+    "scripts/config --enable CONFIG_NET --enable CONFIG_INET --enable CONFIG_NETDEVICES --enable CONFIG_VIRTIO_NET --enable CONFIG_E1000 --enable CONFIG_E1000E --enable CONFIG_IGC --enable CONFIG_R8169 --enable CONFIG_REALTEK_PHY",
+    # WiFi (Intel AX200/AX210/AX211, regulatory)
+    "scripts/config --enable CONFIG_WIRELESS --enable CONFIG_WLAN --enable CONFIG_CFG80211 --enable CONFIG_CFG80211_WEXT --enable CONFIG_MAC80211 --enable CONFIG_IWLWIFI --enable CONFIG_IWLMVM --enable CONFIG_IWLDVM --module CONFIG_IWLWIFI --module CONFIG_IWLMVM",
+    # Bluetooth (Intel AX200)
+    "scripts/config --enable CONFIG_BT --enable CONFIG_BT_BREDR --enable CONFIG_BT_LE --enable CONFIG_BT_HCIBTUSB --enable CONFIG_BT_HCIUART --enable CONFIG_BT_INTEL --enable CONFIG_BT_BCM --enable CONFIG_BT_RFCOMM --enable CONFIG_BT_HIDP",
+    # USB support
+    "scripts/config --enable CONFIG_USB --enable CONFIG_USB_XHCI_HCD --enable CONFIG_USB_EHCI_HCD --enable CONFIG_INPUT_EVDEV --enable CONFIG_HID --enable CONFIG_USB_HID --enable CONFIG_HID_LOGITECH --enable CONFIG_HID_LOGITECH_DJ --enable CONFIG_USB_ACM --enable CONFIG_USB_SERIAL --enable CONFIG_USB_SERIAL_GENERIC --enable CONFIG_USB_SERIAL_CH341 --enable CONFIG_USB_SERIAL_FTDI_SIO --enable CONFIG_USB_SERIAL_CP210X",
+    # Webcam (Logitech C270 - UVC)
+    "scripts/config --enable CONFIG_MEDIA_SUPPORT --enable CONFIG_MEDIA_USB_SUPPORT --enable CONFIG_USB_VIDEO_CLASS --enable CONFIG_USB_VIDEO_CLASS_INPUT_EVDEV --enable CONFIG_VIDEO_DEV --enable CONFIG_VIDEO_V4L2",
+    # Firmware loading
+    "scripts/config --enable CONFIG_FW_LOADER --set-str CONFIG_EXTRA_FIRMWARE_DIR /lib/firmware",
+    # Modules and security
+    "scripts/config --enable CONFIG_MODULES --enable CONFIG_MODULE_UNLOAD --enable CONFIG_MODVERSIONS --disable CONFIG_STACKPROTECTOR --disable CONFIG_STACKPROTECTOR_STRONG",
+    # Namespaces (for containers, user namespaces, Flatpak, Podman, etc.)
+    "scripts/config --enable CONFIG_NAMESPACES --enable CONFIG_USER_NS --enable CONFIG_PID_NS --enable CONFIG_NET_NS --enable CONFIG_UTS_NS --enable CONFIG_IPC_NS --enable CONFIG_CGROUP_NS --enable CONFIG_TIME_NS",
+    # CGroups v2 (for Podman, containers)
+    "scripts/config --enable CONFIG_CGROUPS --enable CONFIG_CGROUP_SCHED --enable CONFIG_CGROUP_PIDS --enable CONFIG_CGROUP_RDMA --enable CONFIG_CGROUP_FREEZER --enable CONFIG_CGROUP_HUGETLB --enable CONFIG_CGROUP_DEVICE --enable CONFIG_CGROUP_CPUACCT --enable CONFIG_CGROUP_PERF --enable CONFIG_CGROUP_BPF --enable CONFIG_MEMCG --enable CONFIG_BLK_CGROUP --enable CONFIG_CGROUP_WRITEBACK --enable CONFIG_CGROUP_MISC",
+    # OverlayFS and FUSE (for Podman, Flatpak)
+    "scripts/config --enable CONFIG_OVERLAY_FS --enable CONFIG_FUSE_FS --enable CONFIG_CUSE",
+    # Seccomp (for containers, Flatpak, Steam)
+    "scripts/config --enable CONFIG_SECCOMP --enable CONFIG_SECCOMP_FILTER",
+    # KVM/QEMU virtualization
+    "scripts/config --enable CONFIG_VIRTUALIZATION --module CONFIG_KVM --module CONFIG_KVM_AMD --module CONFIG_KVM_INTEL --enable CONFIG_KVM_AMD_SEV --enable CONFIG_HAVE_KVM",
+    # VirtIO (for QEMU guests)
+    "scripts/config --enable CONFIG_VIRTIO --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_BLK --enable CONFIG_VIRTIO_NET --enable CONFIG_VIRTIO_CONSOLE --enable CONFIG_VIRTIO_BALLOON --enable CONFIG_VIRTIO_INPUT --enable CONFIG_VIRTIO_MMIO",
+    # VFIO (for GPU passthrough)
+    "scripts/config --enable CONFIG_VFIO --enable CONFIG_VFIO_PCI --enable CONFIG_VFIO_IOMMU_TYPE1 --enable CONFIG_VFIO_VIRQFD",
+    # BPF (for modern container networking)
+    "scripts/config --enable CONFIG_BPF --enable CONFIG_BPF_SYSCALL --enable CONFIG_BPF_JIT",
+    # TUN/TAP (for container/VM networking)
+    "scripts/config --enable CONFIG_TUN --enable CONFIG_VETH --enable CONFIG_BRIDGE --enable CONFIG_NETFILTER --enable CONFIG_NF_NAT --enable CONFIG_NETFILTER_XT_MATCH_CONNTRACK --enable CONFIG_IP_NF_NAT --enable CONFIG_IP_NF_TARGET_MASQUERADE",
+    # Audio (ALSA, HD Audio for AMD Starship + NVIDIA)
+    "scripts/config --enable CONFIG_SOUND --enable CONFIG_SND --enable CONFIG_SND_TIMER --enable CONFIG_SND_PCM --enable CONFIG_SND_HRTIMER --enable CONFIG_SND_DYNAMIC_MINORS --enable CONFIG_SND_PCI --enable CONFIG_SND_HDA --enable CONFIG_SND_HDA_INTEL --enable CONFIG_SND_HDA_CODEC_REALTEK --enable CONFIG_SND_HDA_CODEC_HDMI --enable CONFIG_SND_HDA_CODEC_GENERIC --enable CONFIG_SND_USB --enable CONFIG_SND_USB_AUDIO",
+    # Low-latency/real-time audio
+    "scripts/config --enable CONFIG_PREEMPT --enable CONFIG_PREEMPT_BUILD --enable CONFIG_PREEMPT_COUNT --enable CONFIG_PREEMPTION --enable CONFIG_PREEMPT_DYNAMIC --set-val CONFIG_HZ 1000 --enable CONFIG_HZ_1000 --enable CONFIG_NO_HZ_IDLE --enable CONFIG_NO_HZ_COMMON --enable CONFIG_NO_HZ --enable CONFIG_HIGH_RES_TIMERS --enable CONFIG_CPU_ISOLATION --enable CONFIG_RCU_NOCB_CPU",
+    # Crypto support for RAID and filesystems
+    "scripts/config --enable CONFIG_CRYPTO --enable CONFIG_CRYPTO_CRC32C --enable CONFIG_CRC32 --enable CONFIG_LIBCRC32C",
     "make olddefconfig",
     "make -j${NPROC}",
     "make INSTALL_MOD_PATH=${PKG} modules_install",
