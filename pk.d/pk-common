@@ -114,12 +114,18 @@ extract_array() {
             in_array = 1
             gsub(/^[^=]+=[ \t]*\[[ \t]*/, "")
             if (/\]/) { gsub(/[ \t]*\].*/, ""); in_array = 0 }
-            gsub(/"/, ""); gsub(/,[ \t]*$/, ""); if (/./) print
+            gsub(/^"/, ""); gsub(/"[ \t]*,?[ \t]*$/, "")
+            # Handle TOML escape sequences
+            gsub(/\\"/, "\""); gsub(/\\\\/, "\\")
+            if (/./) print
             next
         }
         in_array {
             if (/\]/) { gsub(/[ \t]*\].*/, ""); in_array = 0 }
-            gsub(/^[ \t]*"/, ""); gsub(/"[ \t]*,?[ \t]*$/, ""); if (/./) print
+            gsub(/^[ \t]*"/, ""); gsub(/"[ \t]*,?[ \t]*$/, "")
+            # Handle TOML escape sequences
+            gsub(/\\"/, "\""); gsub(/\\\\/, "\\")
+            if (/./) print
         }
     '
 }
