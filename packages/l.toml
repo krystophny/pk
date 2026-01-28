@@ -256,8 +256,10 @@ build_commands = [
     "make defconfig",
     # Framebuffer and display
     "scripts/config --enable CONFIG_VGA_CONSOLE --enable CONFIG_FRAMEBUFFER_CONSOLE --enable CONFIG_FB --enable CONFIG_FB_EFI --enable CONFIG_FB_VESA --enable CONFIG_DRM --enable CONFIG_DRM_FBDEV_EMULATION --enable CONFIG_DRM_VIRTIO_GPU --disable CONFIG_DRM_NOUVEAU",
+    # EFI boot support (critical for UEFI systems)
+    "scripts/config --enable CONFIG_EFI --enable CONFIG_EFI_STUB --enable CONFIG_EFI_MIXED --enable CONFIG_EFI_PARTITION --enable CONFIG_EFIVAR_FS --enable CONFIG_EFI_RUNTIME_MAP --enable CONFIG_EFI_BOOTLOADER_CONTROL --enable CONFIG_EFI_VARS_PSTORE --enable CONFIG_EFI_RUNTIME_WRAPPERS",
     # Virtio and storage
-    "scripts/config --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_MMIO --enable CONFIG_EXT4_FS --enable CONFIG_EFIVAR_FS --enable CONFIG_EFI_PARTITION --enable CONFIG_BLK_DEV_NVME --enable CONFIG_NVME_CORE --enable CONFIG_SATA_AHCI --enable CONFIG_ATA_PIIX",
+    "scripts/config --enable CONFIG_VIRTIO_PCI --enable CONFIG_VIRTIO_MMIO --enable CONFIG_EXT4_FS --enable CONFIG_BLK_DEV_NVME --enable CONFIG_NVME_CORE --enable CONFIG_SATA_AHCI --enable CONFIG_ATA_PIIX",
     # MD RAID support (RAID0, RAID1, RAID10, RAID5/6)
     "scripts/config --enable CONFIG_MD --enable CONFIG_BLK_DEV_MD --enable CONFIG_MD_AUTODETECT --enable CONFIG_MD_RAID0 --enable CONFIG_MD_RAID1 --enable CONFIG_MD_RAID10 --enable CONFIG_MD_RAID456 --enable CONFIG_ASYNC_CORE --enable CONFIG_ASYNC_MEMCPY --enable CONFIG_ASYNC_XOR --enable CONFIG_ASYNC_PQ --enable CONFIG_ASYNC_RAID6_RECOV",
     # Devtmpfs and tmpfs
@@ -293,7 +295,14 @@ build_commands = [
     # BPF (for modern container networking)
     "scripts/config --enable CONFIG_BPF --enable CONFIG_BPF_SYSCALL --enable CONFIG_BPF_JIT",
     # TUN/TAP (for container/VM networking)
-    "scripts/config --enable CONFIG_TUN --enable CONFIG_VETH --enable CONFIG_BRIDGE --enable CONFIG_NETFILTER --enable CONFIG_NF_NAT --enable CONFIG_NETFILTER_XT_MATCH_CONNTRACK --enable CONFIG_IP_NF_NAT --enable CONFIG_IP_NF_TARGET_MASQUERADE",
+    "scripts/config --enable CONFIG_TUN --enable CONFIG_VETH --enable CONFIG_BRIDGE",
+    # Netfilter / iptables / nftables (full support for masquerading, NAT, firewall)
+    "scripts/config --enable CONFIG_NETFILTER --enable CONFIG_NETFILTER_ADVANCED --enable CONFIG_NETFILTER_XTABLES --enable CONFIG_NF_CONNTRACK --enable CONFIG_NF_NAT --enable CONFIG_NF_DEFRAG_IPV4 --enable CONFIG_NF_DEFRAG_IPV6",
+    "scripts/config --enable CONFIG_NETFILTER_XT_MATCH_CONNTRACK --enable CONFIG_NETFILTER_XT_MATCH_STATE --enable CONFIG_NETFILTER_XT_MATCH_COMMENT --enable CONFIG_NETFILTER_XT_MATCH_MULTIPORT --enable CONFIG_NETFILTER_XT_MATCH_LIMIT",
+    "scripts/config --enable CONFIG_NETFILTER_XT_TARGET_LOG --module CONFIG_NETFILTER_XT_TARGET_MASQUERADE --enable CONFIG_NETFILTER_XT_TARGET_REDIRECT --enable CONFIG_NETFILTER_XT_NAT",
+    "scripts/config --enable CONFIG_IP_NF_IPTABLES --enable CONFIG_IP_NF_FILTER --enable CONFIG_IP_NF_TARGET_REJECT --enable CONFIG_IP_NF_NAT --enable CONFIG_IP_NF_TARGET_MASQUERADE --enable CONFIG_IP_NF_MANGLE --enable CONFIG_IP_NF_RAW",
+    "scripts/config --enable CONFIG_IP6_NF_IPTABLES --enable CONFIG_IP6_NF_FILTER --enable CONFIG_IP6_NF_TARGET_REJECT --enable CONFIG_IP6_NF_NAT --enable CONFIG_IP6_NF_MANGLE --enable CONFIG_IP6_NF_RAW",
+    "scripts/config --enable CONFIG_NF_TABLES --enable CONFIG_NF_TABLES_INET --enable CONFIG_NFT_NAT --enable CONFIG_NFT_MASQ --enable CONFIG_NFT_REJECT --enable CONFIG_NFT_CT --enable CONFIG_NFT_LOG",
     # Audio (ALSA, HD Audio for AMD Starship + NVIDIA)
     "scripts/config --enable CONFIG_SOUND --enable CONFIG_SND --enable CONFIG_SND_TIMER --enable CONFIG_SND_PCM --enable CONFIG_SND_HRTIMER --enable CONFIG_SND_DYNAMIC_MINORS --enable CONFIG_SND_PCI --enable CONFIG_SND_HDA --enable CONFIG_SND_HDA_INTEL --enable CONFIG_SND_HDA_CODEC_REALTEK --enable CONFIG_SND_HDA_CODEC_HDMI --enable CONFIG_SND_HDA_CODEC_GENERIC --enable CONFIG_SND_USB --enable CONFIG_SND_USB_AUDIO",
     # Low-latency/real-time audio
@@ -358,6 +367,15 @@ url = "https://github.com/thom311/libnl/releases/download/libnl3_12_0/libnl-${ve
 git_url = "https://github.com/thom311/libnl.git"
 use_git = false
 stage = 7
+
+[packages.libmnl]
+version = "1.0.5"
+version_check = "url:https://www.netfilter.org/projects/libmnl/downloads.html|libmnl-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "Minimalistic Netlink library"
+url = "https://www.netfilter.org/projects/libmnl/files/libmnl-${version}.tar.bz2"
+stage = 7
+build_order = 1
+provides = ["/usr/lib/libmnl.so"]
 
 [packages.libXau]
 version = "1.0.12"

@@ -116,6 +116,21 @@ stage = 19
 
 # FPGA/EDA Tools
 
+[packages.iptables]
+version = "1.8.11"
+version_check = "url:https://www.netfilter.org/projects/iptables/downloads.html|iptables-([0-9]+\\.[0-9]+\\.[0-9]+)\\.tar"
+description = "Packet filtering and NAT administration tools"
+url = "https://www.netfilter.org/projects/iptables/files/iptables-${version}.tar.xz"
+stage = 7
+build_order = 5
+depends = ["libnl", "libmnl"]
+build_commands = [
+    "./configure --prefix=/usr --sbindir=/usr/sbin --disable-nftables --enable-libipq",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install"
+]
+provides = ["/usr/sbin/iptables", "/usr/sbin/ip6tables"]
+
 [packages.iverilog]
 version = "12_0"
 version_check = "github:steveicarus/iverilog"
