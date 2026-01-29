@@ -230,6 +230,31 @@ build_commands = [
 ]
 provides = ["/usr/lib/libnvidia-glcore.so.${version}", "/usr/bin/nvidia-smi"]
 
+[packages.nvhpc]
+version = "25.11"
+version_check = "url:https://developer.nvidia.com/hpc-sdk-downloads|NVHPC ([0-9]+\\.[0-9]+)"
+description = "NVIDIA HPC SDK (CUDA, nvcc, nvc, nvc++, nvfortran, cuBLAS, cuDNN, NCCL)"
+url = "https://developer.download.nvidia.com/hpc-sdk/${version}/nvhpc_2025_2511_Linux_x86_64_cuda_multi.tar.gz"
+source_dir = "nvhpc_2025_2511_Linux_x86_64_cuda_multi"
+stage = 12
+depends = ["nvidia"]
+build_commands = [
+    "export NVHPC_SILENT=true",
+    "export NVHPC_INSTALL_DIR=${PKG}/opt/nvidia/hpc_sdk",
+    "export NVHPC_INSTALL_TYPE=single",
+    "./install",
+    "mkdir -p ${PKG}/etc/profile.d",
+    "echo 'export NVHPC=/opt/nvidia/hpc_sdk' > ${PKG}/etc/profile.d/nvhpc.sh",
+    "echo 'export PATH=$NVHPC/Linux_x86_64/${version}/compilers/bin:$PATH' >> ${PKG}/etc/profile.d/nvhpc.sh",
+    "echo 'export PATH=$NVHPC/Linux_x86_64/${version}/cuda/bin:$PATH' >> ${PKG}/etc/profile.d/nvhpc.sh",
+    "echo 'export LD_LIBRARY_PATH=$NVHPC/Linux_x86_64/${version}/cuda/lib64:$LD_LIBRARY_PATH' >> ${PKG}/etc/profile.d/nvhpc.sh",
+    "echo 'export MANPATH=$NVHPC/Linux_x86_64/${version}/compilers/man:$MANPATH' >> ${PKG}/etc/profile.d/nvhpc.sh",
+    "mkdir -p ${PKG}/etc/ld.so.conf.d",
+    "echo '/opt/nvidia/hpc_sdk/Linux_x86_64/${version}/cuda/lib64' > ${PKG}/etc/ld.so.conf.d/nvhpc.conf",
+    "echo '/opt/nvidia/hpc_sdk/Linux_x86_64/${version}/compilers/lib' >> ${PKG}/etc/ld.so.conf.d/nvhpc.conf"
+]
+provides = ["/opt/nvidia/hpc_sdk/Linux_x86_64/${version}/cuda/bin/nvcc"]
+
 [packages.nodejs]
 version = "25.4.0"
 version_check = "github:nodejs/node"

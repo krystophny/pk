@@ -1133,9 +1133,10 @@ git_url = "https://github.com/ggml-org/llama.cpp.git"
 use_git = false
 source_dir = "llama.cpp-${version}"
 stage = 12
-depends = ["cmake", "cuda-toolkit"]
+depends = ["cmake", "nvhpc"]
 build_commands = [
-    "cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DLLAMA_CURL=ON",
+    "source /etc/profile.d/nvhpc.sh",
+    "cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DLLAMA_CURL=ON -DCMAKE_CUDA_COMPILER=/opt/nvidia/hpc_sdk/Linux_x86_64/25.11/cuda/bin/nvcc",
     "cmake --build build --config Release -j${NPROC}",
     "cmake --install build --prefix=${PKG}/usr",
     "mkdir -p ${PKG}/usr/lib",
