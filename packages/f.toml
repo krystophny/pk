@@ -144,6 +144,23 @@ build_commands = [
 ]
 provides = ["/usr/bin/ffmpeg", "/usr/lib/libavcodec.so"]
 
+[packages.fuse2]
+version = "2.9.9"
+version_check = "repology:fuse2"
+description = "Filesystem in Userspace (legacy 2.x branch)"
+url = "https://github.com/libfuse/libfuse/releases/download/fuse-${version}/fuse-${version}.tar.gz"
+source_dir = "fuse-${version}"
+stage = 5
+build_commands = [
+    "sed -i 's/^static int closefrom/static int fuse_closefrom/' util/ulockmgr_server.c",
+    "sed -i 's/closefrom(fd)/fuse_closefrom(fd)/' util/ulockmgr_server.c",
+    "./configure --prefix=/usr --disable-static --enable-lib --enable-util",
+    "make -j${NPROC}",
+    "make DESTDIR=${PKG} install",
+    "chmod u+s ${PKG}/usr/bin/fusermount || true"
+]
+provides = ["/usr/lib/libfuse.so.2"]
+
 [packages.fuse3]
 version = "3.17.1"
 version_check = "github:libfuse/libfuse"
