@@ -1,3 +1,14 @@
+[packages.zip]
+version = "3.0"
+description = "Info-ZIP compression utility"
+url = "https://downloads.sourceforge.net/infozip/zip30.tar.gz"
+source_dir = "zip30"
+stage = 3
+build_commands = [
+    "make -f unix/Makefile generic_gcc",
+    "make -f unix/Makefile prefix=${PKG}/usr install"
+]
+
 [packages.zlib]
 version = "1.3.1"
 version_check = "zlib:"

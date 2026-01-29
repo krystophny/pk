@@ -309,6 +309,8 @@ build_commands = [
     "scripts/config --enable CONFIG_PREEMPT --enable CONFIG_PREEMPT_BUILD --enable CONFIG_PREEMPT_COUNT --enable CONFIG_PREEMPTION --enable CONFIG_PREEMPT_DYNAMIC --set-val CONFIG_HZ 1000 --enable CONFIG_HZ_1000 --enable CONFIG_NO_HZ_IDLE --enable CONFIG_NO_HZ_COMMON --enable CONFIG_NO_HZ --enable CONFIG_HIGH_RES_TIMERS --enable CONFIG_CPU_ISOLATION --enable CONFIG_RCU_NOCB_CPU",
     # Crypto support for RAID and filesystems
     "scripts/config --enable CONFIG_CRYPTO --enable CONFIG_CRYPTO_CRC32C --enable CONFIG_CRC32 --enable CONFIG_LIBCRC32C",
+    # exFAT filesystem (for USB drives, SD cards)
+    "scripts/config --enable CONFIG_EXFAT_FS",
     "make olddefconfig",
     "make -j${NPROC}",
     "make INSTALL_MOD_PATH=${PKG} modules_install",

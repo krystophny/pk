@@ -1,3 +1,13 @@
+[packages.dosfstools]
+version = "4.2"
+version_check = "github:dosfstools/dosfstools"
+description = "FAT filesystem utilities (mkfs.fat, fsck.fat)"
+url = "https://github.com/dosfstools/dosfstools/releases/download/v${version}/dosfstools-${version}.tar.gz"
+stage = 3
+build_system = "autotools"
+configure_flags = "--enable-compat-symlinks"
+provides = ["/usr/sbin/mkfs.fat", "/usr/sbin/mkfs.vfat"]
+
 [packages.desktop-file-utils]
 version = "0.28"
 version_check = "freedesktop:xdg/desktop-file-utils"
