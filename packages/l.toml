@@ -1144,3 +1144,19 @@ build_commands = [
     "cp build/ggml/src/lib*.so ${PKG}/usr/lib/ || true"
 ]
 provides = ["/usr/bin/llama-server", "/usr/bin/llama-cli"]
+
+[packages.lm-studio]
+version = "0.4.0-18"
+version_check = "url:https://lmstudio.ai/download|LM Studio.*?([0-9]+\\.[0-9]+\\.[0-9]+)"
+description = "LM Studio - local LLM inference with GUI and OpenAI-compatible API"
+url = "https://installers.lmstudio.ai/linux/x64/${version}/LM-Studio-${version}-x64.AppImage"
+source_dir = "."
+stage = 12
+build_commands = [
+    "mkdir -p ${PKG}/opt/lm-studio ${PKG}/usr/bin ${PKG}/usr/share/applications",
+    "cp LM-Studio-${version}-x64.AppImage ${PKG}/opt/lm-studio/lm-studio.AppImage",
+    "chmod +x ${PKG}/opt/lm-studio/lm-studio.AppImage",
+    "ln -sf /opt/lm-studio/lm-studio.AppImage ${PKG}/usr/bin/lm-studio",
+    "cat > ${PKG}/usr/share/applications/lm-studio.desktop << 'DESKTOP'\n[Desktop Entry]\nName=LM Studio\nComment=Local LLM inference\nExec=/opt/lm-studio/lm-studio.AppImage\nIcon=lm-studio\nType=Application\nCategories=Development;Science;\nDESKTOP"
+]
+provides = ["/opt/lm-studio/lm-studio.AppImage", "/usr/bin/lm-studio"]
