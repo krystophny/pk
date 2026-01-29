@@ -1123,3 +1123,23 @@ build_order = 7
 depends = ["libva"]
 build_system = "autotools"
 provides = ["/usr/bin/vainfo"]
+
+[packages.llama-cpp]
+version = "b7865"
+version_check = "github:ggml-org/llama.cpp"
+description = "LLM inference in C/C++ with CUDA/Vulkan support"
+url = "https://github.com/ggml-org/llama.cpp/archive/refs/tags/${version}.tar.gz"
+git_url = "https://github.com/ggml-org/llama.cpp.git"
+use_git = false
+source_dir = "llama.cpp-${version}"
+stage = 12
+depends = ["cmake", "cuda-toolkit"]
+build_commands = [
+    "cmake -B build -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DLLAMA_CURL=ON",
+    "cmake --build build --config Release -j${NPROC}",
+    "cmake --install build --prefix=${PKG}/usr",
+    "mkdir -p ${PKG}/usr/lib",
+    "cp build/lib*.so ${PKG}/usr/lib/ || true",
+    "cp build/ggml/src/lib*.so ${PKG}/usr/lib/ || true"
+]
+provides = ["/usr/bin/llama-server", "/usr/bin/llama-cli"]

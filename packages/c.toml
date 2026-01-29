@@ -138,10 +138,19 @@ description = "NVIDIA CUDA Toolkit (nvcc, cuBLAS, cuDNN, etc.)"
 url = "https://developer.download.nvidia.com/compute/cuda/${version}/local_installers/cuda_${version}_570.124.06_linux.run"
 git_url = ""
 use_git = false
-manual_download = true
 stage = 12
 depends = ["nvidia-driver"]
-# Note: Run with: sh cuda_*.run --silent --toolkit --no-opengl-libs
-# Installs to /usr/local/cuda-12.8
+source_dir = "."
+build_commands = [
+    "chmod +x cuda_${version}_570.124.06_linux.run",
+    "mkdir -p ${PKG}/usr/local",
+    "./cuda_${version}_570.124.06_linux.run --silent --toolkit --toolkitpath=${PKG}/usr/local/cuda-12.8 --no-opengl-libs --no-man-page --no-drm",
+    "mkdir -p ${PKG}/etc/profile.d",
+    "echo 'export PATH=/usr/local/cuda-12.8/bin:$PATH' > ${PKG}/etc/profile.d/cuda.sh",
+    "echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.8/lib64:$LD_LIBRARY_PATH' >> ${PKG}/etc/profile.d/cuda.sh",
+    "mkdir -p ${PKG}/etc/ld.so.conf.d",
+    "echo '/usr/local/cuda-12.8/lib64' > ${PKG}/etc/ld.so.conf.d/cuda.conf"
+]
+provides = ["/usr/local/cuda-12.8/bin/nvcc"]
 
 # VM Support (QEMU/KVM)
